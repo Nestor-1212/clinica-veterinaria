@@ -1,5 +1,5 @@
 [build]
-  command = "NODE_OPTIONS=--openssl-legacy-provider ng build --prod"
+  command = "ng build --prod"
   publish = "dist/clinica-veterinaria"
 
 [build.environment]
