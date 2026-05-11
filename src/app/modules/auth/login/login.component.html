@@ -1,0 +1,71 @@
+<div class="login-container">
+  <div class="login-bg"></div>
+  <div class="login-card-wrapper">
+    <mat-card class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">
+          <mat-icon>pets</mat-icon>
+        </div>
+        <h1>VetSystem</h1>
+        <p>Clínica Veterinaria</p>
+      </div>
+
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo electrónico</mat-label>
+            <input matInput type="email" formControlName="correo" placeholder="usuario@clinica.com" autocomplete="email">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="form.get('correo')?.hasError('required')">El correo es requerido</mat-error>
+            <mat-error *ngIf="form.get('correo')?.hasError('email')">Ingrese un correo válido</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="current-password">
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es requerida</mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" class="login-btn" [disabled]="form.invalid || loading">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <mat-icon *ngIf="!loading">login</mat-icon>
+            {{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}
+          </button>
+        </form>
+
+        <div class="demo-credentials">
+          <p class="demo-title">Acceso rápido:</p>
+          <div class="demo-buttons">
+            <button type="button" class="demo-btn demo-admin"
+              (click)="fillCredentials('admin@clinica.com', 'admin123')">
+              <mat-icon>admin_panel_settings</mat-icon>
+              <span class="demo-btn-info">
+                <strong>Admin</strong>
+                <small>admin@clinica.com</small>
+              </span>
+            </button>
+            <button type="button" class="demo-btn demo-vet"
+              (click)="fillCredentials('vet@clinica.com', 'vet123')">
+              <mat-icon>medical_services</mat-icon>
+              <span class="demo-btn-info">
+                <strong>Veterinario</strong>
+                <small>vet@clinica.com</small>
+              </span>
+            </button>
+            <button type="button" class="demo-btn demo-rec"
+              (click)="fillCredentials('recepcion@clinica.com', 'rec123')">
+              <mat-icon>support_agent</mat-icon>
+              <span class="demo-btn-info">
+                <strong>Recepción</strong>
+                <small>recepcion@clinica.com</small>
+              </span>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

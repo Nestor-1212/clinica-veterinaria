@@ -1,0 +1,106 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2><mat-icon>pets</mat-icon> {{ isEdit ? 'Editar Mascota' : 'Registrar Mascota' }}</h2>
+      <p>Complete todos los datos del paciente</p>
+    </div>
+    <button mat-stroked-button (click)="cancelar()">
+      <mat-icon>arrow_back</mat-icon> Volver
+    </button>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="foto-section">
+          <div class="foto-preview" (click)="fotoInput.click()">
+            <img *ngIf="fotoPreview" [src]="fotoPreview" alt="Foto mascota">
+            <div *ngIf="!fotoPreview" class="foto-placeholder">
+              <mat-icon>add_photo_alternate</mat-icon>
+              <span>Agregar foto</span>
+            </div>
+          </div>
+          <input #fotoInput type="file" accept="image/*" (change)="onFotoChange($event)" hidden>
+        </div>
+
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Propietario *</mat-label>
+            <mat-select formControlName="clienteId">
+              <mat-option *ngFor="let c of clientes" [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
+            </mat-select>
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error>Seleccione el propietario</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre *</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ej: Max">
+            <mat-icon matSuffix>pets</mat-icon>
+            <mat-error>El nombre es requerido</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo *</mat-label>
+            <mat-select formControlName="tipo">
+              <mat-option *ngFor="let t of tipos" [value]="t">{{ t }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Raza *</mat-label>
+            <input matInput formControlName="raza" placeholder="Ej: Golden Retriever">
+            <mat-error>La raza es requerida</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Sexo *</mat-label>
+            <mat-select formControlName="sexo">
+              <mat-option value="macho">Macho</mat-option>
+              <mat-option value="hembra">Hembra</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Edad (años) *</mat-label>
+            <input matInput type="number" formControlName="edad" min="0">
+            <mat-error>Ingrese la edad</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Peso (kg) *</mat-label>
+            <input matInput type="number" formControlName="peso" step="0.1" min="0.1">
+            <mat-icon matSuffix>monitor_weight</mat-icon>
+            <mat-error>Ingrese el peso</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Color *</mat-label>
+            <input matInput formControlName="color" placeholder="Ej: Dorado con blanco">
+            <mat-error>El color es requerido</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="dp" formControlName="fechaNacimiento">
+            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+            <mat-datepicker #dp></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Alergias conocidas</mat-label>
+            <textarea matInput formControlName="alergias" rows="2" placeholder="Describe las alergias si las hay..."></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+            {{ isEdit ? 'Actualizar Mascota' : 'Registrar Mascota' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

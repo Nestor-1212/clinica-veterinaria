@@ -1,0 +1,75 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2><mat-icon>vaccines</mat-icon> {{ isEdit ? 'Editar Vacuna' : 'Registrar Vacuna' }}</h2>
+      <p>Registro de vacunación del paciente</p>
+    </div>
+    <button mat-stroked-button routerLink="/vacunas"><mat-icon>arrow_back</mat-icon> Volver</button>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Mascota *</mat-label>
+            <mat-select formControlName="mascotaId" (selectionChange)="onMascotaChange($event.value)">
+              <mat-option *ngFor="let m of mascotas" [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
+            </mat-select>
+            <mat-error>Seleccione la mascota</mat-error>
+          </mat-form-field>
+
+          <div class="cliente-info" *ngIf="cliente">
+            <mat-icon>person</mat-icon> Propietario: <strong>{{ cliente.nombre }}</strong>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Vacuna aplicada *</mat-label>
+            <mat-select formControlName="nombre">
+              <mat-option *ngFor="let v of vacunasComunes" [value]="v">{{ v }}</mat-option>
+              <mat-option value="Otra">Otra...</mat-option>
+            </mat-select>
+            <mat-error>Seleccione la vacuna</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Lote *</mat-label>
+            <input matInput formControlName="lote" placeholder="Ej: LAB-2024-001">
+            <mat-error>El lote es requerido</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de aplicación *</mat-label>
+            <input matInput [matDatepicker]="dp1" formControlName="fechaAplicacion">
+            <mat-datepicker-toggle matSuffix [for]="dp1"></mat-datepicker-toggle>
+            <mat-datepicker #dp1></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Próxima vacunación *</mat-label>
+            <input matInput [matDatepicker]="dp2" formControlName="proximaFecha">
+            <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
+            <mat-datepicker #dp2></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Laboratorio</mat-label>
+            <input matInput formControlName="laboratorio" placeholder="Ej: MSD Animal Health">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="col-full">
+            <mat-label>Observaciones</mat-label>
+            <textarea matInput formControlName="observaciones" rows="2"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/vacunas">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+            <mat-icon>vaccines</mat-icon> Registrar Vacuna
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

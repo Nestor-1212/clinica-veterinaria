@@ -1,0 +1,111 @@
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  h1 { margin: 0; font-size: 26px; font-weight: 700; color: #1b2a3b; }
+  p { margin: 4px 0 0; color: #666; font-size: 14px; }
+}
+
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    button { flex: 1; }
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid transparent;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important; }
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px !important;
+  }
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mat-icon { font-size: 28px; width: 28px; height: 28px; color: white; }
+}
+
+.stat-value { font-size: 28px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+
+.stat-clientes { border-left-color: #1976d2; .stat-icon { background: #1976d2; } }
+.stat-mascotas { border-left-color: #00796b; .stat-icon { background: #00796b; } }
+.stat-citas { border-left-color: #7b1fa2; .stat-icon { background: #7b1fa2; } }
+.stat-consultas { border-left-color: #f57c00; .stat-icon { background: #f57c00; } }
+.stat-ingresos { border-left-color: #388e3c; .stat-icon { background: #388e3c; } }
+.stat-vacunas { border-left-color: #c62828; .stat-icon { background: #c62828; } }
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.panel-card {
+  border-radius: 12px !important;
+
+  mat-card-avatar { background: #00796b; color: white; display: flex; align-items: center; justify-content: center; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: #999;
+  mat-icon { font-size: 48px; width: 48px; height: 48px; }
+  p { margin: 8px 0 0; }
+}
+
+.ver-mas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.cita-item, .vacuna-item { border-bottom: 1px solid #f0f0f0; }
+.cita-info { font-size: 13px; }
+.warn-icon { color: #f57c00 !important; }
+
+.chip-pendiente { background: #fff3e0 !important; color: #e65100 !important; }
+.chip-confirmada { background: #e8f5e9 !important; color: #2e7d32 !important; }
+.chip-inmediata { background: #fce4ec !important; color: #c62828 !important; }
+.chip-completada { background: #e3f2fd !important; color: #1565c0 !important; }
+
+.estado-pendiente { color: #e65100; }
+.estado-confirmada { color: #2e7d32; }
+.estado-inmediata { color: #c62828; }
+.estado-completada { color: #1565c0; }

@@ -1,0 +1,22 @@
+.receta-print {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.receta-header-print { text-align: center; background: #00796b; color: white; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
+.clinic-name { font-size: 22px; font-weight: 700; }
+.clinic-sub { font-size: 12px; opacity: 0.85; }
+.receta-title { text-align: center; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 8px; }
+.receta-datos { margin-bottom: 16px; }
+.dato-row { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 6px; span { color: #666; font-size: 13px; } strong { font-size: 13px; } }
+.receta-rx { margin: 16px 0; }
+.rx-symbol { font-size: 24px; font-style: italic; color: #333; margin-bottom: 8px; }
+.rx-table { width: 100%; border: 1px solid #e0e0e0; }
+.observaciones { background: #f9f9f9; padding: 12px; border-radius: 6px; margin-top: 16px; }
+.firma-section { text-align: center; margin-top: 40px; }
+.firma-line { width: 200px; border-top: 1px solid #333; margin: 0 auto 8px; }
+.firma-name { font-weight: 600; }
+.firma-esp { font-size: 13px; color: #666; }

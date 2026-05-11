@@ -1,0 +1,86 @@
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1b2a3b;
+  color: white;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px;
+  background: rgba(0,0,0,0.2);
+
+  .clinic-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #00796b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    mat-icon { color: white; font-size: 24px; width: 24px; height: 24px; }
+  }
+
+  .clinic-info {
+    display: flex;
+    flex-direction: column;
+    .clinic-name { font-weight: 700; font-size: 16px; }
+    .clinic-sub { font-size: 11px; opacity: 0.6; }
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.nav-item {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px !important;
+  height: 48px !important;
+  color: rgba(255,255,255,0.75) !important;
+  text-decoration: none;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background: rgba(255,255,255,0.08) !important;
+    color: white !important;
+  }
+
+  &.active-link {
+    background: rgba(0, 121, 107, 0.3) !important;
+    color: #4db6ac !important;
+    border-left-color: #00796b;
+
+    .nav-icon { color: #4db6ac; }
+  }
+}
+
+.nav-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+}
+
+.nav-label { font-size: 14px; font-weight: 500; }
+
+.sidebar-footer {
+  padding-bottom: 8px;
+  .version {
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.4;
+    padding: 8px;
+  }
+}
+
+mat-divider { border-top-color: rgba(255,255,255,0.1) !important; }

@@ -1,0 +1,29 @@
+<div class="sidebar-container">
+  <div class="sidebar-header">
+    <div class="clinic-logo">
+      <mat-icon>local_hospital</mat-icon>
+    </div>
+    <div class="clinic-info">
+      <span class="clinic-name">Clínica Vet</span>
+      <span class="clinic-sub">Sistema de Gestión</span>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <nav class="sidebar-nav">
+    <a *ngFor="let item of visibleItems"
+       mat-list-item
+       [routerLink]="item.route"
+       routerLinkActive="active-link"
+       class="nav-item">
+      <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <mat-divider></mat-divider>
+    <div class="version">v1.0.0 — VetSystem</div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+.shell-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidenav-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-sidenav {
+  width: 240px;
+  border-right: none !important;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+}
+
+.main-content {
+  background: #f0f2f5;
+}
+
+.content-wrapper {
+  padding: 24px;
+  min-height: 100%;
+
+  @media (max-width: 600px) {
+    padding: 12px;
+  }
+}

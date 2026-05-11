@@ -1,0 +1,138 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div>
+      <h1>¡Bienvenido, {{ userName }}!</h1>
+      <p>{{ today | date:'EEEE, d MMMM yyyy':'':'es' }} — Resumen del día</p>
+    </div>
+    <div class="quick-actions">
+      <button mat-raised-button color="accent" (click)="nuevaAtencionInmediata()">
+        <mat-icon>flash_on</mat-icon> Atención Inmediata
+      </button>
+      <button mat-raised-button color="primary" (click)="nuevaCita()">
+        <mat-icon>event_available</mat-icon> Nueva Cita
+      </button>
+      <button mat-stroked-button (click)="nuevoCliente()">
+        <mat-icon>person_add</mat-icon> Nuevo Cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- Tarjetas de estadísticas -->
+  <div class="stats-grid">
+    <mat-card class="stat-card stat-clientes" routerLink="/clientes">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>people</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.clientes }}</div>
+          <div class="stat-label">Clientes Activos</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-mascotas" routerLink="/mascotas">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>pets</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.mascotas }}</div>
+          <div class="stat-label">Mascotas Registradas</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-citas" routerLink="/citas">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>event</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.citasHoy }}</div>
+          <div class="stat-label">Citas Hoy</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-consultas" routerLink="/consultas">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>medical_services</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.consultasHoy }}</div>
+          <div class="stat-label">Consultas Hoy</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-ingresos" routerLink="/pagos">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>payments</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">${{ stats.ingresosMes | number:'1.2-2' }}</div>
+          <div class="stat-label">Ingresos del Mes</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stat-vacunas" routerLink="/vacunas">
+      <mat-card-content>
+        <div class="stat-icon"><mat-icon>vaccines</mat-icon></div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.vacunasPendientes }}</div>
+          <div class="stat-label">Vacunas Pendientes</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="dashboard-panels">
+    <!-- Citas de hoy -->
+    <mat-card class="panel-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>event</mat-icon>
+        <mat-card-title>Citas de Hoy</mat-card-title>
+        <mat-card-subtitle>{{ citasHoy.length }} programadas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="citasHoy.length === 0" class="empty-state">
+          <mat-icon>event_available</mat-icon>
+          <p>No hay citas programadas para hoy</p>
+        </div>
+        <mat-list *ngIf="citasHoy.length > 0">
+          <mat-list-item *ngFor="let cita of citasHoy" class="cita-item">
+            <mat-icon matListIcon [class]="'estado-' + cita.estado">schedule</mat-icon>
+            <div matLine class="cita-info">
+              <strong>{{ cita.hora }}</strong> — {{ cita.motivo }}
+            </div>
+            <mat-chip [class]="'chip-' + cita.estado" small>{{ cita.estado }}</mat-chip>
+          </mat-list-item>
+        </mat-list>
+        <button mat-button color="primary" routerLink="/citas" class="ver-mas">
+          Ver todas las citas <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Vacunas próximas -->
+    <mat-card class="panel-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="warn-icon">vaccines</mat-icon>
+        <mat-card-title>Vacunas Próximas</mat-card-title>
+        <mat-card-subtitle>Próximos 7 días</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="vacunasPendientes.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>No hay vacunas pendientes</p>
+        </div>
+        <mat-list *ngIf="vacunasPendientes.length > 0">
+          <mat-list-item *ngFor="let vac of vacunasPendientes" class="vacuna-item">
+            <mat-icon matListIcon class="warn-icon">vaccines</mat-icon>
+            <div matLine>
+              <strong>{{ vac.nombre }}</strong>
+            </div>
+            <div matLine class="fecha-vac">{{ vac.proximaFecha | date:'dd/MM/yyyy' }}</div>
+          </mat-list-item>
+        </mat-list>
+        <button mat-button color="warn" routerLink="/vacunas" class="ver-mas">
+          Ver recordatorios <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

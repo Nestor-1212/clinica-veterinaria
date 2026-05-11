@@ -1,0 +1,14 @@
+export type EstadoCita = 'pendiente' | 'confirmada' | 'completada' | 'cancelada' | 'inmediata';
+
+export interface Cita {
+  id: string;
+  clienteId: string;
+  mascotaId: string;
+  veterinarioId: string;
+  fecha: Date | string;
+  hora: string;
+  motivo: string;
+  estado: EstadoCita;
+  notas?: string;
+  createdAt: Date | string;
+}

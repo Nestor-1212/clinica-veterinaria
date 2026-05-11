@@ -1,0 +1,8 @@
+.table-row { cursor: pointer; }
+.chip-pendiente { background: #fff3e0 !important; color: #e65100 !important; }
+.chip-confirmada { background: #e8f5e9 !important; color: #2e7d32 !important; }
+.chip-completada { background: #e3f2fd !important; color: #1565c0 !important; }
+.chip-cancelada { background: #fce4ec !important; color: #c62828 !important; }
+.chip-inmediata { background: #fce4ec !important; color: #c62828 !important; font-weight: 700 !important; }
+.warn-item { color: #c62828; mat-icon { color: #c62828; } }
+.no-data { text-align: center; padding: 40px; color: #999; mat-icon { font-size: 48px; width: 48px; height: 48px; } }

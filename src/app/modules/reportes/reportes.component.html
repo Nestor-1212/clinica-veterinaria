@@ -1,0 +1,111 @@
+<div class="page-container">
+  <div class="page-header">
+    <div><h2><mat-icon>bar_chart</mat-icon> Reportes y Estadísticas</h2><p>Panel de análisis de la clínica</p></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card kpi-blue">
+      <mat-card-content><mat-icon>people</mat-icon><div><span>{{ stats.clientes }}</span><small>Clientes Activos</small></div></mat-card-content>
+    </mat-card>
+    <mat-card class="kpi-card kpi-green">
+      <mat-card-content><mat-icon>pets</mat-icon><div><span>{{ stats.mascotas }}</span><small>Mascotas</small></div></mat-card-content>
+    </mat-card>
+    <mat-card class="kpi-card kpi-purple">
+      <mat-card-content><mat-icon>medical_services</mat-icon><div><span>{{ stats.consultasMes }}</span><small>Consultas del Mes</small></div></mat-card-content>
+    </mat-card>
+    <mat-card class="kpi-card kpi-orange">
+      <mat-card-content><mat-icon>medical_services</mat-icon><div><span>{{ stats.consultasTotal }}</span><small>Consultas Totales</small></div></mat-card-content>
+    </mat-card>
+    <mat-card class="kpi-card kpi-teal">
+      <mat-card-content><mat-icon>payments</mat-icon><div><span>${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del Mes</small></div></mat-card-content>
+    </mat-card>
+    <mat-card class="kpi-card kpi-red">
+      <mat-card-content><mat-icon>vaccines</mat-icon><div><span>{{ stats.vacunasPendientes }}</span><small>Vacunas Pendientes</small></div></mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="charts-grid">
+    <!-- Gráfico de consultas mensual -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Consultas — Últimos 6 meses</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-chart">
+          <div *ngFor="let r of reporteMensual" class="bar-item">
+            <div class="bar-value">{{ r.consultas }}</div>
+            <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100" [style.background]="'#1976d2'"></div>
+            <div class="bar-label">{{ r.mes }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Gráfico de ingresos -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Ingresos — Últimos 6 meses ($)</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-chart">
+          <div *ngFor="let r of reporteMensual" class="bar-item">
+            <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
+            <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100" [style.background]="'#2e7d32'"></div>
+            <div class="bar-label">{{ r.mes }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tipo de consultas -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Tipo de Consultas</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let item of consultasPorTipo" class="progress-item">
+          <div class="progress-header">
+            <span>{{ item.tipo }}</span>
+            <span>{{ item.cantidad }}</span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0" [color]="item.tipo === 'Cita programada' ? 'primary' : 'warn'"></mat-progress-bar>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Métodos de pago -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Métodos de Pago</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngFor="let item of pagosPorMetodo" class="progress-item">
+          <div class="progress-header">
+            <span>{{ item.metodo | titlecase }}</span>
+            <span>{{ item.cantidad }}</span>
+          </div>
+          <mat-progress-bar mode="determinate" [value]="(item.cantidad / pagosTotal) * 100"></mat-progress-bar>
+        </div>
+        <p *ngIf="pagosPorMetodo.length === 0" class="empty-msg">No hay pagos registrados</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Vacunas pendientes -->
+  <mat-card *ngIf="vacunasPendientesList.length > 0" class="alert-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="warn-avatar">vaccines</mat-icon>
+      <mat-card-title>Vacunas Próximas (7 días)</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list>
+        <mat-list-item *ngFor="let v of vacunasPendientesList">
+          <mat-icon matListIcon class="warn-icon">vaccines</mat-icon>
+          <div matLine>{{ v.nombre }}</div>
+          <div matLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>
