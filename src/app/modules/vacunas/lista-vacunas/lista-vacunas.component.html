@@ -14,8 +14,11 @@
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar...</mat-label>
-          <input matInput (keyup)="applyFilter($event)">
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
         </mat-form-field>
         <mat-checkbox [(ngModel)]="mostrarSoloPendientes" (ngModelChange)="cargar()" color="warn">
           Solo pendientes (próx. 7 días)
@@ -26,23 +29,23 @@
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
           <ng-container matColumnDef="mascota">
             <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let v">{{ getMascota(v.mascotaId) }}</td>
+            <td mat-cell *matCellDef="let v" class="cell-primary">{{ getMascota(v.mascotaId) }}</td>
           </ng-container>
           <ng-container matColumnDef="cliente">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let v" class="hide-sm">{{ getCliente(v.mascotaId) }}</td>
+            <td mat-cell *matCellDef="let v" class="hide-sm" data-label="Propietario">{{ getCliente(v.mascotaId) }}</td>
           </ng-container>
           <ng-container matColumnDef="vacuna">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Vacuna</th>
-            <td mat-cell *matCellDef="let v"><strong>{{ v.nombre }}</strong></td>
+            <td mat-cell *matCellDef="let v" data-label="Vacuna"><strong>{{ v.nombre }}</strong></td>
           </ng-container>
           <ng-container matColumnDef="fechaAplicacion">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Aplicada</th>
-            <td mat-cell *matCellDef="let v">{{ v.fechaAplicacion | date:'dd/MM/yyyy' }}</td>
+            <td mat-cell *matCellDef="let v" data-label="Aplicada">{{ v.fechaAplicacion | date:'dd/MM/yyyy' }}</td>
           </ng-container>
           <ng-container matColumnDef="proximaFecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Próxima</th>
-            <td mat-cell *matCellDef="let v">
+            <td mat-cell *matCellDef="let v" data-label="Próxima">
               <span [class.text-warn]="esPendiente(v)" [class.text-ok]="!esPendiente(v)">
                 {{ v.proximaFecha | date:'dd/MM/yyyy' }}
               </span>
@@ -51,12 +54,12 @@
           </ng-container>
           <ng-container matColumnDef="lote">
             <th mat-header-cell *matHeaderCellDef class="hide-md">Lote</th>
-            <td mat-cell *matCellDef="let v" class="hide-md">{{ v.lote }}</td>
+            <td mat-cell *matCellDef="let v" class="hide-md" data-label="Lote">{{ v.lote }}</td>
           </ng-container>
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let v">
-              <button mat-icon-button (click)="editar(v)" matTooltip="Editar"><mat-icon>edit</mat-icon></button>
+            <td mat-cell *matCellDef="let v" class="cell-actions">
+              <button mat-icon-button (click)="editar(v)" matTooltip="Editar" [attr.aria-label]="'Editar vacuna de ' + getMascota(v.mascotaId)"><mat-icon>edit</mat-icon></button>
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

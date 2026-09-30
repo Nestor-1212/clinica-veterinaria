@@ -40,6 +40,11 @@ export class ListaPagosComponent implements OnInit {
   getCliente(id: string): string { return this.clientesService.getById(id)?.nombre || '-'; }
   getMascota(id: string): string { return this.mascotasService.getById(id)?.nombre || '-'; }
 
+  iconoEstado(estado: string): string {
+    const iconos: Record<string, string> = { pagado: 'check_circle', pendiente: 'schedule', anulado: 'cancel' };
+    return iconos[estado] || 'payments';
+  }
+
   async imprimirFactura(pago: Pago): Promise<void> {
     const cliente = this.clientesService.getById(pago.clienteId);
     const mascota = this.mascotasService.getById(pago.mascotaId);

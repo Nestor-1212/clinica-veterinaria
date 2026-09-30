@@ -50,6 +50,17 @@ export class ListaCitasComponent implements OnInit {
   getMascota(id: string): string { return this.mascotasService.getById(id)?.nombre || '-'; }
   getVet(id: string): string { return this.usuariosService.getNombreCompleto(id); }
 
+  iconoEstado(estado: string): string {
+    const iconos: Record<string, string> = {
+      pendiente: 'schedule',
+      confirmada: 'check_circle',
+      completada: 'done_all',
+      cancelada: 'cancel',
+      inmediata: 'flash_on'
+    };
+    return iconos[estado] || 'event';
+  }
+
   cambiarEstado(cita: Cita, estado: EstadoCita): void {
     this.citasService.update(cita.id, { estado });
     this.cargar();

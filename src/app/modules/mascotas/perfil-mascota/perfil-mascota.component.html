@@ -66,7 +66,7 @@
               <div class="detail-row"><strong>Diagnóstico:</strong> {{ c.diagnostico }}</div>
               <div class="detail-row"><strong>Tratamiento:</strong> {{ c.tratamiento }}</div>
               <div class="detail-row" *ngIf="c.observaciones"><strong>Observaciones:</strong> {{ c.observaciones }}</div>
-              <div class="tipo-chip"><mat-chip [class]="'chip-' + c.tipo">{{ c.tipo }}</mat-chip></div>
+              <div class="tipo-chip"><mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip></div>
             </div>
           </mat-expansion-panel>
           <p *ngIf="consultas.length === 0" class="empty-tab">No hay consultas registradas</p>

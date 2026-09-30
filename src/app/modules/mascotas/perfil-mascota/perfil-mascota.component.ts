@@ -56,4 +56,6 @@ export class PerfilMascotaComponent implements OnInit {
   nuevoExamen(): void {
     this.router.navigate(['/examenes/nuevo'], { queryParams: { mascotaId: this.mascota.id } });
   }
+
+  iconoTipoConsulta(tipo: string): string { return tipo === 'inmediata' ? 'flash_on' : 'event'; }
 }

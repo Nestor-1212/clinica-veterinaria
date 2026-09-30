@@ -86,7 +86,7 @@
             <mat-icon matListIcon [class]="'estado-' + cita.estado">event</mat-icon>
             <div matLine><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
             <div matLine>{{ cita.motivo }}</div>
-            <mat-chip [class]="'chip-' + cita.estado">{{ cita.estado }}</mat-chip>
+            <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="citas.length === 0">
             <p>No hay citas registradas</p>
@@ -102,7 +102,7 @@
             <mat-icon matListIcon>medical_services</mat-icon>
             <div matLine><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
             <div matLine>{{ c.diagnostico }}</div>
-            <mat-chip [class]="'chip-' + c.tipo">{{ c.tipo }}</mat-chip>
+            <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="consultas.length === 0">
             <p>No hay consultas registradas</p>
@@ -118,7 +118,7 @@
             <mat-icon matListIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
             <div matLine><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
             <div matLine>{{ p.metodoPago }}</div>
-            <mat-chip [class]="'chip-' + p.estado">{{ p.estado }}</mat-chip>
+            <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="pagos.length === 0">
             <p>No hay pagos registrados</p>

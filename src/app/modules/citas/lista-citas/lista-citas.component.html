@@ -19,8 +19,11 @@
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar...</mat-label>
-          <input matInput (keyup)="applyFilter($event)">
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
         </mat-form-field>
         <mat-form-field appearance="outline" style="width:160px">
           <mat-label>Estado</mat-label>
@@ -35,7 +38,7 @@
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha / Hora</th>
-            <td mat-cell *matCellDef="let c">
+            <td mat-cell *matCellDef="let c" class="cell-primary">
               <strong>{{ c.fecha | date:'dd/MM/yyyy' }}</strong>
               <br><small>{{ c.hora }}</small>
             </td>
@@ -43,38 +46,40 @@
 
           <ng-container matColumnDef="mascota">
             <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let c">{{ getMascota(c.mascotaId) }}</td>
+            <td mat-cell *matCellDef="let c" data-label="Mascota">{{ getMascota(c.mascotaId) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="cliente">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">{{ getCliente(c.clienteId) }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Propietario">{{ getCliente(c.clienteId) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="veterinario">
             <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
-            <td mat-cell *matCellDef="let c" class="hide-md">{{ getVet(c.veterinarioId) }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Veterinario">{{ getVet(c.veterinarioId) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="motivo">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Motivo</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">{{ c.motivo | slice:0:40 }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Motivo">{{ c.motivo | slice:0:40 }}</td>
           </ng-container>
 
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let c">
-              <mat-chip [class]="'chip-' + c.estado">{{ c.estado }}</mat-chip>
+            <td mat-cell *matCellDef="let c" data-label="Estado">
+              <mat-chip [class]="'chip-' + c.estado">
+                <mat-icon class="chip-icon">{{ iconoEstado(c.estado) }}</mat-icon>{{ c.estado }}
+              </mat-chip>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let c">
-              <button mat-icon-button color="primary" (click)="iniciarConsulta(c)" matTooltip="Iniciar consulta">
+            <td mat-cell *matCellDef="let c" class="cell-actions">
+              <button mat-icon-button color="primary" (click)="iniciarConsulta(c)" matTooltip="Iniciar consulta" aria-label="Iniciar consulta">
                 <mat-icon>medical_services</mat-icon>
               </button>
-              <button mat-icon-button [matMenuTriggerFor]="menu">
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" aria-label="Más acciones para esta cita">
                 <mat-icon>more_vert</mat-icon>
               </button>
               <mat-menu #menu>

@@ -1,5 +1,5 @@
 <mat-toolbar class="app-header" color="primary">
-  <button mat-icon-button (click)="menuToggle.emit()" class="menu-btn">
+  <button mat-icon-button (click)="menuToggle.emit()" class="menu-btn" aria-label="Abrir menú de navegación">
     <mat-icon>menu</mat-icon>
   </button>
 
@@ -11,7 +11,7 @@
   <span class="spacer"></span>
 
   <div class="header-actions">
-    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn">
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn" [attr.aria-label]="'Menú de la cuenta de ' + (user?.nombre || '')">
       <div class="user-avatar">{{ user?.nombre?.charAt(0) }}</div>
     </button>
 

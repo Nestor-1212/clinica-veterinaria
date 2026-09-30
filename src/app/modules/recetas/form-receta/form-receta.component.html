@@ -49,7 +49,7 @@
             <mat-card-content [formGroupName]="i">
               <div class="medicamento-header">
                 <span class="med-num">Medicamento {{ i + 1 }}</span>
-                <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1">
+                <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1" [attr.aria-label]="'Eliminar medicamento ' + (i + 1)" matTooltip="Eliminar medicamento">
                   <mat-icon>remove_circle</mat-icon>
                 </button>
               </div>

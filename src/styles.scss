@@ -169,3 +169,102 @@ mat-list-item { height: auto !important; min-height: 48px !important; }
 
 /* ===== SIDENAV ===== */
 .mat-drawer-container { background: #f0f2f5 !important; }
+
+/* ===== ACCESSIBLE FOCUS ===== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.mat-form-field:focus-within .mat-form-field-outline-thick,
+[tabindex]:focus-visible {
+  outline: 2px solid #00796b;
+  outline-offset: 2px;
+}
+
+/* ===== STATUS CHIPS WITH ICON (color + icon, never color alone) ===== */
+mat-chip.mat-chip {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+
+  .chip-icon {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+.search-field .mat-icon-button {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+/* ===== RESPONSIVE TABLE -> CARD LIST (tablet & mobile) =====
+   Below 768px a data table becomes unreadable if only shrunk or scrolled.
+   Each row becomes a self-contained card and every hidden column reappears
+   (labelled) so no information is lost on smaller screens. */
+@media (max-width: 768px) {
+  .table-responsive { overflow: visible; }
+
+  .mat-table.full-table {
+    display: block !important;
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+
+    .mat-header-row, thead { display: none !important; }
+    tbody { display: block; }
+
+    .mat-row, tr.mat-row, tr[mat-row] {
+      display: block !important;
+      height: auto !important;
+      border: 1px solid #e5e7eb !important;
+      border-bottom-width: 1px !important;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      padding: 4px 14px !important;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .mat-cell, td.mat-cell {
+      display: flex !important;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0 !important;
+      border-bottom: 1px solid #f2f2f2 !important;
+      text-align: right;
+      white-space: normal;
+      min-height: 0 !important;
+      height: auto !important;
+      overflow: visible;
+
+      &:last-of-type { border-bottom: none !important; }
+
+      &[data-label]::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #888;
+        text-align: left;
+        flex-shrink: 0;
+      }
+    }
+
+    .cell-primary.mat-cell {
+      justify-content: flex-start;
+      padding-top: 12px !important;
+      font-size: 15px;
+    }
+
+    .cell-actions.mat-cell {
+      justify-content: flex-end;
+      padding-bottom: 12px !important;
+      gap: 2px;
+    }
+  }
+}

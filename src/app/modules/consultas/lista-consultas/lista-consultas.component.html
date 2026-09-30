@@ -14,8 +14,11 @@
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar consultas...</mat-label>
-          <input matInput (keyup)="applyFilter($event)">
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
         </mat-form-field>
       </div>
 
@@ -23,34 +26,36 @@
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-            <td mat-cell *matCellDef="let c">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td mat-cell *matCellDef="let c" class="cell-primary">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
           </ng-container>
           <ng-container matColumnDef="mascota">
             <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let c">{{ getMascota(c.mascotaId) }}</td>
+            <td mat-cell *matCellDef="let c" data-label="Mascota">{{ getMascota(c.mascotaId) }}</td>
           </ng-container>
           <ng-container matColumnDef="cliente">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">{{ getCliente(c.clienteId) }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Propietario">{{ getCliente(c.clienteId) }}</td>
           </ng-container>
           <ng-container matColumnDef="veterinario">
             <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
-            <td mat-cell *matCellDef="let c" class="hide-md">{{ getVet(c.veterinarioId) }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Veterinario">{{ getVet(c.veterinarioId) }}</td>
           </ng-container>
           <ng-container matColumnDef="diagnostico">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Diagnóstico</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">{{ c.diagnostico | slice:0:50 }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Diagnóstico">{{ c.diagnostico | slice:0:50 }}</td>
           </ng-container>
           <ng-container matColumnDef="tipo">
             <th mat-header-cell *matHeaderCellDef>Tipo</th>
-            <td mat-cell *matCellDef="let c">
-              <mat-chip [class]="'chip-' + c.tipo">{{ c.tipo }}</mat-chip>
+            <td mat-cell *matCellDef="let c" data-label="Tipo">
+              <mat-chip [class]="'chip-' + c.tipo">
+                <mat-icon class="chip-icon">{{ iconoTipo(c.tipo) }}</mat-icon>{{ c.tipo }}
+              </mat-chip>
             </td>
           </ng-container>
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let c">
-              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver historial mascota">
+            <td mat-cell *matCellDef="let c" class="cell-actions">
+              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver historial mascota" aria-label="Ver historial de la mascota">
                 <mat-icon>visibility</mat-icon>
               </button>
             </td>

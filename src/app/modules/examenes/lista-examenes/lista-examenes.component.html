@@ -7,17 +7,19 @@
     <mat-card-content>
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label><input matInput (keyup)="applyFilter($event)"><mat-icon matSuffix>search</mat-icon>
+          <mat-label>Buscar...</mat-label><input matInput #searchInput (keyup)="applyFilter($event)">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''"><mat-icon>close</mat-icon></button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
         </mat-form-field>
       </div>
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th><td mat-cell *matCellDef="let e">{{ e.fecha | date:'dd/MM/yyyy' }}</td></ng-container>
-          <ng-container matColumnDef="mascota"><th mat-header-cell *matHeaderCellDef>Mascota</th><td mat-cell *matCellDef="let e">{{ getMascota(e.mascotaId) }}</td></ng-container>
-          <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th><td mat-cell *matCellDef="let e" class="hide-sm">{{ getCliente(e.mascotaId) }}</td></ng-container>
-          <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Tipo</th><td mat-cell *matCellDef="let e"><mat-chip>{{ e.tipo }}</mat-chip></td></ng-container>
-          <ng-container matColumnDef="resultado"><th mat-header-cell *matHeaderCellDef class="hide-sm">Resultado</th><td mat-cell *matCellDef="let e" class="hide-sm">{{ e.resultado | slice:0:60 }}</td></ng-container>
-          <ng-container matColumnDef="acciones"><th mat-header-cell *matHeaderCellDef>Acciones</th><td mat-cell *matCellDef="let e"><button mat-icon-button (click)="editar(e)"><mat-icon>edit</mat-icon></button></td></ng-container>
+          <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th><td mat-cell *matCellDef="let e" class="cell-primary">{{ e.fecha | date:'dd/MM/yyyy' }}</td></ng-container>
+          <ng-container matColumnDef="mascota"><th mat-header-cell *matHeaderCellDef>Mascota</th><td mat-cell *matCellDef="let e" data-label="Mascota">{{ getMascota(e.mascotaId) }}</td></ng-container>
+          <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th><td mat-cell *matCellDef="let e" class="hide-sm" data-label="Propietario">{{ getCliente(e.mascotaId) }}</td></ng-container>
+          <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Tipo</th><td mat-cell *matCellDef="let e" data-label="Tipo"><mat-chip>{{ e.tipo }}</mat-chip></td></ng-container>
+          <ng-container matColumnDef="resultado"><th mat-header-cell *matHeaderCellDef class="hide-sm">Resultado</th><td mat-cell *matCellDef="let e" class="hide-sm" data-label="Resultado">{{ e.resultado | slice:0:60 }}</td></ng-container>
+          <ng-container matColumnDef="acciones"><th mat-header-cell *matHeaderCellDef>Acciones</th><td mat-cell *matCellDef="let e" class="cell-actions"><button mat-icon-button (click)="editar(e)" matTooltip="Editar" aria-label="Editar examen"><mat-icon>edit</mat-icon></button></td></ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
           <tr class="mat-row" *matNoDataRow><td class="mat-cell no-data" [attr.colspan]="displayedColumns.length"><mat-icon>search_off</mat-icon><p>No se encontraron exámenes</p></td></tr>

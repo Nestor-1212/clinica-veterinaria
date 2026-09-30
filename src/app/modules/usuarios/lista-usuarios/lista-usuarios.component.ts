@@ -39,6 +39,11 @@ export class ListaUsuariosComponent implements OnInit {
     return labels[rol] || rol;
   }
 
+  iconoRol(rol: string): string {
+    const iconos: Record<string, string> = { admin: 'admin_panel_settings', veterinario: 'medical_services', recepcion: 'support_agent' };
+    return iconos[rol] || 'person';
+  }
+
   eliminar(u: Usuario): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Desactivar Usuario', message: `¿Desactivar a ${u.nombre} ${u.apellido}?`, confirmText: 'Desactivar', color: 'warn' }

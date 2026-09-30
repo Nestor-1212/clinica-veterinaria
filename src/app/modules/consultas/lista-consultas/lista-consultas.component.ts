@@ -42,6 +42,7 @@ export class ListaConsultasComponent implements OnInit {
   getMascota(id: string): string { return this.mascotasService.getById(id)?.nombre || '-'; }
   getCliente(id: string): string { return this.clientesService.getById(id)?.nombre || '-'; }
   getVet(id: string): string { return this.usuariosService.getNombreCompleto(id); }
+  iconoTipo(tipo: string): string { return tipo === 'inmediata' ? 'flash_on' : 'event'; }
   verDetalle(c: Consulta): void { this.router.navigate(['/mascotas', c.mascotaId]); }
   nueva(): void { this.router.navigate(['/consultas/nueva']); }
 }

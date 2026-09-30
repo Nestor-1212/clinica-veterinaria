@@ -86,7 +86,7 @@
               <span matPrefix>$&nbsp;</span>
             </mat-form-field>
             <div class="subtotal-cell">${{ (item.get('cantidad')?.value * item.get('precioUnitario')?.value) | number:'1.2-2' }}</div>
-            <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1">
+            <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1" [attr.aria-label]="'Eliminar ítem ' + (i + 1)" matTooltip="Eliminar ítem">
               <mat-icon>delete</mat-icon>
             </button>
           </div>

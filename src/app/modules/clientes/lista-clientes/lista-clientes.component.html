@@ -14,8 +14,11 @@
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar por nombre, cédula, teléfono...</mat-label>
-          <input matInput (keyup)="applyFilter($event)" placeholder="Ej: Juan Pérez">
-          <mat-icon matSuffix>search</mat-icon>
+          <input matInput #searchInput (keyup)="applyFilter($event)" placeholder="Ej: Juan Pérez">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
         </mat-form-field>
       </div>
 
@@ -24,7 +27,7 @@
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let c">
+            <td mat-cell *matCellDef="let c" class="cell-primary">
               <div class="cliente-nombre">
                 <div class="avatar">{{ c.nombre.charAt(0) }}</div>
                 <span>{{ c.nombre }}</span>
@@ -34,27 +37,27 @@
 
           <ng-container matColumnDef="cedula">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Cédula</th>
-            <td mat-cell *matCellDef="let c">{{ c.cedula }}</td>
+            <td mat-cell *matCellDef="let c" data-label="Cédula">{{ c.cedula }}</td>
           </ng-container>
 
           <ng-container matColumnDef="telefono">
             <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-            <td mat-cell *matCellDef="let c">{{ c.telefono }}</td>
+            <td mat-cell *matCellDef="let c" data-label="Teléfono">{{ c.telefono }}</td>
           </ng-container>
 
           <ng-container matColumnDef="correo">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Correo</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">{{ c.correo }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Correo">{{ c.correo || '—' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="fechaRegistro">
             <th mat-header-cell *matHeaderCellDef mat-sort-header class="hide-md">Registro</th>
-            <td mat-cell *matCellDef="let c" class="hide-md">{{ c.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Registro">{{ c.fechaRegistro | date:'dd/MM/yyyy' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="mascotas">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Mascotas</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm">
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Mascotas">
               <mat-chip-list>
                 <mat-chip color="primary" selected>{{ getMascotas(c.id) }}</mat-chip>
               </mat-chip-list>
@@ -63,17 +66,17 @@
 
           <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let c">
-              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver expediente">
+            <td mat-cell *matCellDef="let c" class="cell-actions">
+              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver expediente" [attr.aria-label]="'Ver expediente de ' + c.nombre">
                 <mat-icon>folder_open</mat-icon>
               </button>
-              <button mat-icon-button color="accent" (click)="nuevaAtencion(c)" matTooltip="Atención inmediata">
+              <button mat-icon-button color="accent" (click)="nuevaAtencion(c)" matTooltip="Atención inmediata" [attr.aria-label]="'Iniciar atención inmediata para ' + c.nombre">
                 <mat-icon>flash_on</mat-icon>
               </button>
-              <button mat-icon-button (click)="editar(c)" matTooltip="Editar">
+              <button mat-icon-button (click)="editar(c)" matTooltip="Editar" [attr.aria-label]="'Editar ' + c.nombre">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="eliminar(c)" matTooltip="Eliminar">
+              <button mat-icon-button color="warn" (click)="eliminar(c)" matTooltip="Eliminar" [attr.aria-label]="'Eliminar ' + c.nombre">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>

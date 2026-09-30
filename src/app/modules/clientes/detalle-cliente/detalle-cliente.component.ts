@@ -60,4 +60,18 @@ export class DetalleClienteComponent implements OnInit {
   get totalPagado(): number {
     return this.pagos.filter(p => p.estado === 'pagado').reduce((a, p) => a + p.total, 0);
   }
+
+  iconoEstadoCita(estado: string): string {
+    const iconos: Record<string, string> = {
+      pendiente: 'schedule', confirmada: 'check_circle', completada: 'done_all', cancelada: 'cancel', inmediata: 'flash_on'
+    };
+    return iconos[estado] || 'event';
+  }
+
+  iconoTipoConsulta(tipo: string): string { return tipo === 'inmediata' ? 'flash_on' : 'event'; }
+
+  iconoEstadoPago(estado: string): string {
+    const iconos: Record<string, string> = { pagado: 'check_circle', pendiente: 'schedule', anulado: 'cancel' };
+    return iconos[estado] || 'payments';
+  }
 }

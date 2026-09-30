@@ -31,5 +31,6 @@
 .chip-inmediata, .chip-pendiente { background: #fff3e0 !important; color: #e65100 !important; }
 .chip-cita, .chip-confirmada, .chip-completada { background: #e8f5e9 !important; color: #2e7d32 !important; }
 .chip-pagado { background: #e8f5e9 !important; color: #2e7d32 !important; }
+.chip-cancelada, .chip-anulado { background: #fce4ec !important; color: #c62828 !important; }
 .estado-pendiente, .estado-inmediata { color: #e65100; }
 .estado-confirmada, .estado-completada { color: #2e7d32; }
