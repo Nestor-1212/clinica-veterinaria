@@ -9,6 +9,7 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Cliente, Mascota, Usuario } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-cita',
   templateUrl: './form-cita.component.html',
   styleUrls: ['./form-cita.component.scss']

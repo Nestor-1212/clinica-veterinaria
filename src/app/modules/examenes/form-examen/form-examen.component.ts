@@ -9,6 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Mascota, Cliente } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-examen',
   templateUrl: './form-examen.component.html',
   styleUrls: ['./form-examen.component.scss']

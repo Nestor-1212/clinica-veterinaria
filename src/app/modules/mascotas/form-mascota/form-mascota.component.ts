@@ -7,6 +7,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { Cliente, TipoMascota } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-mascota',
   templateUrl: './form-mascota.component.html',
   styleUrls: ['./form-mascota.component.scss']

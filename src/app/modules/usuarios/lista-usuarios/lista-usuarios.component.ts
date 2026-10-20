@@ -10,6 +10,7 @@ import { Usuario } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-usuarios',
   templateUrl: './lista-usuarios.component.html',
   styleUrls: ['./lista-usuarios.component.scss']

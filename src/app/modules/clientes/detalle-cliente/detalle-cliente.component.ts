@@ -8,6 +8,7 @@ import { PagosService } from '../../../core/services/pagos.service';
 import { Cliente, Mascota, Consulta, Cita, Pago } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-detalle-cliente',
   templateUrl: './detalle-cliente.component.html',
   styleUrls: ['./detalle-cliente.component.scss']

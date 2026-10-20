@@ -9,6 +9,7 @@ import { PdfService } from '../../../core/services/pdf.service';
 import { Receta, Mascota, Cliente, Usuario } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-ver-receta',
   templateUrl: './ver-receta.component.html',
   styleUrls: ['./ver-receta.component.scss']

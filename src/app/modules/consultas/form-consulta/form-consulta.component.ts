@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Mascota, Cliente, Usuario } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-consulta',
   templateUrl: './form-consulta.component.html',
   styleUrls: ['./form-consulta.component.scss']

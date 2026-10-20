@@ -6,6 +6,7 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { RolUsuario } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-usuario',
   templateUrl: './form-usuario.component.html',
   styleUrls: ['./form-usuario.component.scss']

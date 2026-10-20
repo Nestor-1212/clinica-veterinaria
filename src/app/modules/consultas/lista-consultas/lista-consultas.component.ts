@@ -10,6 +10,7 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Consulta } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-consultas',
   templateUrl: './lista-consultas.component.html',
   styleUrls: ['./lista-consultas.component.scss']

@@ -9,6 +9,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { Examen } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-examenes',
   templateUrl: './lista-examenes.component.html',
   styleUrls: ['./lista-examenes.component.scss']

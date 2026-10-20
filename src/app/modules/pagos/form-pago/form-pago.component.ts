@@ -9,6 +9,7 @@ import { PdfService } from '../../../core/services/pdf.service';
 import { Cliente, Mascota, MetodoPago } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-pago',
   templateUrl: './form-pago.component.html',
   styleUrls: ['./form-pago.component.scss']

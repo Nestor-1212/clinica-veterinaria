@@ -19,6 +19,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
@@ -34,7 +35,7 @@ const MATERIAL_MODULES = [
   MatListModule, MatCardModule, MatTableModule, MatPaginatorModule,
   MatSortModule, MatInputModule, MatFormFieldModule, MatSelectModule,
   MatDatepickerModule, MatNativeDateModule, MatDialogModule, MatSnackBarModule,
-  MatMenuModule, MatChipsModule, MatBadgeModule, MatProgressSpinnerModule,
+  MatMenuModule, MatChipsModule, MatBadgeModule, MatProgressSpinnerModule, MatProgressBarModule,
   MatTooltipModule, MatTabsModule, MatStepperModule, MatCheckboxModule,
   MatRadioModule, MatExpansionModule, MatDividerModule, MatAutocompleteModule,
   MatGridListModule

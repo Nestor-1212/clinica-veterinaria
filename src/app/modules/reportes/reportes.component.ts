@@ -13,6 +13,7 @@ interface ReporteMes {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-reportes',
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss']

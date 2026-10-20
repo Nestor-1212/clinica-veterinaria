@@ -1,16 +1,27 @@
-@import '~@angular/material/theming';
+@use '@angular/material' as mat;
+@use './theme-colors' as theme;
 
-@include mat-core();
-
-$primary: mat-palette($mat-teal, 700, 400, 900);
-$accent: mat-palette($mat-orange, 700);
-$warn: mat-palette($mat-red, 700);
-
-$theme: mat-light-theme((
-  color: (primary: $primary, accent: $accent, warn: $warn)
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: theme.$primary-palette,
+    tertiary: theme.$tertiary-palette,
+  ),
+  typography: (
+    plain-family: ('Segoe UI', Roboto, sans-serif),
+    brand-family: ('Segoe UI', Roboto, sans-serif),
+  ),
+  density: (scale: 0),
 ));
 
-@include angular-material-theme($theme);
+html {
+  color-scheme: light;
+  @include mat.all-component-themes($theme);
+  @include mat.system-level-colors($theme);
+  @include mat.system-level-typography($theme);
+  // Mantiene funcionando color="primary|accent|warn" en botones, chips, etc.
+  @include mat.color-variants-backwards-compatibility($theme);
+}
 
 /* ===== RESET & BASE ===== */
 * { box-sizing: border-box; }
@@ -88,7 +99,7 @@ mat-card {
   width: 100%;
   min-width: 480px;
 
-  th.mat-header-cell {
+  th.mat-mdc-header-cell {
     font-weight: 600;
     color: #555;
     font-size: 13px;
@@ -97,7 +108,7 @@ mat-card {
     padding: 12px 16px;
   }
 
-  td.mat-cell {
+  td.mat-mdc-cell {
     padding: 12px 16px;
     font-size: 13px;
     border-bottom: 1px solid #f5f5f5;
@@ -152,7 +163,7 @@ mat-chip {
 }
 
 /* ===== SNACKBAR ===== */
-.snack-error .mat-simple-snackbar {
+.snack-error .mat-mdc-snack-bar-label {
   color: #ffcdd2;
 }
 
@@ -164,9 +175,6 @@ mat-chip {
 /* ===== MAT-LIST ===== */
 mat-list-item { height: auto !important; min-height: 48px !important; }
 
-/* ===== THEME OVERRIDE ===== */
-.mat-primary .mat-button-wrapper mat-icon { vertical-align: middle; }
-
 /* ===== SIDENAV ===== */
 .mat-drawer-container { background: #f0f2f5 !important; }
 
@@ -174,14 +182,13 @@ mat-list-item { height: auto !important; min-height: 48px !important; }
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
-.mat-form-field:focus-within .mat-form-field-outline-thick,
 [tabindex]:focus-visible {
   outline: 2px solid #00796b;
   outline-offset: 2px;
 }
 
 /* ===== STATUS CHIPS WITH ICON (color + icon, never color alone) ===== */
-mat-chip.mat-chip {
+mat-chip.mat-mdc-chip {
   display: inline-flex !important;
   align-items: center;
   gap: 4px;
@@ -193,7 +200,7 @@ mat-chip.mat-chip {
   }
 }
 
-.search-field .mat-icon-button {
+.search-field .mat-mdc-icon-button {
   width: 32px;
   height: 32px;
   line-height: 32px;
@@ -206,16 +213,16 @@ mat-chip.mat-chip {
 @media (max-width: 768px) {
   .table-responsive { overflow: visible; }
 
-  .mat-table.full-table {
+  .mat-mdc-table.full-table {
     display: block !important;
     width: 100%;
     min-width: 0;
     border-collapse: collapse;
 
-    .mat-header-row, thead { display: none !important; }
+    .mat-mdc-header-row, thead { display: none !important; }
     tbody { display: block; }
 
-    .mat-row, tr.mat-row, tr[mat-row] {
+    .mat-mdc-row, tr.mat-mdc-row, tr[mat-row] {
       display: block !important;
       height: auto !important;
       border: 1px solid #e5e7eb !important;
@@ -227,7 +234,7 @@ mat-chip.mat-chip {
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
-    .mat-cell, td.mat-cell {
+    .mat-mdc-cell, td.mat-mdc-cell {
       display: flex !important;
       width: 100%;
       align-items: center;
@@ -255,13 +262,13 @@ mat-chip.mat-chip {
       }
     }
 
-    .cell-primary.mat-cell {
+    .cell-primary.mat-mdc-cell {
       justify-content: flex-start;
       padding-top: 12px !important;
       font-size: 15px;
     }
 
-    .cell-actions.mat-cell {
+    .cell-actions.mat-mdc-cell {
       justify-content: flex-end;
       padding-bottom: 12px !important;
       gap: 2px;

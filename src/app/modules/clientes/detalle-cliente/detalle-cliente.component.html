@@ -83,9 +83,9 @@
       <div class="tab-content">
         <mat-list>
           <mat-list-item *ngFor="let cita of citas" class="list-row">
-            <mat-icon matListIcon [class]="'estado-' + cita.estado">event</mat-icon>
-            <div matLine><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
-            <div matLine>{{ cita.motivo }}</div>
+            <mat-icon matListItemIcon [class]="'estado-' + cita.estado">event</mat-icon>
+            <div matListItemTitle><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
+            <div matListItemLine>{{ cita.motivo }}</div>
             <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="citas.length === 0">
@@ -99,9 +99,9 @@
       <div class="tab-content">
         <mat-list>
           <mat-list-item *ngFor="let c of consultas" class="list-row">
-            <mat-icon matListIcon>medical_services</mat-icon>
-            <div matLine><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
-            <div matLine>{{ c.diagnostico }}</div>
+            <mat-icon matListItemIcon>medical_services</mat-icon>
+            <div matListItemTitle><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+            <div matListItemLine>{{ c.diagnostico }}</div>
             <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="consultas.length === 0">
@@ -115,9 +115,9 @@
       <div class="tab-content">
         <mat-list>
           <mat-list-item *ngFor="let p of pagos" class="list-row">
-            <mat-icon matListIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
-            <div matLine><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
-            <div matLine>{{ p.metodoPago }}</div>
+            <mat-icon matListItemIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
+            <div matListItemTitle><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
+            <div matListItemLine>{{ p.metodoPago }}</div>
             <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado }}</mat-chip>
           </mat-list-item>
           <mat-list-item *ngIf="pagos.length === 0">

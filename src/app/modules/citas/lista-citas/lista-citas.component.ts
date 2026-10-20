@@ -13,6 +13,7 @@ import { Cita, EstadoCita } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-citas',
   templateUrl: './lista-citas.component.html',
   styleUrls: ['./lista-citas.component.scss']

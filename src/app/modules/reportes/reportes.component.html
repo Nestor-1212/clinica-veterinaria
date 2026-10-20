@@ -101,9 +101,9 @@
     <mat-card-content>
       <mat-list>
         <mat-list-item *ngFor="let v of vacunasPendientesList">
-          <mat-icon matListIcon class="warn-icon">vaccines</mat-icon>
-          <div matLine>{{ v.nombre }}</div>
-          <div matLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+          <mat-icon matListItemIcon class="warn-icon">vaccines</mat-icon>
+          <div matListItemTitle>{{ v.nombre }}</div>
+          <div matListItemLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
         </mat-list-item>
       </mat-list>
     </mat-card-content>

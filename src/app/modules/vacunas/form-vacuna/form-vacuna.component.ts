@@ -10,6 +10,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Mascota, Cliente } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-vacuna',
   templateUrl: './form-vacuna.component.html',
   styleUrls: ['./form-vacuna.component.scss']

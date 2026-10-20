@@ -10,6 +10,7 @@ import { PdfService } from '../../../core/services/pdf.service';
 import { Pago } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-pagos',
   templateUrl: './lista-pagos.component.html',
   styleUrls: ['./lista-pagos.component.scss']

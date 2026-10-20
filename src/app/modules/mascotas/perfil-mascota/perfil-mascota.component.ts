@@ -9,6 +9,7 @@ import { RecetasService } from '../../../core/services/recetas.service';
 import { Mascota, Cliente, Consulta, Vacuna, Examen, Receta } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-perfil-mascota',
   templateUrl: './perfil-mascota.component.html',
   styleUrls: ['./perfil-mascota.component.scss']

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
-import { RoleGuard } from './core/guards/role.guard';
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 import { ShellComponent } from './shared/components/shell/shell.component';
 
 const routes: Routes = [
@@ -9,7 +9,7 @@ const routes: Routes = [
   {
     path: '',
     component: ShellComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadChildren: () => import('./modules/dashboard/dashboard.module').then(m => m.DashboardModule) },
@@ -24,13 +24,13 @@ const routes: Routes = [
       {
         path: 'reportes',
         loadChildren: () => import('./modules/reportes/reportes.module').then(m => m.ReportesModule),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: { roles: ['admin'] }
       },
       {
         path: 'usuarios',
         loadChildren: () => import('./modules/usuarios/usuarios.module').then(m => m.UsuariosModule),
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: { roles: ['admin'] }
       }
     ]
@@ -39,7 +39,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}

@@ -9,6 +9,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { Vacuna } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-vacunas',
   templateUrl: './lista-vacunas.component.html',
   styleUrls: ['./lista-vacunas.component.scss']

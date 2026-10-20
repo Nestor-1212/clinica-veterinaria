@@ -10,6 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Cita, Vacuna, Pago } from '../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

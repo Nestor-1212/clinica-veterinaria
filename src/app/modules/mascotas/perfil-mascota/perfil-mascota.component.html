@@ -78,10 +78,10 @@
       <div class="tab-content">
         <mat-list>
           <mat-list-item *ngFor="let v of vacunas" class="vacuna-item">
-            <mat-icon matListIcon color="primary">vaccines</mat-icon>
-            <div matLine><strong>{{ v.nombre }}</strong></div>
-            <div matLine>Aplicada: {{ v.fechaAplicacion | date:'dd/MM/yyyy' }} — Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
-            <div matLine *ngIf="v.lote">Lote: {{ v.lote }}</div>
+            <mat-icon matListItemIcon color="primary">vaccines</mat-icon>
+            <div matListItemTitle><strong>{{ v.nombre }}</strong></div>
+            <div matListItemLine>Aplicada: {{ v.fechaAplicacion | date:'dd/MM/yyyy' }} — Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+            <div matListItemLine *ngIf="v.lote">Lote: {{ v.lote }}</div>
           </mat-list-item>
           <p *ngIf="vacunas.length === 0" class="empty-tab">No hay vacunas registradas</p>
         </mat-list>
@@ -92,9 +92,9 @@
       <div class="tab-content">
         <mat-list>
           <mat-list-item *ngFor="let e of examenes">
-            <mat-icon matListIcon>biotech</mat-icon>
-            <div matLine><strong>{{ e.tipo }}</strong> — {{ e.fecha | date:'dd/MM/yyyy' }}</div>
-            <div matLine>{{ e.resultado }}</div>
+            <mat-icon matListItemIcon>biotech</mat-icon>
+            <div matListItemTitle><strong>{{ e.tipo }}</strong> — {{ e.fecha | date:'dd/MM/yyyy' }}</div>
+            <div matListItemLine>{{ e.resultado }}</div>
           </mat-list-item>
           <p *ngIf="examenes.length === 0" class="empty-tab">No hay exámenes registrados</p>
         </mat-list>
@@ -111,9 +111,9 @@
             </mat-expansion-panel-header>
             <mat-list>
               <mat-list-item *ngFor="let item of r.items">
-                <mat-icon matListIcon>medication</mat-icon>
-                <div matLine><strong>{{ item.medicamento }}</strong></div>
-                <div matLine>{{ item.dosis }} — {{ item.frecuencia }} — {{ item.duracion }}</div>
+                <mat-icon matListItemIcon>medication</mat-icon>
+                <div matListItemTitle><strong>{{ item.medicamento }}</strong></div>
+                <div matListItemLine>{{ item.dosis }} — {{ item.frecuencia }} — {{ item.duracion }}</div>
               </mat-list-item>
             </mat-list>
           </mat-expansion-panel>

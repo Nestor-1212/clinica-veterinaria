@@ -15,6 +15,5 @@ import { ShellComponent } from './components/shell/shell.component';
     CommonModule, ReactiveFormsModule, FormsModule, RouterModule,
     MaterialModule, ConfirmDialogComponent, HeaderComponent, SidebarComponent, ShellComponent
   ],
-  entryComponents: [ConfirmDialogComponent]
 })
 export class SharedModule {}

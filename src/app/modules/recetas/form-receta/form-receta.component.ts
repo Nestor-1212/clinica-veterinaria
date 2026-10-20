@@ -12,6 +12,7 @@ import { PdfService } from '../../../core/services/pdf.service';
 import { Mascota, Cliente, Consulta } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-form-receta',
   templateUrl: './form-receta.component.html',
   styleUrls: ['./form-receta.component.scss']

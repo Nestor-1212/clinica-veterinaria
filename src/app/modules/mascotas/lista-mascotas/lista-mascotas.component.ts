@@ -11,6 +11,7 @@ import { Mascota } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-mascotas',
   templateUrl: './lista-mascotas.component.html',
   styleUrls: ['./lista-mascotas.component.scss']

@@ -13,6 +13,7 @@ import { Receta } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
+  standalone: false,
   selector: 'app-lista-recetas',
   templateUrl: './lista-recetas.component.html',
   styleUrls: ['./lista-recetas.component.scss']
