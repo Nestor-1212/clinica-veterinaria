@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna } from '../models';
 
@@ -10,7 +10,8 @@ function addDays(base: Date, days: number): Date {
 
 @Injectable({ providedIn: 'root' })
 export class DemoSeedService {
-  constructor(private storage: StorageService) {}
+  private storage = inject(StorageService);
+
 
   seedIfEmpty(): void {
     if (this.storage.get<Cliente>('vet_clientes').length > 0) return;

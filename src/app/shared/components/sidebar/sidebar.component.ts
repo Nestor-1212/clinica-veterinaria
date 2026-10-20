@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
@@ -15,6 +15,8 @@ interface NavItem {
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
+  auth = inject(AuthService);
+
   navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['admin', 'veterinario', 'recepcion'] },
     { label: 'Clientes', icon: 'people', route: '/clientes', roles: ['admin', 'veterinario', 'recepcion'] },
@@ -28,8 +30,6 @@ export class SidebarComponent {
     { label: 'Reportes', icon: 'bar_chart', route: '/reportes', roles: ['admin'] },
     { label: 'Usuarios', icon: 'manage_accounts', route: '/usuarios', roles: ['admin'] }
   ];
-
-  constructor(public auth: AuthService) {}
 
   get visibleItems(): NavItem[] {
     const rol = this.auth.currentUser?.rol;

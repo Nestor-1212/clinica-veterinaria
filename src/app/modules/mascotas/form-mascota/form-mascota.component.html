@@ -14,11 +14,15 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="foto-section">
           <div class="foto-preview" (click)="fotoInput.click()">
-            <img *ngIf="fotoPreview" [src]="fotoPreview" alt="Foto mascota">
-            <div *ngIf="!fotoPreview" class="foto-placeholder">
-              <mat-icon>add_photo_alternate</mat-icon>
-              <span>Agregar foto</span>
-            </div>
+            @if (fotoPreview) {
+              <img [src]="fotoPreview" alt="Foto mascota">
+            }
+            @if (!fotoPreview) {
+              <div class="foto-placeholder">
+                <mat-icon>add_photo_alternate</mat-icon>
+                <span>Agregar foto</span>
+              </div>
+            }
           </div>
           <input #fotoInput type="file" accept="image/*" (change)="onFotoChange($event)" hidden>
         </div>
@@ -27,7 +31,9 @@
           <mat-form-field appearance="outline" class="col-full">
             <mat-label>Propietario *</mat-label>
             <mat-select formControlName="clienteId">
-              <mat-option *ngFor="let c of clientes" [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
+              @for (c of clientes; track c) {
+                <mat-option [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>person</mat-icon>
             <mat-error>Seleccione el propietario</mat-error>
@@ -43,7 +49,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Tipo *</mat-label>
             <mat-select formControlName="tipo">
-              <mat-option *ngFor="let t of tipos" [value]="t">{{ t }}</mat-option>
+              @for (t of tipos; track t) {
+                <mat-option [value]="t">{{ t }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
 

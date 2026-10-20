@@ -16,8 +16,12 @@
             <mat-label>Correo electrónico</mat-label>
             <input matInput type="email" formControlName="correo" placeholder="usuario@clinica.com" autocomplete="email">
             <mat-icon matSuffix>email</mat-icon>
-            <mat-error *ngIf="form.get('correo')?.hasError('required')">El correo es requerido</mat-error>
-            <mat-error *ngIf="form.get('correo')?.hasError('email')">Ingrese un correo válido</mat-error>
+            @if (form.get('correo')?.hasError('required')) {
+              <mat-error>El correo es requerido</mat-error>
+            }
+            @if (form.get('correo')?.hasError('email')) {
+              <mat-error>Ingrese un correo válido</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -26,12 +30,18 @@
             <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'" [attr.aria-pressed]="!hidePassword">
               <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            <mat-error *ngIf="form.get('password')?.hasError('required')">La contraseña es requerida</mat-error>
+            @if (form.get('password')?.hasError('required')) {
+              <mat-error>La contraseña es requerida</mat-error>
+            }
           </mat-form-field>
 
           <button mat-raised-button color="primary" type="submit" class="login-btn" [disabled]="form.invalid || loading">
-            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
-            <mat-icon *ngIf="!loading">login</mat-icon>
+            @if (loading) {
+              <mat-spinner diameter="20"></mat-spinner>
+            }
+            @if (!loading) {
+              <mat-icon>login</mat-icon>
+            }
             {{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}
           </button>
         </form>

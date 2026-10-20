@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,18 +11,18 @@ import { ClientesService } from '../../../core/services/clientes.service';
   styleUrls: ['./form-cliente.component.scss']
 })
 export class FormClienteComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private clientesService = inject(ClientesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   isEdit = false;
   clienteId = '';
   loading = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private clientesService: ClientesService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       cedula: ['', [Validators.required]],

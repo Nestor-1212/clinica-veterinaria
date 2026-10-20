@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,6 +12,12 @@ import { RolUsuario } from '../../../core/models';
   styleUrls: ['./form-usuario.component.scss']
 })
 export class FormUsuarioComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private usuariosService = inject(UsuariosService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   isEdit = false;
   usuarioId = '';
@@ -21,13 +27,7 @@ export class FormUsuarioComponent implements OnInit {
     { value: 'recepcion', label: 'Recepción' }
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private usuariosService: UsuariosService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellido: ['', [Validators.required]],

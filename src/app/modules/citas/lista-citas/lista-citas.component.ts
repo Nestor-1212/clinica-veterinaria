@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -19,6 +19,14 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   styleUrls: ['./lista-citas.component.scss']
 })
 export class ListaCitasComponent implements OnInit {
+  private citasService = inject(CitasService);
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private usuariosService = inject(UsuariosService);
+  private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
+  private router = inject(Router);
+
   displayedColumns = ['fecha', 'mascota', 'cliente', 'veterinario', 'motivo', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<Cita>();
   filtroEstado = '';
@@ -26,16 +34,6 @@ export class ListaCitasComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  constructor(
-    private citasService: CitasService,
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private usuariosService: UsuariosService,
-    private dialog: MatDialog,
-    private snack: MatSnackBar,
-    private router: Router
-  ) {}
 
   ngOnInit(): void { this.cargar(); }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,6 +15,15 @@ import { Cliente, Mascota, MetodoPago } from '../../../core/models';
   styleUrls: ['./form-pago.component.scss']
 })
 export class FormPagoComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private pagosService = inject(PagosService);
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private pdfService = inject(PdfService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
@@ -22,16 +31,7 @@ export class FormPagoComponent implements OnInit {
   metodosPago: MetodoPago[] = ['efectivo', 'tarjeta', 'yappy', 'transferencia'];
   categorias = ['consulta', 'medicamento', 'vacuna', 'cirugia', 'examen', 'otro'];
 
-  constructor(
-    private fb: FormBuilder,
-    private pagosService: PagosService,
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private pdfService: PdfService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       mascotaId: ['', Validators.required],

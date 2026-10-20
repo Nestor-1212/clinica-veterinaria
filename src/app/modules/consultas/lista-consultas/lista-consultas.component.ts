@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -16,19 +16,17 @@ import { Consulta } from '../../../core/models';
   styleUrls: ['./lista-consultas.component.scss']
 })
 export class ListaConsultasComponent implements OnInit {
+  private consultasService = inject(ConsultasService);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private usuariosService = inject(UsuariosService);
+  private router = inject(Router);
+
   displayedColumns = ['fecha', 'mascota', 'cliente', 'veterinario', 'diagnostico', 'tipo', 'acciones'];
   dataSource = new MatTableDataSource<Consulta>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  constructor(
-    private consultasService: ConsultasService,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private usuariosService: UsuariosService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.dataSource.data = this.consultasService.getAll().sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DemoSeedService } from './core/services/demo-seed.service';
 
 @Component({
@@ -7,7 +7,9 @@ import { DemoSeedService } from './core/services/demo-seed.service';
   template: '<router-outlet></router-outlet>'
 })
 export class AppComponent {
-  constructor(seed: DemoSeedService) {
+  constructor() {
+    const seed = inject(DemoSeedService);
+
     seed.seedIfEmpty();
   }
 }

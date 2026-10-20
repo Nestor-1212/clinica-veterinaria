@@ -14,7 +14,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Rol *</mat-label>
             <mat-select formControlName="rol">
-              <mat-option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</mat-option>
+              @for (r of roles; track r) {
+                <mat-option [value]="r.value">{{ r.label }}</mat-option>
+              }
             </mat-select>
           </mat-form-field>
           <mat-form-field appearance="outline"><mat-label>Teléfono</mat-label><input matInput formControlName="telefono"></mat-form-field>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -16,20 +16,18 @@ import { Pago } from '../../../core/models';
   styleUrls: ['./lista-pagos.component.scss']
 })
 export class ListaPagosComponent implements OnInit {
+  private pagosService = inject(PagosService);
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private pdfService = inject(PdfService);
+  private router = inject(Router);
+
   displayedColumns = ['fecha', 'cliente', 'mascota', 'metodo', 'total', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<Pago>();
   totalMes = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  constructor(
-    private pagosService: PagosService,
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private pdfService: PdfService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.dataSource.data = this.pagosService.getAll().sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());

@@ -11,10 +11,12 @@
   </div>
 
   <mat-card class="form-card" [class.card-inmediata]="isInmediata">
-    <div *ngIf="isInmediata" class="inmediata-banner">
-      <mat-icon>flash_on</mat-icon>
-      <strong>ATENCIÓN INMEDIATA</strong> — El cliente llegó sin cita previa
-    </div>
+    @if (isInmediata) {
+      <div class="inmediata-banner">
+        <mat-icon>flash_on</mat-icon>
+        <strong>ATENCIÓN INMEDIATA</strong> — El cliente llegó sin cita previa
+      </div>
+    }
 
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -22,7 +24,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Propietario *</mat-label>
             <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-              <mat-option *ngFor="let c of clientes" [value]="c.id">{{ c.nombre }}</mat-option>
+              @for (c of clientes; track c) {
+                <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>person</mat-icon>
             <mat-error>Seleccione el propietario</mat-error>
@@ -31,7 +35,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Mascota *</mat-label>
             <mat-select formControlName="mascotaId" [disabled]="!form.get('clienteId')?.value">
-              <mat-option *ngFor="let m of mascotas" [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
+              @for (m of mascotas; track m) {
+                <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>pets</mat-icon>
             <mat-error>Seleccione la mascota</mat-error>
@@ -40,7 +46,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Veterinario *</mat-label>
             <mat-select formControlName="veterinarioId">
-              <mat-option *ngFor="let v of veterinarios" [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+              @for (v of veterinarios; track v) {
+                <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>medical_services</mat-icon>
             <mat-error>Seleccione el veterinario</mat-error>
@@ -56,7 +64,9 @@
           <mat-form-field appearance="outline">
             <mat-label>Hora *</mat-label>
             <mat-select formControlName="hora">
-              <mat-option *ngFor="let h of horas" [value]="h">{{ h }}</mat-option>
+              @for (h of horas; track h) {
+                <mat-option [value]="h">{{ h }}</mat-option>
+              }
             </mat-select>
             <mat-icon matSuffix>schedule</mat-icon>
           </mat-form-field>

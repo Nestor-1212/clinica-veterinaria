@@ -17,29 +17,39 @@
             <mat-label>Nombre Completo *</mat-label>
             <input matInput formControlName="nombre" placeholder="Ej: Juan Carlos Pérez">
             <mat-icon matSuffix>person</mat-icon>
-            <mat-error *ngIf="form.get('nombre')?.hasError('required')">El nombre es requerido</mat-error>
-            <mat-error *ngIf="form.get('nombre')?.hasError('minlength')">Mínimo 3 caracteres</mat-error>
+            @if (form.get('nombre')?.hasError('required')) {
+              <mat-error>El nombre es requerido</mat-error>
+            }
+            @if (form.get('nombre')?.hasError('minlength')) {
+              <mat-error>Mínimo 3 caracteres</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Cédula *</mat-label>
             <input matInput formControlName="cedula" placeholder="Ej: 8-888-888">
             <mat-icon matSuffix>badge</mat-icon>
-            <mat-error *ngIf="form.get('cedula')?.hasError('required')">La cédula es requerida</mat-error>
+            @if (form.get('cedula')?.hasError('required')) {
+              <mat-error>La cédula es requerida</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Teléfono *</mat-label>
             <input matInput formControlName="telefono" placeholder="Ej: 6000-0000">
             <mat-icon matSuffix>phone</mat-icon>
-            <mat-error *ngIf="form.get('telefono')?.hasError('required')">El teléfono es requerido</mat-error>
+            @if (form.get('telefono')?.hasError('required')) {
+              <mat-error>El teléfono es requerido</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Correo Electrónico</mat-label>
             <input matInput type="email" formControlName="correo" placeholder="correo@ejemplo.com">
             <mat-icon matSuffix>email</mat-icon>
-            <mat-error *ngIf="form.get('correo')?.hasError('email')">Ingrese un correo válido</mat-error>
+            @if (form.get('correo')?.hasError('email')) {
+              <mat-error>Ingrese un correo válido</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-full">
@@ -52,8 +62,12 @@
         <div class="form-actions">
           <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
           <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
-            <mat-spinner diameter="18" *ngIf="loading"></mat-spinner>
-            <mat-icon *ngIf="!loading">{{ isEdit ? 'save' : 'person_add' }}</mat-icon>
+            @if (loading) {
+              <mat-spinner diameter="18"></mat-spinner>
+            }
+            @if (!loading) {
+              <mat-icon>{{ isEdit ? 'save' : 'person_add' }}</mat-icon>
+            }
             {{ isEdit ? 'Actualizar' : 'Registrar Cliente' }}
           </button>
         </div>

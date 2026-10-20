@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,6 +15,15 @@ import { Mascota, Cliente } from '../../../core/models';
   styleUrls: ['./form-examen.component.scss']
 })
 export class FormExamenComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private examenesService = inject(ExamenesService);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   mascotas: Mascota[] = [];
   mascota: Mascota | null = null;
@@ -23,16 +32,7 @@ export class FormExamenComponent implements OnInit {
   examenId = '';
   tiposExamen = ['Hemograma', 'Química sanguínea', 'Urianálisis', 'Coprológico', 'Radiografía', 'Ecografía', 'Cultivo', 'PCR', 'ELISA', 'Otro'];
 
-  constructor(
-    private fb: FormBuilder,
-    private examenesService: ExamenesService,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private auth: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       mascotaId: ['', Validators.required],
       clienteId: [''],

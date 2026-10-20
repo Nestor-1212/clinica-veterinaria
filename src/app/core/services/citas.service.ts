@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Cita } from '../models';
 import { StorageService } from './storage.service';
@@ -7,10 +7,12 @@ const KEY = 'vet_citas';
 
 @Injectable({ providedIn: 'root' })
 export class CitasService {
+  private storage = inject(StorageService);
+
   private subject = new BehaviorSubject<Cita[]>([]);
   citas$: Observable<Cita[]> = this.subject.asObservable();
 
-  constructor(private storage: StorageService) {
+  constructor() {
     this.refresh();
   }
 

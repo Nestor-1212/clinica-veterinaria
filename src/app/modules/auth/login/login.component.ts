@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,16 +11,16 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
+  private fb = inject(FormBuilder);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   loading = false;
   hidePassword = true;
 
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]

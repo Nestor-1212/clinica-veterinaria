@@ -15,17 +15,23 @@
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar mascota...</mat-label>
           <input matInput #searchInput (keyup)="applyFilter($event)">
-          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-            <mat-icon>close</mat-icon>
-          </button>
-          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          @if (!searchInput.value) {
+            <mat-icon matSuffix>search</mat-icon>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="filter-field">
           <mat-label>Filtrar por tipo</mat-label>
           <mat-select [(ngModel)]="tipoFiltro" (ngModelChange)="cargar()">
             <mat-option value="">Todos</mat-option>
-            <mat-option *ngFor="let t of tipos" [value]="t">{{ t }}</mat-option>
+            @for (t of tipos; track t) {
+              <mat-option [value]="t">{{ t }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </div>

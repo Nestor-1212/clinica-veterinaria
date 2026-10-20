@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ClientesService } from '../../core/services/clientes.service';
 import { MascotasService } from '../../core/services/mascotas.service';
 import { ConsultasService } from '../../core/services/consultas.service';
@@ -19,21 +19,19 @@ interface ReporteMes {
   styleUrls: ['./reportes.component.scss']
 })
 export class ReportesComponent implements OnInit {
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private consultasService = inject(ConsultasService);
+  private vacunasService = inject(VacunasService);
+  private pagosService = inject(PagosService);
+  private citasService = inject(CitasService);
+
   stats = { clientes: 0, mascotas: 0, consultasTotal: 0, consultasMes: 0, ingresosMes: 0, ingresosTotal: 0, vacunasPendientes: 0 };
   vacunasPendientesList: any[] = [];
   consultasPorTipo: any[] = [];
   pagosPorMetodo: any[] = [];
   reporteMensual: ReporteMes[] = [];
   meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-
-  constructor(
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private consultasService: ConsultasService,
-    private vacunasService: VacunasService,
-    private pagosService: PagosService,
-    private citasService: CitasService
-  ) {}
 
   ngOnInit(): void {
     const now = new Date();

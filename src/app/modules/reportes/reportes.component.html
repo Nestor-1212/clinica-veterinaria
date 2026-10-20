@@ -33,11 +33,13 @@
       </mat-card-header>
       <mat-card-content>
         <div class="bar-chart">
-          <div *ngFor="let r of reporteMensual" class="bar-item">
-            <div class="bar-value">{{ r.consultas }}</div>
-            <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100" [style.background]="'#1976d2'"></div>
-            <div class="bar-label">{{ r.mes }}</div>
-          </div>
+          @for (r of reporteMensual; track r) {
+            <div class="bar-item">
+              <div class="bar-value">{{ r.consultas }}</div>
+              <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100" [style.background]="'#1976d2'"></div>
+              <div class="bar-label">{{ r.mes }}</div>
+            </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>
@@ -49,11 +51,13 @@
       </mat-card-header>
       <mat-card-content>
         <div class="bar-chart">
-          <div *ngFor="let r of reporteMensual" class="bar-item">
-            <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
-            <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100" [style.background]="'#2e7d32'"></div>
-            <div class="bar-label">{{ r.mes }}</div>
-          </div>
+          @for (r of reporteMensual; track r) {
+            <div class="bar-item">
+              <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
+              <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100" [style.background]="'#2e7d32'"></div>
+              <div class="bar-label">{{ r.mes }}</div>
+            </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>
@@ -64,13 +68,15 @@
         <mat-card-title>Tipo de Consultas</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div *ngFor="let item of consultasPorTipo" class="progress-item">
-          <div class="progress-header">
-            <span>{{ item.tipo }}</span>
-            <span>{{ item.cantidad }}</span>
+        @for (item of consultasPorTipo; track item) {
+          <div class="progress-item">
+            <div class="progress-header">
+              <span>{{ item.tipo }}</span>
+              <span>{{ item.cantidad }}</span>
+            </div>
+            <mat-progress-bar mode="determinate" [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0" [color]="item.tipo === 'Cita programada' ? 'primary' : 'warn'"></mat-progress-bar>
           </div>
-          <mat-progress-bar mode="determinate" [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0" [color]="item.tipo === 'Cita programada' ? 'primary' : 'warn'"></mat-progress-bar>
-        </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -80,32 +86,40 @@
         <mat-card-title>Métodos de Pago</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div *ngFor="let item of pagosPorMetodo" class="progress-item">
-          <div class="progress-header">
-            <span>{{ item.metodo | titlecase }}</span>
-            <span>{{ item.cantidad }}</span>
+        @for (item of pagosPorMetodo; track item) {
+          <div class="progress-item">
+            <div class="progress-header">
+              <span>{{ item.metodo | titlecase }}</span>
+              <span>{{ item.cantidad }}</span>
+            </div>
+            <mat-progress-bar mode="determinate" [value]="(item.cantidad / pagosTotal) * 100"></mat-progress-bar>
           </div>
-          <mat-progress-bar mode="determinate" [value]="(item.cantidad / pagosTotal) * 100"></mat-progress-bar>
-        </div>
-        <p *ngIf="pagosPorMetodo.length === 0" class="empty-msg">No hay pagos registrados</p>
+        }
+        @if (pagosPorMetodo.length === 0) {
+          <p class="empty-msg">No hay pagos registrados</p>
+        }
       </mat-card-content>
     </mat-card>
   </div>
 
   <!-- Vacunas pendientes -->
-  <mat-card *ngIf="vacunasPendientesList.length > 0" class="alert-card">
-    <mat-card-header>
-      <mat-icon mat-card-avatar class="warn-avatar">vaccines</mat-icon>
-      <mat-card-title>Vacunas Próximas (7 días)</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        <mat-list-item *ngFor="let v of vacunasPendientesList">
-          <mat-icon matListItemIcon class="warn-icon">vaccines</mat-icon>
-          <div matListItemTitle>{{ v.nombre }}</div>
-          <div matListItemLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
-        </mat-list-item>
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+  @if (vacunasPendientesList.length > 0) {
+    <mat-card class="alert-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="warn-avatar">vaccines</mat-icon>
+        <mat-card-title>Vacunas Próximas (7 días)</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          @for (v of vacunasPendientesList; track v) {
+            <mat-list-item>
+              <mat-icon matListItemIcon class="warn-icon">vaccines</mat-icon>
+              <div matListItemTitle>{{ v.nombre }}</div>
+              <div matListItemLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+            </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  }
 </div>

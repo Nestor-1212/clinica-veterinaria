@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -17,6 +17,12 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
   styleUrls: ['./lista-mascotas.component.scss']
 })
 export class ListaMascotasComponent implements OnInit {
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
+  private router = inject(Router);
+
   displayedColumns = ['nombre', 'tipo', 'raza', 'cliente', 'peso', 'edad', 'acciones'];
   dataSource = new MatTableDataSource<Mascota>();
   tipoFiltro = '';
@@ -24,14 +30,6 @@ export class ListaMascotasComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-
-  constructor(
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private dialog: MatDialog,
-    private snack: MatSnackBar,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.cargar();

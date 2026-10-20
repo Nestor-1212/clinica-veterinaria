@@ -15,10 +15,14 @@
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar...</mat-label>
           <input matInput #searchInput (keyup)="applyFilter($event)">
-          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-            <mat-icon>close</mat-icon>
-          </button>
-          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          @if (!searchInput.value) {
+            <mat-icon matSuffix>search</mat-icon>
+          }
         </mat-form-field>
         <mat-checkbox [(ngModel)]="mostrarSoloPendientes" (ngModelChange)="cargar()" color="warn">
           Solo pendientes (próx. 7 días)
@@ -49,7 +53,9 @@
               <span [class.text-warn]="esPendiente(v)" [class.text-ok]="!esPendiente(v)">
                 {{ v.proximaFecha | date:'dd/MM/yyyy' }}
               </span>
-              <mat-icon *ngIf="esPendiente(v)" class="warn-icon" matTooltip="Próxima en 7 días o menos">warning</mat-icon>
+              @if (esPendiente(v)) {
+                <mat-icon class="warn-icon" matTooltip="Próxima en 7 días o menos">warning</mat-icon>
+              }
             </td>
           </ng-container>
           <ng-container matColumnDef="lote">

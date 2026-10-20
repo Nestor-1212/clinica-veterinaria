@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { RecetasService } from '../../../core/services/recetas.service';
@@ -15,22 +15,20 @@ import { Receta, Mascota, Cliente, Usuario } from '../../../core/models';
   styleUrls: ['./ver-receta.component.scss']
 })
 export class VerRecetaComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private recetasService = inject(RecetasService);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private usuariosService = inject(UsuariosService);
+  private pdfService = inject(PdfService);
+
   receta!: Receta;
   mascota!: Mascota;
   cliente!: Cliente;
   veterinario!: Usuario;
   dataSource = new MatTableDataSource<any>();
   displayedColumns = ['medicamento', 'dosis', 'frecuencia', 'duracion', 'indicaciones'];
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private recetasService: RecetasService,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private usuariosService: UsuariosService,
-    private pdfService: PdfService
-  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.params.id;

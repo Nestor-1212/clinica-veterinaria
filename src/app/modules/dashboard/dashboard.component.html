@@ -75,19 +75,25 @@
         <mat-card-subtitle>{{ citasHoy.length }} programadas</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div *ngIf="citasHoy.length === 0" class="empty-state">
-          <mat-icon>event_available</mat-icon>
-          <p>No hay citas programadas para hoy</p>
-        </div>
-        <mat-list *ngIf="citasHoy.length > 0">
-          <mat-list-item *ngFor="let cita of citasHoy" class="cita-item">
-            <mat-icon matListItemIcon [class]="'estado-' + cita.estado">schedule</mat-icon>
-            <div matListItemTitle class="cita-info">
-              <strong>{{ cita.hora }}</strong> — {{ cita.motivo }}
-            </div>
-            <mat-chip [class]="'chip-' + cita.estado" small>{{ cita.estado }}</mat-chip>
-          </mat-list-item>
-        </mat-list>
+        @if (citasHoy.length === 0) {
+          <div class="empty-state">
+            <mat-icon>event_available</mat-icon>
+            <p>No hay citas programadas para hoy</p>
+          </div>
+        }
+        @if (citasHoy.length > 0) {
+          <mat-list>
+            @for (cita of citasHoy; track cita) {
+              <mat-list-item class="cita-item">
+                <mat-icon matListItemIcon [class]="'estado-' + cita.estado">schedule</mat-icon>
+                <div matListItemTitle class="cita-info">
+                  <strong>{{ cita.hora }}</strong> — {{ cita.motivo }}
+                </div>
+                <mat-chip [class]="'chip-' + cita.estado" small>{{ cita.estado }}</mat-chip>
+              </mat-list-item>
+            }
+          </mat-list>
+        }
         <button mat-button color="primary" routerLink="/citas" class="ver-mas">
           Ver todas las citas <mat-icon>arrow_forward</mat-icon>
         </button>
@@ -99,30 +105,40 @@
       <mat-card-header>
         <mat-icon mat-card-avatar class="warn-icon">vaccines</mat-icon>
         <mat-card-title>Vacunas Próximas</mat-card-title>
-        <mat-card-subtitle *ngIf="stats.vacunasVencidas > 0" class="subtitle-alert">
-          {{ stats.vacunasVencidas }} vencida{{ stats.vacunasVencidas === 1 ? '' : 's' }} · {{ stats.vacunasPendientes - stats.vacunasVencidas }} próxima{{ (stats.vacunasPendientes - stats.vacunasVencidas) === 1 ? '' : 's' }}
-        </mat-card-subtitle>
-        <mat-card-subtitle *ngIf="stats.vacunasVencidas === 0">{{ stats.vacunasPendientes }} en los próximos 7 días</mat-card-subtitle>
+        @if (stats.vacunasVencidas > 0) {
+          <mat-card-subtitle class="subtitle-alert">
+            {{ stats.vacunasVencidas }} vencida{{ stats.vacunasVencidas === 1 ? '' : 's' }} · {{ stats.vacunasPendientes - stats.vacunasVencidas }} próxima{{ (stats.vacunasPendientes - stats.vacunasVencidas) === 1 ? '' : 's' }}
+          </mat-card-subtitle>
+        }
+        @if (stats.vacunasVencidas === 0) {
+          <mat-card-subtitle>{{ stats.vacunasPendientes }} en los próximos 7 días</mat-card-subtitle>
+        }
       </mat-card-header>
       <mat-card-content>
-        <div *ngIf="vacunasPendientes.length === 0" class="empty-state">
-          <mat-icon>check_circle</mat-icon>
-          <p>No hay vacunas pendientes</p>
-        </div>
-        <mat-list *ngIf="vacunasPendientes.length > 0">
-          <mat-list-item *ngFor="let vac of vacunasPendientes" class="vacuna-item">
-            <mat-icon matListItemIcon [class]="esVacunaVencida(vac) ? 'danger-icon' : 'warn-icon'">
-              {{ esVacunaVencida(vac) ? 'error' : 'vaccines' }}
-            </mat-icon>
-            <div matListItemTitle>
-              <strong>{{ vac.nombre }}</strong>
-            </div>
-            <div matListItemLine class="fecha-vac">{{ vac.proximaFecha | date:'dd/MM/yyyy' }}</div>
-            <mat-chip [class]="esVacunaVencida(vac) ? 'chip-vencida' : 'chip-proxima'">
-              {{ esVacunaVencida(vac) ? 'Vencida' : 'Próxima' }}
-            </mat-chip>
-          </mat-list-item>
-        </mat-list>
+        @if (vacunasPendientes.length === 0) {
+          <div class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <p>No hay vacunas pendientes</p>
+          </div>
+        }
+        @if (vacunasPendientes.length > 0) {
+          <mat-list>
+            @for (vac of vacunasPendientes; track vac) {
+              <mat-list-item class="vacuna-item">
+                <mat-icon matListItemIcon [class]="esVacunaVencida(vac) ? 'danger-icon' : 'warn-icon'">
+                  {{ esVacunaVencida(vac) ? 'error' : 'vaccines' }}
+                </mat-icon>
+                <div matListItemTitle>
+                  <strong>{{ vac.nombre }}</strong>
+                </div>
+                <div matListItemLine class="fecha-vac">{{ vac.proximaFecha | date:'dd/MM/yyyy' }}</div>
+                <mat-chip [class]="esVacunaVencida(vac) ? 'chip-vencida' : 'chip-proxima'">
+                  {{ esVacunaVencida(vac) ? 'Vencida' : 'Próxima' }}
+                </mat-chip>
+              </mat-list-item>
+            }
+          </mat-list>
+        }
         <button mat-button color="warn" routerLink="/vacunas" class="ver-mas">
           Ver recordatorios <mat-icon>arrow_forward</mat-icon>
         </button>
@@ -134,23 +150,33 @@
       <mat-card-header>
         <mat-icon mat-card-avatar class="danger-avatar">schedule</mat-icon>
         <mat-card-title>Pagos Pendientes</mat-card-title>
-        <mat-card-subtitle class="subtitle-alert" *ngIf="stats.pagosPendientesCount > 0">
-          {{ stats.pagosPendientesCount }} pago{{ stats.pagosPendientesCount === 1 ? '' : 's' }} · ${{ stats.montoPorCobrar | number:'1.2-2' }} por cobrar
-        </mat-card-subtitle>
-        <mat-card-subtitle *ngIf="stats.pagosPendientesCount === 0">Todo al día</mat-card-subtitle>
+        @if (stats.pagosPendientesCount > 0) {
+          <mat-card-subtitle class="subtitle-alert">
+            {{ stats.pagosPendientesCount }} pago{{ stats.pagosPendientesCount === 1 ? '' : 's' }} · ${{ stats.montoPorCobrar | number:'1.2-2' }} por cobrar
+          </mat-card-subtitle>
+        }
+        @if (stats.pagosPendientesCount === 0) {
+          <mat-card-subtitle>Todo al día</mat-card-subtitle>
+        }
       </mat-card-header>
       <mat-card-content>
-        <div *ngIf="pagosPendientes.length === 0" class="empty-state">
-          <mat-icon>check_circle</mat-icon>
-          <p>No hay pagos pendientes</p>
-        </div>
-        <mat-list *ngIf="pagosPendientes.length > 0">
-          <mat-list-item *ngFor="let pago of pagosPendientes" class="pago-item">
-            <mat-icon matListItemIcon class="warn-icon">payments</mat-icon>
-            <div matListItemTitle><strong>{{ getClienteNombre(pago.clienteId) }}</strong> — ${{ pago.total | number:'1.2-2' }}</div>
-            <div matListItemLine class="metodo-pago">{{ pago.fecha | date:'dd/MM/yyyy' }} · {{ pago.metodoPago | titlecase }}</div>
-          </mat-list-item>
-        </mat-list>
+        @if (pagosPendientes.length === 0) {
+          <div class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <p>No hay pagos pendientes</p>
+          </div>
+        }
+        @if (pagosPendientes.length > 0) {
+          <mat-list>
+            @for (pago of pagosPendientes; track pago) {
+              <mat-list-item class="pago-item">
+                <mat-icon matListItemIcon class="warn-icon">payments</mat-icon>
+                <div matListItemTitle><strong>{{ getClienteNombre(pago.clienteId) }}</strong> — ${{ pago.total | number:'1.2-2' }}</div>
+                <div matListItemLine class="metodo-pago">{{ pago.fecha | date:'dd/MM/yyyy' }} · {{ pago.metodoPago | titlecase }}</div>
+              </mat-list-item>
+            }
+          </mat-list>
+        }
         <button mat-button color="primary" routerLink="/pagos" class="ver-mas">
           Ver todos los pagos <mat-icon>arrow_forward</mat-icon>
         </button>

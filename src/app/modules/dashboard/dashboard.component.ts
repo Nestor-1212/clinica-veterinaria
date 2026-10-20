@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClientesService } from '../../core/services/clientes.service';
 import { MascotasService } from '../../core/services/mascotas.service';
@@ -16,6 +16,15 @@ import { Cita, Vacuna, Pago } from '../../core/models';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private citasService = inject(CitasService);
+  private consultasService = inject(ConsultasService);
+  private vacunasService = inject(VacunasService);
+  private pagosService = inject(PagosService);
+  auth = inject(AuthService);
+  private router = inject(Router);
+
   stats = {
     clientes: 0,
     mascotas: 0,
@@ -37,17 +46,6 @@ export class DashboardComponent implements OnInit {
     const u = this.auth.currentUser;
     return u ? u.nombre : '';
   }
-
-  constructor(
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private citasService: CitasService,
-    private consultasService: ConsultasService,
-    private vacunasService: VacunasService,
-    private pagosService: PagosService,
-    public auth: AuthService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.stats.clientes = this.clientesService.getAll().filter(c => c.activo).length;

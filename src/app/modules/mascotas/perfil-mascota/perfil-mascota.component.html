@@ -1,125 +1,154 @@
-<div class="page-container" *ngIf="mascota">
-  <div class="page-header">
-    <div>
-      <h2><mat-icon>pets</mat-icon> Historial Médico — {{ mascota.nombre }}</h2>
-      <p>Expediente clínico completo</p>
-    </div>
-    <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="nuevaConsulta()"><mat-icon>medical_services</mat-icon> Consulta</button>
-      <button mat-raised-button color="accent" (click)="nuevaVacuna()"><mat-icon>vaccines</mat-icon> Vacuna</button>
-      <button mat-raised-button (click)="nuevoExamen()"><mat-icon>biotech</mat-icon> Examen</button>
-      <button mat-stroked-button routerLink="/mascotas"><mat-icon>arrow_back</mat-icon> Volver</button>
-    </div>
-  </div>
-
-  <!-- Perfil -->
-  <mat-card class="perfil-card">
-    <mat-card-content>
-      <div class="perfil-layout">
-        <div class="mascota-foto">
-          <img *ngIf="mascota.foto" [src]="mascota.foto" [alt]="mascota.nombre">
-          <div *ngIf="!mascota.foto" class="foto-default">
-            <mat-icon>pets</mat-icon>
-          </div>
-        </div>
-        <div class="mascota-data">
-          <h3>{{ mascota.nombre }}</h3>
-          <p class="tipo-badge">{{ mascota.tipo }}</p>
-          <div class="datos-grid">
-            <div><span>Raza</span><strong>{{ mascota.raza }}</strong></div>
-            <div><span>Sexo</span><strong>{{ mascota.sexo | titlecase }}</strong></div>
-            <div><span>Edad</span><strong>{{ mascota.edad }} años</strong></div>
-            <div><span>Peso</span><strong>{{ mascota.peso }} kg</strong></div>
-            <div><span>Color</span><strong>{{ mascota.color }}</strong></div>
-            <div *ngIf="mascota.fechaNacimiento"><span>Nacimiento</span><strong>{{ mascota.fechaNacimiento | date:'dd/MM/yyyy' }}</strong></div>
-          </div>
-          <div *ngIf="mascota.alergias" class="alergias-alert">
-            <mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}
-          </div>
-        </div>
-        <div class="propietario-info" *ngIf="cliente">
-          <mat-icon>person</mat-icon>
-          <div>
-            <strong>{{ cliente.nombre }}</strong>
-            <p>{{ cliente.telefono }}</p>
-            <p>{{ cliente.correo }}</p>
-          </div>
-        </div>
+@if (mascota) {
+  <div class="page-container">
+    <div class="page-header">
+      <div>
+        <h2><mat-icon>pets</mat-icon> Historial Médico — {{ mascota.nombre }}</h2>
+        <p>Expediente clínico completo</p>
       </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Historial en tabs -->
-  <mat-tab-group class="historial-tabs">
-    <mat-tab label="Consultas ({{ consultas.length }})">
-      <div class="tab-content">
-        <mat-accordion>
-          <mat-expansion-panel *ngFor="let c of consultas">
-            <mat-expansion-panel-header>
-              <mat-panel-title>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</mat-panel-title>
-              <mat-panel-description>{{ c.diagnostico | slice:0:50 }}...</mat-panel-description>
-            </mat-expansion-panel-header>
-            <div class="consulta-detail">
-              <div class="detail-row"><strong>Síntomas:</strong> {{ c.sintomas }}</div>
-              <div class="detail-row"><strong>Temperatura:</strong> {{ c.temperatura }}°C</div>
-              <div class="detail-row"><strong>Peso:</strong> {{ c.peso }} kg</div>
-              <div class="detail-row"><strong>Diagnóstico:</strong> {{ c.diagnostico }}</div>
-              <div class="detail-row"><strong>Tratamiento:</strong> {{ c.tratamiento }}</div>
-              <div class="detail-row" *ngIf="c.observaciones"><strong>Observaciones:</strong> {{ c.observaciones }}</div>
-              <div class="tipo-chip"><mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip></div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="nuevaConsulta()"><mat-icon>medical_services</mat-icon> Consulta</button>
+        <button mat-raised-button color="accent" (click)="nuevaVacuna()"><mat-icon>vaccines</mat-icon> Vacuna</button>
+        <button mat-raised-button (click)="nuevoExamen()"><mat-icon>biotech</mat-icon> Examen</button>
+        <button mat-stroked-button routerLink="/mascotas"><mat-icon>arrow_back</mat-icon> Volver</button>
+      </div>
+    </div>
+    <!-- Perfil -->
+    <mat-card class="perfil-card">
+      <mat-card-content>
+        <div class="perfil-layout">
+          <div class="mascota-foto">
+            @if (mascota.foto) {
+              <img [src]="mascota.foto" [alt]="mascota.nombre">
+            }
+            @if (!mascota.foto) {
+              <div class="foto-default">
+                <mat-icon>pets</mat-icon>
+              </div>
+            }
+          </div>
+          <div class="mascota-data">
+            <h3>{{ mascota.nombre }}</h3>
+            <p class="tipo-badge">{{ mascota.tipo }}</p>
+            <div class="datos-grid">
+              <div><span>Raza</span><strong>{{ mascota.raza }}</strong></div>
+              <div><span>Sexo</span><strong>{{ mascota.sexo | titlecase }}</strong></div>
+              <div><span>Edad</span><strong>{{ mascota.edad }} años</strong></div>
+              <div><span>Peso</span><strong>{{ mascota.peso }} kg</strong></div>
+              <div><span>Color</span><strong>{{ mascota.color }}</strong></div>
+              @if (mascota.fechaNacimiento) {
+                <div><span>Nacimiento</span><strong>{{ mascota.fechaNacimiento | date:'dd/MM/yyyy' }}</strong></div>
+              }
             </div>
-          </mat-expansion-panel>
-          <p *ngIf="consultas.length === 0" class="empty-tab">No hay consultas registradas</p>
-        </mat-accordion>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Vacunas ({{ vacunas.length }})">
-      <div class="tab-content">
-        <mat-list>
-          <mat-list-item *ngFor="let v of vacunas" class="vacuna-item">
-            <mat-icon matListItemIcon color="primary">vaccines</mat-icon>
-            <div matListItemTitle><strong>{{ v.nombre }}</strong></div>
-            <div matListItemLine>Aplicada: {{ v.fechaAplicacion | date:'dd/MM/yyyy' }} — Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
-            <div matListItemLine *ngIf="v.lote">Lote: {{ v.lote }}</div>
-          </mat-list-item>
-          <p *ngIf="vacunas.length === 0" class="empty-tab">No hay vacunas registradas</p>
-        </mat-list>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Exámenes ({{ examenes.length }})">
-      <div class="tab-content">
-        <mat-list>
-          <mat-list-item *ngFor="let e of examenes">
-            <mat-icon matListItemIcon>biotech</mat-icon>
-            <div matListItemTitle><strong>{{ e.tipo }}</strong> — {{ e.fecha | date:'dd/MM/yyyy' }}</div>
-            <div matListItemLine>{{ e.resultado }}</div>
-          </mat-list-item>
-          <p *ngIf="examenes.length === 0" class="empty-tab">No hay exámenes registrados</p>
-        </mat-list>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Recetas ({{ recetas.length }})">
-      <div class="tab-content">
-        <mat-accordion>
-          <mat-expansion-panel *ngFor="let r of recetas">
-            <mat-expansion-panel-header>
-              <mat-panel-title>{{ r.fecha | date:'dd/MM/yyyy' }}</mat-panel-title>
-              <mat-panel-description>{{ r.items.length }} medicamento(s)</mat-panel-description>
-            </mat-expansion-panel-header>
-            <mat-list>
-              <mat-list-item *ngFor="let item of r.items">
-                <mat-icon matListItemIcon>medication</mat-icon>
-                <div matListItemTitle><strong>{{ item.medicamento }}</strong></div>
-                <div matListItemLine>{{ item.dosis }} — {{ item.frecuencia }} — {{ item.duracion }}</div>
+            @if (mascota.alergias) {
+              <div class="alergias-alert">
+                <mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}
+              </div>
+            }
+          </div>
+          @if (cliente) {
+            <div class="propietario-info">
+              <mat-icon>person</mat-icon>
+              <div>
+                <strong>{{ cliente.nombre }}</strong>
+                <p>{{ cliente.telefono }}</p>
+                <p>{{ cliente.correo }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <!-- Historial en tabs -->
+    <mat-tab-group class="historial-tabs">
+      <mat-tab label="Consultas ({{ consultas.length }})">
+        <div class="tab-content">
+          <mat-accordion>
+            @for (c of consultas; track c) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</mat-panel-title>
+                  <mat-panel-description>{{ c.diagnostico | slice:0:50 }}...</mat-panel-description>
+                </mat-expansion-panel-header>
+                <div class="consulta-detail">
+                  <div class="detail-row"><strong>Síntomas:</strong> {{ c.sintomas }}</div>
+                  <div class="detail-row"><strong>Temperatura:</strong> {{ c.temperatura }}°C</div>
+                  <div class="detail-row"><strong>Peso:</strong> {{ c.peso }} kg</div>
+                  <div class="detail-row"><strong>Diagnóstico:</strong> {{ c.diagnostico }}</div>
+                  <div class="detail-row"><strong>Tratamiento:</strong> {{ c.tratamiento }}</div>
+                  @if (c.observaciones) {
+                    <div class="detail-row"><strong>Observaciones:</strong> {{ c.observaciones }}</div>
+                  }
+                  <div class="tipo-chip"><mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip></div>
+                </div>
+              </mat-expansion-panel>
+            }
+            @if (consultas.length === 0) {
+              <p class="empty-tab">No hay consultas registradas</p>
+            }
+          </mat-accordion>
+        </div>
+      </mat-tab>
+      <mat-tab label="Vacunas ({{ vacunas.length }})">
+        <div class="tab-content">
+          <mat-list>
+            @for (v of vacunas; track v) {
+              <mat-list-item class="vacuna-item">
+                <mat-icon matListItemIcon color="primary">vaccines</mat-icon>
+                <div matListItemTitle><strong>{{ v.nombre }}</strong></div>
+                <div matListItemLine>Aplicada: {{ v.fechaAplicacion | date:'dd/MM/yyyy' }} — Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+                @if (v.lote) {
+                  <div matListItemLine>Lote: {{ v.lote }}</div>
+                }
               </mat-list-item>
-            </mat-list>
-          </mat-expansion-panel>
-          <p *ngIf="recetas.length === 0" class="empty-tab">No hay recetas registradas</p>
-        </mat-accordion>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</div>
+            }
+            @if (vacunas.length === 0) {
+              <p class="empty-tab">No hay vacunas registradas</p>
+            }
+          </mat-list>
+        </div>
+      </mat-tab>
+      <mat-tab label="Exámenes ({{ examenes.length }})">
+        <div class="tab-content">
+          <mat-list>
+            @for (e of examenes; track e) {
+              <mat-list-item>
+                <mat-icon matListItemIcon>biotech</mat-icon>
+                <div matListItemTitle><strong>{{ e.tipo }}</strong> — {{ e.fecha | date:'dd/MM/yyyy' }}</div>
+                <div matListItemLine>{{ e.resultado }}</div>
+              </mat-list-item>
+            }
+            @if (examenes.length === 0) {
+              <p class="empty-tab">No hay exámenes registrados</p>
+            }
+          </mat-list>
+        </div>
+      </mat-tab>
+      <mat-tab label="Recetas ({{ recetas.length }})">
+        <div class="tab-content">
+          <mat-accordion>
+            @for (r of recetas; track r) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>{{ r.fecha | date:'dd/MM/yyyy' }}</mat-panel-title>
+                  <mat-panel-description>{{ r.items.length }} medicamento(s)</mat-panel-description>
+                </mat-expansion-panel-header>
+                <mat-list>
+                  @for (item of r.items; track item) {
+                    <mat-list-item>
+                      <mat-icon matListItemIcon>medication</mat-icon>
+                      <div matListItemTitle><strong>{{ item.medicamento }}</strong></div>
+                      <div matListItemLine>{{ item.dosis }} — {{ item.frecuencia }} — {{ item.duracion }}</div>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              </mat-expansion-panel>
+            }
+            @if (recetas.length === 0) {
+              <p class="empty-tab">No hay recetas registradas</p>
+            }
+          </mat-accordion>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+}

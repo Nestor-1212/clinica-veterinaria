@@ -12,8 +12,12 @@
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="search-field">
           <mat-label>Buscar...</mat-label><input matInput #searchInput (keyup)="applyFilter($event)">
-          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''"><mat-icon>close</mat-icon></button>
-          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''"><mat-icon>close</mat-icon></button>
+          }
+          @if (!searchInput.value) {
+            <mat-icon matSuffix>search</mat-icon>
+          }
         </mat-form-field>
       </div>
       <div class="table-responsive">

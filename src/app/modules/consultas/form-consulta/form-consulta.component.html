@@ -8,25 +8,29 @@
   </div>
 
   <!-- Info del paciente -->
-  <mat-card class="paciente-card" *ngIf="mascota && cliente">
-    <mat-card-content>
-      <div class="paciente-info">
-        <div class="p-avatar"><mat-icon>pets</mat-icon></div>
-        <div>
-          <h3>{{ mascota.nombre }} <span class="tipo">{{ mascota.tipo }}</span></h3>
-          <p>{{ mascota.raza }} — {{ mascota.sexo | titlecase }} — {{ mascota.edad }} años</p>
-          <p *ngIf="mascota.alergias" class="alergia"><mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}</p>
-        </div>
-        <div class="propietario">
-          <mat-icon>person</mat-icon>
+  @if (mascota && cliente) {
+    <mat-card class="paciente-card">
+      <mat-card-content>
+        <div class="paciente-info">
+          <div class="p-avatar"><mat-icon>pets</mat-icon></div>
           <div>
-            <strong>{{ cliente.nombre }}</strong>
-            <p>{{ cliente.telefono }}</p>
+            <h3>{{ mascota.nombre }} <span class="tipo">{{ mascota.tipo }}</span></h3>
+            <p>{{ mascota.raza }} — {{ mascota.sexo | titlecase }} — {{ mascota.edad }} años</p>
+            @if (mascota.alergias) {
+              <p class="alergia"><mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}</p>
+            }
+          </div>
+          <div class="propietario">
+            <mat-icon>person</mat-icon>
+            <div>
+              <strong>{{ cliente.nombre }}</strong>
+              <p>{{ cliente.telefono }}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  }
 
   <!-- Formulario -->
   <mat-card class="form-card">
@@ -44,7 +48,9 @@
             <mat-form-field appearance="outline">
               <mat-label>Veterinario *</mat-label>
               <mat-select formControlName="veterinarioId">
-                <mat-option *ngFor="let v of veterinarios" [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+                @for (v of veterinarios; track v) {
+                  <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+                }
               </mat-select>
               <mat-error>Seleccione el veterinario</mat-error>
             </mat-form-field>

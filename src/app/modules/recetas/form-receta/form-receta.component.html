@@ -13,21 +13,25 @@
   </div>
 
   <!-- Paciente -->
-  <mat-card class="paciente-card" *ngIf="mascota && cliente">
-    <mat-card-content>
-      <div class="paciente-row">
-        <div class="p-icon"><mat-icon>pets</mat-icon></div>
-        <div>
-          <strong>{{ mascota.nombre }}</strong> ({{ mascota.tipo }}) — {{ mascota.raza }}
-          <br><small>Propietario: {{ cliente.nombre }} — {{ cliente.telefono }}</small>
+  @if (mascota && cliente) {
+    <mat-card class="paciente-card">
+      <mat-card-content>
+        <div class="paciente-row">
+          <div class="p-icon"><mat-icon>pets</mat-icon></div>
+          <div>
+            <strong>{{ mascota.nombre }}</strong> ({{ mascota.tipo }}) — {{ mascota.raza }}
+            <br><small>Propietario: {{ cliente.nombre }} — {{ cliente.telefono }}</small>
+          </div>
+          @if (consulta) {
+            <div class="consulta-ref">
+              <mat-icon>medical_services</mat-icon>
+              <span>Dx: {{ consulta.diagnostico | slice:0:60 }}</span>
+            </div>
+          }
         </div>
-        <div *ngIf="consulta" class="consulta-ref">
-          <mat-icon>medical_services</mat-icon>
-          <span>Dx: {{ consulta.diagnostico | slice:0:60 }}</span>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  }
 
   <mat-card class="form-card">
     <mat-card-content>
@@ -45,47 +49,45 @@
         </div>
 
         <div formArrayName="items">
-          <mat-card *ngFor="let item of items.controls; let i = index" class="medicamento-card">
-            <mat-card-content [formGroupName]="i">
-              <div class="medicamento-header">
-                <span class="med-num">Medicamento {{ i + 1 }}</span>
-                <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1" [attr.aria-label]="'Eliminar medicamento ' + (i + 1)" matTooltip="Eliminar medicamento">
-                  <mat-icon>remove_circle</mat-icon>
-                </button>
-              </div>
-              <div class="med-grid">
-                <mat-form-field appearance="outline" class="col-full">
-                  <mat-label>Medicamento *</mat-label>
-                  <input matInput formControlName="medicamento" placeholder="Nombre del medicamento">
-                  <mat-icon matSuffix>medication</mat-icon>
-                  <mat-error>Requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                  <mat-label>Dosis *</mat-label>
-                  <input matInput formControlName="dosis" placeholder="Ej: 500mg">
-                  <mat-error>Requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                  <mat-label>Frecuencia *</mat-label>
-                  <input matInput formControlName="frecuencia" placeholder="Ej: Cada 12 horas">
-                  <mat-error>Requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                  <mat-label>Duración *</mat-label>
-                  <input matInput formControlName="duracion" placeholder="Ej: 7 días">
-                  <mat-error>Requerido</mat-error>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline">
-                  <mat-label>Indicaciones especiales</mat-label>
-                  <input matInput formControlName="indicaciones" placeholder="Ej: Administrar con comida">
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-          </mat-card>
+          @for (item of items.controls; track item; let i = $index) {
+            <mat-card class="medicamento-card">
+              <mat-card-content [formGroupName]="i">
+                <div class="medicamento-header">
+                  <span class="med-num">Medicamento {{ i + 1 }}</span>
+                  <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1" [attr.aria-label]="'Eliminar medicamento ' + (i + 1)" matTooltip="Eliminar medicamento">
+                    <mat-icon>remove_circle</mat-icon>
+                  </button>
+                </div>
+                <div class="med-grid">
+                  <mat-form-field appearance="outline" class="col-full">
+                    <mat-label>Medicamento *</mat-label>
+                    <input matInput formControlName="medicamento" placeholder="Nombre del medicamento">
+                    <mat-icon matSuffix>medication</mat-icon>
+                    <mat-error>Requerido</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Dosis *</mat-label>
+                    <input matInput formControlName="dosis" placeholder="Ej: 500mg">
+                    <mat-error>Requerido</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Frecuencia *</mat-label>
+                    <input matInput formControlName="frecuencia" placeholder="Ej: Cada 12 horas">
+                    <mat-error>Requerido</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Duración *</mat-label>
+                    <input matInput formControlName="duracion" placeholder="Ej: 7 días">
+                    <mat-error>Requerido</mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Indicaciones especiales</mat-label>
+                    <input matInput formControlName="indicaciones" placeholder="Ej: Administrar con comida">
+                  </mat-form-field>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
         </div>
 
         <mat-form-field appearance="outline" class="full-width" style="margin-top:16px">

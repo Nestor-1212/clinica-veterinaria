@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Receta } from '../models';
 import { StorageService } from './storage.service';
@@ -7,10 +7,12 @@ const KEY = 'vet_recetas';
 
 @Injectable({ providedIn: 'root' })
 export class RecetasService {
+  private storage = inject(StorageService);
+
   private subject = new BehaviorSubject<Receta[]>([]);
   recetas$: Observable<Receta[]> = this.subject.asObservable();
 
-  constructor(private storage: StorageService) {
+  constructor() {
     this.refresh();
   }
 

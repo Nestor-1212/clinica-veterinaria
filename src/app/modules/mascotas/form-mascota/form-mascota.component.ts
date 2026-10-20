@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,6 +13,13 @@ import { Cliente, TipoMascota } from '../../../core/models';
   styleUrls: ['./form-mascota.component.scss']
 })
 export class FormMascotaComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   isEdit = false;
   mascotaId = '';
@@ -21,14 +28,7 @@ export class FormMascotaComponent implements OnInit {
   sexos = ['macho', 'hembra'];
   fotoPreview: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       nombre: ['', [Validators.required, Validators.minLength(2)]],

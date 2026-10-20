@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, inject } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
@@ -9,10 +9,10 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   styleUrls: ['./shell.component.scss']
 })
 export class ShellComponent implements OnInit {
+  private bp = inject(BreakpointObserver);
+
   @ViewChild('sidenav') sidenav!: MatSidenav;
   isMobile = false;
-
-  constructor(private bp: BreakpointObserver) {}
 
   ngOnInit(): void {
     this.bp.observe([Breakpoints.Handset, Breakpoints.TabletPortrait])

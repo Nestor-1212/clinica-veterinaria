@@ -12,14 +12,16 @@
   <mat-divider></mat-divider>
 
   <nav class="sidebar-nav">
-    <a *ngFor="let item of visibleItems"
-       mat-list-item
-       [routerLink]="item.route"
-       routerLinkActive="active-link"
-       class="nav-item">
-      <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
-      <span class="nav-label">{{ item.label }}</span>
-    </a>
+    @for (item of visibleItems; track item) {
+      <a
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active-link"
+        class="nav-item">
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
   </nav>
 
   <div class="sidebar-footer">

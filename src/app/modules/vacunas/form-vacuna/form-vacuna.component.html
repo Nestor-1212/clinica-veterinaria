@@ -14,19 +14,25 @@
           <mat-form-field appearance="outline" class="col-full">
             <mat-label>Mascota *</mat-label>
             <mat-select formControlName="mascotaId" (selectionChange)="onMascotaChange($event.value)">
-              <mat-option *ngFor="let m of mascotas" [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
+              @for (m of mascotas; track m) {
+                <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
+              }
             </mat-select>
             <mat-error>Seleccione la mascota</mat-error>
           </mat-form-field>
 
-          <div class="cliente-info" *ngIf="cliente">
-            <mat-icon>person</mat-icon> Propietario: <strong>{{ cliente.nombre }}</strong>
-          </div>
+          @if (cliente) {
+            <div class="cliente-info">
+              <mat-icon>person</mat-icon> Propietario: <strong>{{ cliente.nombre }}</strong>
+            </div>
+          }
 
           <mat-form-field appearance="outline">
             <mat-label>Vacuna aplicada *</mat-label>
             <mat-select formControlName="nombre">
-              <mat-option *ngFor="let v of vacunasComunes" [value]="v">{{ v }}</mat-option>
+              @for (v of vacunasComunes; track v) {
+                <mat-option [value]="v">{{ v }}</mat-option>
+              }
               <mat-option value="Otra">Otra...</mat-option>
             </mat-select>
             <mat-error>Seleccione la vacuna</mat-error>

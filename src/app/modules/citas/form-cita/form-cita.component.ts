@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,6 +15,15 @@ import { Cliente, Mascota, Usuario } from '../../../core/models';
   styleUrls: ['./form-cita.component.scss']
 })
 export class FormCitaComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private citasService = inject(CitasService);
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private usuariosService = inject(UsuariosService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
@@ -22,16 +31,7 @@ export class FormCitaComponent implements OnInit {
   isInmediata = false;
   horas = this.generarHoras();
 
-  constructor(
-    private fb: FormBuilder,
-    private citasService: CitasService,
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private usuariosService: UsuariosService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       mascotaId: ['', Validators.required],

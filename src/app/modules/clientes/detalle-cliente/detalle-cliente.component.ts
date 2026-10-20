@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
@@ -14,22 +14,20 @@ import { Cliente, Mascota, Consulta, Cita, Pago } from '../../../core/models';
   styleUrls: ['./detalle-cliente.component.scss']
 })
 export class DetalleClienteComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private clientesService = inject(ClientesService);
+  private mascotasService = inject(MascotasService);
+  private consultasService = inject(ConsultasService);
+  private citasService = inject(CitasService);
+  private pagosService = inject(PagosService);
+
   cliente!: Cliente;
   mascotas: Mascota[] = [];
   consultas: Consulta[] = [];
   citas: Cita[] = [];
   pagos: Pago[] = [];
   selectedTab = 0;
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private clientesService: ClientesService,
-    private mascotasService: MascotasService,
-    private consultasService: ConsultasService,
-    private citasService: CitasService,
-    private pagosService: PagosService
-  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.params.id;

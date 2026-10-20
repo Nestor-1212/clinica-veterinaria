@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../models';
 import { StorageService } from './storage.service';
@@ -8,10 +8,12 @@ const SESSION_KEY = 'vet_session';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private storage = inject(StorageService);
+
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.loadSession());
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private storage: StorageService) {
+  constructor() {
     this.seedAdminIfEmpty();
   }
 

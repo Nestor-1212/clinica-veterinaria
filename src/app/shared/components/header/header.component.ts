@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Usuario } from '../../../core/models';
@@ -10,6 +10,9 @@ import { Usuario } from '../../../core/models';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   @Output() menuToggle = new EventEmitter<void>();
 
   get user(): Usuario | null {
@@ -20,8 +23,6 @@ export class HeaderComponent {
     const roles: any = { admin: 'Administrador', veterinario: 'Veterinario', recepcion: 'Recepción' };
     return this.user ? roles[this.user.rol] : '';
   }
-
-  constructor(private auth: AuthService, private router: Router) {}
 
   logout(): void {
     this.auth.logout();

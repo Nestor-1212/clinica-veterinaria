@@ -1,130 +1,144 @@
-<div class="page-container" *ngIf="cliente">
-  <div class="page-header">
-    <div>
-      <h2><mat-icon>folder_open</mat-icon> Expediente del Cliente</h2>
-      <p>Historial completo y datos del propietario</p>
+@if (cliente) {
+  <div class="page-container">
+    <div class="page-header">
+      <div>
+        <h2><mat-icon>folder_open</mat-icon> Expediente del Cliente</h2>
+        <p>Historial completo y datos del propietario</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="warn" (click)="nuevaAtencion()">
+          <mat-icon>flash_on</mat-icon> Atención Inmediata
+        </button>
+        <button mat-raised-button color="primary" (click)="nuevaCita()">
+          <mat-icon>event</mat-icon> Nueva Cita
+        </button>
+        <button mat-stroked-button routerLink="/clientes">
+          <mat-icon>arrow_back</mat-icon> Volver
+        </button>
+      </div>
     </div>
-    <div class="header-actions">
-      <button mat-raised-button color="warn" (click)="nuevaAtencion()">
-        <mat-icon>flash_on</mat-icon> Atención Inmediata
-      </button>
-      <button mat-raised-button color="primary" (click)="nuevaCita()">
-        <mat-icon>event</mat-icon> Nueva Cita
-      </button>
-      <button mat-stroked-button routerLink="/clientes">
-        <mat-icon>arrow_back</mat-icon> Volver
-      </button>
-    </div>
-  </div>
-
-  <!-- Info del cliente -->
-  <mat-card class="cliente-info-card">
-    <mat-card-content>
-      <div class="cliente-profile">
-        <div class="profile-avatar">{{ cliente.nombre.charAt(0) }}</div>
-        <div class="profile-info">
-          <h3>{{ cliente.nombre }}</h3>
-          <div class="info-grid">
-            <div class="info-item"><mat-icon>badge</mat-icon> {{ cliente.cedula }}</div>
-            <div class="info-item"><mat-icon>phone</mat-icon> {{ cliente.telefono }}</div>
-            <div class="info-item" *ngIf="cliente.correo"><mat-icon>email</mat-icon> {{ cliente.correo }}</div>
-            <div class="info-item" *ngIf="cliente.direccion"><mat-icon>location_on</mat-icon> {{ cliente.direccion }}</div>
-            <div class="info-item"><mat-icon>calendar_today</mat-icon> Cliente desde {{ cliente.fechaRegistro | date:'dd/MM/yyyy' }}</div>
+    <!-- Info del cliente -->
+    <mat-card class="cliente-info-card">
+      <mat-card-content>
+        <div class="cliente-profile">
+          <div class="profile-avatar">{{ cliente.nombre.charAt(0) }}</div>
+          <div class="profile-info">
+            <h3>{{ cliente.nombre }}</h3>
+            <div class="info-grid">
+              <div class="info-item"><mat-icon>badge</mat-icon> {{ cliente.cedula }}</div>
+              <div class="info-item"><mat-icon>phone</mat-icon> {{ cliente.telefono }}</div>
+              @if (cliente.correo) {
+                <div class="info-item"><mat-icon>email</mat-icon> {{ cliente.correo }}</div>
+              }
+              @if (cliente.direccion) {
+                <div class="info-item"><mat-icon>location_on</mat-icon> {{ cliente.direccion }}</div>
+              }
+              <div class="info-item"><mat-icon>calendar_today</mat-icon> Cliente desde {{ cliente.fechaRegistro | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="pstat"><span>{{ mascotas.length }}</span><small>Mascotas</small></div>
+            <div class="pstat"><span>{{ consultas.length }}</span><small>Consultas</small></div>
+            <div class="pstat"><span>${{ totalPagado | number:'1.2-2' }}</span><small>Total Pagado</small></div>
           </div>
         </div>
-        <div class="profile-stats">
-          <div class="pstat"><span>{{ mascotas.length }}</span><small>Mascotas</small></div>
-          <div class="pstat"><span>{{ consultas.length }}</span><small>Consultas</small></div>
-          <div class="pstat"><span>${{ totalPagado | number:'1.2-2' }}</span><small>Total Pagado</small></div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button [routerLink]="['/clientes/editar', cliente.id]"><mat-icon>edit</mat-icon> Editar</button>
+        <button mat-button color="primary" (click)="nuevaMascota()"><mat-icon>pets</mat-icon> Agregar Mascota</button>
+      </mat-card-actions>
+    </mat-card>
+    <!-- Tabs -->
+    <mat-tab-group [(selectedIndex)]="selectedTab" class="detail-tabs">
+      <mat-tab label="Mascotas ({{ mascotas.length }})">
+        <div class="tab-content">
+          <div class="mascotas-grid">
+            @for (m of mascotas; track m) {
+              <mat-card class="mascota-card" (click)="verMascota(m)">
+                <mat-card-content>
+                  <div class="mascota-header">
+                    <div class="mascota-avatar">
+                      <mat-icon>{{ m.tipo === 'Perro' ? 'pets' : m.tipo === 'Gato' ? 'catching_pokemon' : 'cruelty_free' }}</mat-icon>
+                    </div>
+                    <div>
+                      <h4>{{ m.nombre }}</h4>
+                      <p>{{ m.tipo }} — {{ m.raza }}</p>
+                    </div>
+                  </div>
+                  <div class="mascota-details">
+                    <span><mat-icon>straighten</mat-icon> {{ m.peso }} kg</span>
+                    <span><mat-icon>cake</mat-icon> {{ m.edad }} años</span>
+                    <span><mat-icon>{{ m.sexo === 'macho' ? 'male' : 'female' }}</mat-icon> {{ m.sexo }}</span>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+            <mat-card class="mascota-card add-card" (click)="nuevaMascota()">
+              <mat-card-content>
+                <mat-icon>add_circle</mat-icon>
+                <p>Agregar Mascota</p>
+              </mat-card-content>
+            </mat-card>
+          </div>
         </div>
-      </div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-button [routerLink]="['/clientes/editar', cliente.id]"><mat-icon>edit</mat-icon> Editar</button>
-      <button mat-button color="primary" (click)="nuevaMascota()"><mat-icon>pets</mat-icon> Agregar Mascota</button>
-    </mat-card-actions>
-  </mat-card>
-
-  <!-- Tabs -->
-  <mat-tab-group [(selectedIndex)]="selectedTab" class="detail-tabs">
-    <mat-tab label="Mascotas ({{ mascotas.length }})">
-      <div class="tab-content">
-        <div class="mascotas-grid">
-          <mat-card *ngFor="let m of mascotas" class="mascota-card" (click)="verMascota(m)">
-            <mat-card-content>
-              <div class="mascota-header">
-                <div class="mascota-avatar">
-                  <mat-icon>{{ m.tipo === 'Perro' ? 'pets' : m.tipo === 'Gato' ? 'catching_pokemon' : 'cruelty_free' }}</mat-icon>
-                </div>
-                <div>
-                  <h4>{{ m.nombre }}</h4>
-                  <p>{{ m.tipo }} — {{ m.raza }}</p>
-                </div>
-              </div>
-              <div class="mascota-details">
-                <span><mat-icon>straighten</mat-icon> {{ m.peso }} kg</span>
-                <span><mat-icon>cake</mat-icon> {{ m.edad }} años</span>
-                <span><mat-icon>{{ m.sexo === 'macho' ? 'male' : 'female' }}</mat-icon> {{ m.sexo }}</span>
-              </div>
-            </mat-card-content>
-          </mat-card>
-
-          <mat-card class="mascota-card add-card" (click)="nuevaMascota()">
-            <mat-card-content>
-              <mat-icon>add_circle</mat-icon>
-              <p>Agregar Mascota</p>
-            </mat-card-content>
-          </mat-card>
+      </mat-tab>
+      <mat-tab label="Citas ({{ citas.length }})">
+        <div class="tab-content">
+          <mat-list>
+            @for (cita of citas; track cita) {
+              <mat-list-item class="list-row">
+                <mat-icon matListItemIcon [class]="'estado-' + cita.estado">event</mat-icon>
+                <div matListItemTitle><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
+                <div matListItemLine>{{ cita.motivo }}</div>
+                <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado }}</mat-chip>
+              </mat-list-item>
+            }
+            @if (citas.length === 0) {
+              <mat-list-item>
+                <p>No hay citas registradas</p>
+              </mat-list-item>
+            }
+          </mat-list>
         </div>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Citas ({{ citas.length }})">
-      <div class="tab-content">
-        <mat-list>
-          <mat-list-item *ngFor="let cita of citas" class="list-row">
-            <mat-icon matListItemIcon [class]="'estado-' + cita.estado">event</mat-icon>
-            <div matListItemTitle><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
-            <div matListItemLine>{{ cita.motivo }}</div>
-            <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado }}</mat-chip>
-          </mat-list-item>
-          <mat-list-item *ngIf="citas.length === 0">
-            <p>No hay citas registradas</p>
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Consultas ({{ consultas.length }})">
-      <div class="tab-content">
-        <mat-list>
-          <mat-list-item *ngFor="let c of consultas" class="list-row">
-            <mat-icon matListItemIcon>medical_services</mat-icon>
-            <div matListItemTitle><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
-            <div matListItemLine>{{ c.diagnostico }}</div>
-            <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip>
-          </mat-list-item>
-          <mat-list-item *ngIf="consultas.length === 0">
-            <p>No hay consultas registradas</p>
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </mat-tab>
-
-    <mat-tab label="Pagos ({{ pagos.length }})">
-      <div class="tab-content">
-        <mat-list>
-          <mat-list-item *ngFor="let p of pagos" class="list-row">
-            <mat-icon matListItemIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
-            <div matListItemTitle><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
-            <div matListItemLine>{{ p.metodoPago }}</div>
-            <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado }}</mat-chip>
-          </mat-list-item>
-          <mat-list-item *ngIf="pagos.length === 0">
-            <p>No hay pagos registrados</p>
-          </mat-list-item>
-        </mat-list>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</div>
+      </mat-tab>
+      <mat-tab label="Consultas ({{ consultas.length }})">
+        <div class="tab-content">
+          <mat-list>
+            @for (c of consultas; track c) {
+              <mat-list-item class="list-row">
+                <mat-icon matListItemIcon>medical_services</mat-icon>
+                <div matListItemTitle><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+                <div matListItemLine>{{ c.diagnostico }}</div>
+                <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip>
+              </mat-list-item>
+            }
+            @if (consultas.length === 0) {
+              <mat-list-item>
+                <p>No hay consultas registradas</p>
+              </mat-list-item>
+            }
+          </mat-list>
+        </div>
+      </mat-tab>
+      <mat-tab label="Pagos ({{ pagos.length }})">
+        <div class="tab-content">
+          <mat-list>
+            @for (p of pagos; track p) {
+              <mat-list-item class="list-row">
+                <mat-icon matListItemIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
+                <div matListItemTitle><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
+                <div matListItemLine>{{ p.metodoPago }}</div>
+                <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado }}</mat-chip>
+              </mat-list-item>
+            }
+            @if (pagos.length === 0) {
+              <mat-list-item>
+                <p>No hay pagos registrados</p>
+              </mat-list-item>
+            }
+          </mat-list>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+}

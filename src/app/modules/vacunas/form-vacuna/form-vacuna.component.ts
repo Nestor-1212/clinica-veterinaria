@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -16,6 +16,16 @@ import { Mascota, Cliente } from '../../../core/models';
   styleUrls: ['./form-vacuna.component.scss']
 })
 export class FormVacunaComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private vacunasService = inject(VacunasService);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private usuariosService = inject(UsuariosService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private snack = inject(MatSnackBar);
+
   form: FormGroup;
   mascotas: Mascota[] = [];
   mascota: Mascota | null = null;
@@ -25,17 +35,7 @@ export class FormVacunaComponent implements OnInit {
 
   vacunasComunes = ['Parvovirus', 'Moquillo', 'Rabia', 'Bordetella', 'Leptospira', 'Hepatitis', 'Leucemia Felina', 'Calicivirus', 'Rinotraqueitis', 'Desparasitación'];
 
-  constructor(
-    private fb: FormBuilder,
-    private vacunasService: VacunasService,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private usuariosService: UsuariosService,
-    private auth: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snack: MatSnackBar
-  ) {
+  constructor() {
     this.form = this.fb.group({
       mascotaId: ['', Validators.required],
       clienteId: [''],

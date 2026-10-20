@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
@@ -15,23 +15,21 @@ import { Mascota, Cliente, Consulta, Vacuna, Examen, Receta } from '../../../cor
   styleUrls: ['./perfil-mascota.component.scss']
 })
 export class PerfilMascotaComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private mascotasService = inject(MascotasService);
+  private clientesService = inject(ClientesService);
+  private consultasService = inject(ConsultasService);
+  private vacunasService = inject(VacunasService);
+  private examenesService = inject(ExamenesService);
+  private recetasService = inject(RecetasService);
+
   mascota!: Mascota;
   cliente!: Cliente;
   consultas: Consulta[] = [];
   vacunas: Vacuna[] = [];
   examenes: Examen[] = [];
   recetas: Receta[] = [];
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private mascotasService: MascotasService,
-    private clientesService: ClientesService,
-    private consultasService: ConsultasService,
-    private vacunasService: VacunasService,
-    private examenesService: ExamenesService,
-    private recetasService: RecetasService
-  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.params.id;
