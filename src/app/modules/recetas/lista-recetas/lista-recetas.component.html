@@ -1,0 +1,86 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2><mat-icon>medication</mat-icon> Recetas Médicas</h2>
+      <p>Historial de prescripciones emitidas</p>
+    </div>
+    <button mat-stroked-button routerLink="/consultas">
+      <mat-icon>medical_services</mat-icon> Ir a Consultas
+    </button>
+  </div>
+
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-toolbar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar...</mat-label>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          <button mat-icon-button matSuffix *ngIf="searchInput.value" type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-icon matSuffix *ngIf="!searchInput.value">search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSource" matSort class="full-table">
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+            <td mat-cell *matCellDef="let r" class="cell-primary">{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="mascota">
+            <th mat-header-cell *matHeaderCellDef>Mascota</th>
+            <td mat-cell *matCellDef="let r" data-label="Mascota">{{ getMascota(r.mascotaId) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="cliente">
+            <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
+            <td mat-cell *matCellDef="let r" class="hide-sm" data-label="Propietario">{{ getCliente(r.clienteId) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="veterinario">
+            <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
+            <td mat-cell *matCellDef="let r" class="hide-md" data-label="Veterinario">{{ getVet(r.veterinarioId) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="medicamentos">
+            <th mat-header-cell *matHeaderCellDef>Medicamentos</th>
+            <td mat-cell *matCellDef="let r" data-label="Medicamentos">
+              <mat-chip>{{ r.items.length }} {{ r.items.length === 1 ? 'medicamento' : 'medicamentos' }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let r" class="cell-actions">
+              <button mat-icon-button color="primary" (click)="ver(r)" matTooltip="Ver receta" [attr.aria-label]="'Ver receta de ' + getMascota(r.mascotaId)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button (click)="editar(r)" matTooltip="Editar" [attr.aria-label]="'Editar receta de ' + getMascota(r.mascotaId)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="eliminar(r)" matTooltip="Eliminar" [attr.aria-label]="'Eliminar receta de ' + getMascota(r.mascotaId)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row" (click)="ver(row)"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+              <mat-icon>medication</mat-icon>
+              <p>Sin recetas registradas</p>
+              <p class="no-data-hint">Las recetas se generan al guardar una consulta médica con el botón "Guardar y crear receta".</p>
+              <button mat-stroked-button color="primary" routerLink="/consultas">Ir a Consultas</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

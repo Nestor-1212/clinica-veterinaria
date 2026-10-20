@@ -17,28 +17,9 @@
     </div>
   </div>
 
-  <!-- Tarjetas de estadísticas -->
-  <div class="stats-grid">
-    <mat-card class="stat-card stat-clientes" routerLink="/clientes">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>people</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.clientes }}</div>
-          <div class="stat-label">Clientes Activos</div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card stat-mascotas" routerLink="/mascotas">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>pets</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.mascotas }}</div>
-          <div class="stat-label">Mascotas Registradas</div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
+  <!-- Hoy y este mes: lo que requiere atención ahora -->
+  <div class="section-label">Hoy y este mes</div>
+  <div class="stats-grid stats-grid-primary">
     <mat-card class="stat-card stat-citas" routerLink="/citas">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>event</mat-icon></div>
@@ -59,7 +40,7 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="stat-card stat-ingresos" routerLink="/pagos">
+    <mat-card class="stat-card stat-ingresos hero-card" routerLink="/pagos">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>payments</mat-icon></div>
         <div class="stat-info">
@@ -68,15 +49,20 @@
         </div>
       </mat-card-content>
     </mat-card>
+  </div>
 
-    <mat-card class="stat-card stat-vacunas" routerLink="/vacunas">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>vaccines</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.vacunasPendientes }}</div>
-          <div class="stat-label">Vacunas Pendientes</div>
-        </div>
-      </mat-card-content>
+  <!-- Referencia: totales que rara vez cambian de un día a otro -->
+  <div class="stats-grid stats-grid-secondary">
+    <mat-card class="stat-card-mini" routerLink="/clientes">
+      <mat-icon>people</mat-icon>
+      <div class="mini-value">{{ stats.clientes }}</div>
+      <div class="mini-label">Clientes Activos</div>
+    </mat-card>
+
+    <mat-card class="stat-card-mini" routerLink="/mascotas">
+      <mat-icon>pets</mat-icon>
+      <div class="mini-value">{{ stats.mascotas }}</div>
+      <div class="mini-label">Mascotas Registradas</div>
     </mat-card>
   </div>
 
@@ -113,7 +99,10 @@
       <mat-card-header>
         <mat-icon mat-card-avatar class="warn-icon">vaccines</mat-icon>
         <mat-card-title>Vacunas Próximas</mat-card-title>
-        <mat-card-subtitle>Próximos 7 días</mat-card-subtitle>
+        <mat-card-subtitle *ngIf="stats.vacunasVencidas > 0" class="subtitle-alert">
+          {{ stats.vacunasVencidas }} vencida{{ stats.vacunasVencidas === 1 ? '' : 's' }} · {{ stats.vacunasPendientes - stats.vacunasVencidas }} próxima{{ (stats.vacunasPendientes - stats.vacunasVencidas) === 1 ? '' : 's' }}
+        </mat-card-subtitle>
+        <mat-card-subtitle *ngIf="stats.vacunasVencidas === 0">{{ stats.vacunasPendientes }} en los próximos 7 días</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div *ngIf="vacunasPendientes.length === 0" class="empty-state">
@@ -122,15 +111,48 @@
         </div>
         <mat-list *ngIf="vacunasPendientes.length > 0">
           <mat-list-item *ngFor="let vac of vacunasPendientes" class="vacuna-item">
-            <mat-icon matListIcon class="warn-icon">vaccines</mat-icon>
+            <mat-icon matListIcon [class]="esVacunaVencida(vac) ? 'danger-icon' : 'warn-icon'">
+              {{ esVacunaVencida(vac) ? 'error' : 'vaccines' }}
+            </mat-icon>
             <div matLine>
               <strong>{{ vac.nombre }}</strong>
             </div>
             <div matLine class="fecha-vac">{{ vac.proximaFecha | date:'dd/MM/yyyy' }}</div>
+            <mat-chip [class]="esVacunaVencida(vac) ? 'chip-vencida' : 'chip-proxima'">
+              {{ esVacunaVencida(vac) ? 'Vencida' : 'Próxima' }}
+            </mat-chip>
           </mat-list-item>
         </mat-list>
         <button mat-button color="warn" routerLink="/vacunas" class="ver-mas">
           Ver recordatorios <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Pagos pendientes -->
+    <mat-card class="panel-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="danger-avatar">schedule</mat-icon>
+        <mat-card-title>Pagos Pendientes</mat-card-title>
+        <mat-card-subtitle class="subtitle-alert" *ngIf="stats.pagosPendientesCount > 0">
+          {{ stats.pagosPendientesCount }} pago{{ stats.pagosPendientesCount === 1 ? '' : 's' }} · ${{ stats.montoPorCobrar | number:'1.2-2' }} por cobrar
+        </mat-card-subtitle>
+        <mat-card-subtitle *ngIf="stats.pagosPendientesCount === 0">Todo al día</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="pagosPendientes.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>No hay pagos pendientes</p>
+        </div>
+        <mat-list *ngIf="pagosPendientes.length > 0">
+          <mat-list-item *ngFor="let pago of pagosPendientes" class="pago-item">
+            <mat-icon matListIcon class="warn-icon">payments</mat-icon>
+            <div matLine><strong>{{ getClienteNombre(pago.clienteId) }}</strong> — ${{ pago.total | number:'1.2-2' }}</div>
+            <div matLine class="metodo-pago">{{ pago.fecha | date:'dd/MM/yyyy' }} · {{ pago.metodoPago | titlecase }}</div>
+          </mat-list-item>
+        </mat-list>
+        <button mat-button color="primary" routerLink="/pagos" class="ver-mas">
+          Ver todos los pagos <mat-icon>arrow_forward</mat-icon>
         </button>
       </mat-card-content>
     </mat-card>
