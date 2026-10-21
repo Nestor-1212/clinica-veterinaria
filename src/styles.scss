@@ -67,13 +67,13 @@ html { scrollbar-color: #879390 transparent; }
   flex-wrap: wrap;
   gap: var(--vs-space-4);
 
-  h2 {
+  // Título de página: un <h1> por pantalla
+  h1 {
     display: flex;
     align-items: center;
     gap: 10px;
     margin: 0;
-    font-size: 24px;
-    font-weight: 700;
+    font: var(--vs-text-h1);
     color: var(--vs-text);
     mat-icon { color: var(--vs-primary); font-size: 28px; width: 28px; height: 28px; }
   }
@@ -156,6 +156,8 @@ mat-card.mat-mdc-card {
   // Las acciones de fila no se parten en dos líneas: la columna toma su ancho justo
   @media (min-width: 769px) {
     td.cell-actions.mat-mdc-cell { white-space: nowrap; width: 1%; }
+    // Cédulas, teléfonos, fechas e importes no se parten en el guion
+    td.cell-nowrap.mat-mdc-cell { white-space: nowrap; }
   }
 }
 

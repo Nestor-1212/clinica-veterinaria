@@ -1,7 +1,7 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h2><mat-icon>medical_services</mat-icon> Consultas Médicas</h2>
+      <h1><mat-icon>medical_services</mat-icon> Consultas Médicas</h1>
       <p>Historial de todas las atenciones</p>
     </div>
     <button mat-flat-button color="primary" routerLink="/citas/nueva">
@@ -30,7 +30,7 @@
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-            <td mat-cell *matCellDef="let c" class="cell-primary">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td mat-cell *matCellDef="let c" class="cell-nowrap cell-primary">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
           </ng-container>
           <ng-container matColumnDef="mascota">
             <th mat-header-cell *matHeaderCellDef>Mascota</th>

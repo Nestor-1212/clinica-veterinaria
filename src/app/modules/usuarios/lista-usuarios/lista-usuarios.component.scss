@@ -1,6 +1,4 @@
 .user-cell { display: flex; align-items: center; gap: 10px; }
-.user-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 14px; }
-.rol-admin { background: #7b1fa2; } .rol-veterinario { background: var(--vs-primary); } .rol-recepcion { background: #1976d2; }
-.chip-rol-admin { background: #f3e5f5 !important; color: #6a1b9a !important; }
-.chip-rol-veterinario { background: var(--vs-primary-soft) !important; color: var(--vs-on-primary-soft) !important; }
-.chip-rol-recepcion { background: #e3f2fd !important; color: #0d47a1 !important; }
+.user-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; background: var(--vs-primary-container); color: var(--vs-on-primary-container); }
+/* Rol: dato, no estado -> chip neutro; el icono distingue cada rol */
+[class*='chip-rol-'].mat-mdc-chip { background: var(--vs-surface-muted) !important; color: var(--vs-text-secondary) !important; --mat-chip-label-text-color: var(--vs-text-secondary); }

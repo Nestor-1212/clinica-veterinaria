@@ -1,7 +1,7 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h2><mat-icon>payments</mat-icon> Pagos y Facturación</h2>
+      <h1><mat-icon>payments</mat-icon> Pagos y Facturación</h1>
       <p>Ingreso del mes: <strong class="total-mes">${{ totalMes | number:'1.2-2' }}</strong></p>
     </div>
     <button mat-flat-button color="primary" routerLink="/pagos/nuevo"><mat-icon>add</mat-icon> Nuevo Pago</button>
@@ -22,13 +22,13 @@
       </div>
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th><td mat-cell *matCellDef="let p" class="cell-primary">{{ p.fecha | date:'dd/MM/yyyy' }}</td></ng-container>
+          <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th><td mat-cell *matCellDef="let p" class="cell-nowrap cell-primary">{{ p.fecha | date:'dd/MM/yyyy' }}</td></ng-container>
           <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef>Cliente</th><td mat-cell *matCellDef="let p" data-label="Cliente">{{ getCliente(p.clienteId) }}</td></ng-container>
           <ng-container matColumnDef="mascota"><th mat-header-cell *matHeaderCellDef class="hide-sm">Mascota</th><td mat-cell *matCellDef="let p" class="hide-sm" data-label="Mascota">{{ getMascota(p.mascotaId) }}</td></ng-container>
           <ng-container matColumnDef="metodo"><th mat-header-cell *matHeaderCellDef class="hide-sm">Método</th><td mat-cell *matCellDef="let p" class="hide-sm" data-label="Método"><mat-chip>{{ p.metodoPago | titlecase }}</mat-chip></td></ng-container>
           <ng-container matColumnDef="total">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
-            <td mat-cell *matCellDef="let p" data-label="Total"><strong class="total-val">${{ p.total | number:'1.2-2' }}</strong></td>
+            <td mat-cell class="cell-nowrap" *matCellDef="let p" data-label="Total"><strong class="total-val">${{ p.total | number:'1.2-2' }}</strong></td>
           </ng-container>
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef>Estado</th>

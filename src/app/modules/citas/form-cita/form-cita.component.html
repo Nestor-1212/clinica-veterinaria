@@ -1,10 +1,10 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h2>
+      <h1>
         <mat-icon [class]="isInmediata ? 'icon-warn' : ''">{{ isInmediata ? 'flash_on' : 'event_available' }}</mat-icon>
         {{ isInmediata ? 'Atención Inmediata' : 'Nueva Cita' }}
-      </h2>
+      </h1>
       <p>{{ isInmediata ? 'Registre la atención sin cita programada' : 'Programe una cita para el paciente' }}</p>
     </div>
     <button mat-stroked-button routerLink="/citas"><mat-icon>arrow_back</mat-icon> Volver</button>

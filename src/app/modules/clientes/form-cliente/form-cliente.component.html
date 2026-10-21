@@ -1,7 +1,7 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h2><mat-icon>person_{{ isEdit ? 'edit' : 'add' }}</mat-icon> {{ isEdit ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+      <h1><mat-icon>person_{{ isEdit ? 'edit' : 'add' }}</mat-icon> {{ isEdit ? 'Editar Cliente' : 'Nuevo Cliente' }}</h1>
       <p>{{ isEdit ? 'Actualice los datos del cliente' : 'Complete el formulario para registrar un nuevo cliente' }}</p>
     </div>
     <button mat-stroked-button (click)="cancelar()">

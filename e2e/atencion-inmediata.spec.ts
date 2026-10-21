@@ -8,7 +8,7 @@ test('atención inmediata → consulta queda vinculada, tipo inmediata y cita co
   await login(page, 'veterinario');
 
   await page.goto('/citas/nueva?tipo=inmediata');
-  await expect(page.getByRole('heading', { level: 2 })).toContainText('Atención Inmediata');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Atención Inmediata');
 
   // Ana Castillo tiene una sola mascota (Max) en la semilla demo: se autoselecciona.
   await elegirOpcion(page, 'Propietario', 'Ana Castillo');
