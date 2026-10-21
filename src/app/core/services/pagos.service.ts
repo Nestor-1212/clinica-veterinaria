@@ -60,6 +60,23 @@ export class PagosService {
     return pago;
   }
 
+  /** Cobra un pago pendiente. Devuelve false si no existe o no estaba pendiente. */
+  marcarPagado(id: string): boolean {
+    const pago = this.getById(id);
+    if (!pago || pago.estado !== 'pendiente') return false;
+    this.update(id, { estado: 'pagado', fechaPago: new Date() });
+    return true;
+  }
+
+  /** Anula un pago pendiente o pagado. El motivo es obligatorio. */
+  anular(id: string, motivo: string, usuarioId?: string): boolean {
+    const pago = this.getById(id);
+    const motivoLimpio = (motivo || '').trim();
+    if (!pago || pago.estado === 'anulado' || !motivoLimpio) return false;
+    this.update(id, { estado: 'anulado', motivoAnulacion: motivoLimpio, fechaAnulacion: new Date(), anuladoPor: usuarioId });
+    return true;
+  }
+
   update(id: string, data: Partial<Pago>): void {
     const all = this.getAll().map(p => p.id === id ? { ...p, ...data } : p);
     this.storage.set(KEY, all);

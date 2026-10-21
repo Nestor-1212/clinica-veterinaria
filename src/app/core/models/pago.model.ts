@@ -23,4 +23,10 @@ export interface Pago {
   estado: EstadoPago;
   referencia?: string;
   notas?: string;
+  /** Fecha en que se cobró un pago que estaba pendiente. */
+  fechaPago?: Date | string;
+  motivoAnulacion?: string;
+  fechaAnulacion?: Date | string;
+  /** Id del usuario que anuló el pago. */
+  anuladoPor?: string;
 }
