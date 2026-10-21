@@ -9,6 +9,7 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { RolUsuario, Usuario } from '../../../core/models';
 import { ROL_LABELS } from '../../../core/auth/permisos';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -36,7 +37,11 @@ export class ListaUsuariosComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngOnInit(): void { this.cargar(); }
+  ngOnInit(): void {
+    // B9: nunca filtrar por la contraseña.
+    this.dataSource.filterPredicate = filtroPorTexto<Usuario>(u => [u.nombre, u.apellido, u.correo, this.getRolLabel(u.rol), u.especialidad, u.telefono]);
+    this.cargar();
+  }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
   cargar(): void { this.dataSource.data = this.usuariosService.getAll(); }
   applyFilter(ev: Event): void { this.dataSource.filter = (ev.target as HTMLInputElement).value.trim().toLowerCase(); }

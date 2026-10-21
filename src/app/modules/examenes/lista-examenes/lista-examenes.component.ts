@@ -7,6 +7,7 @@ import { ExamenesService } from '../../../core/services/examenes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Examen } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -33,7 +34,10 @@ export class ListaExamenesComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngOnInit(): void { this.dataSource.data = this.examenesService.getAll().sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()); }
+  ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Examen>(e => [this.getMascota(e.mascotaId), this.getCliente(e.mascotaId), e.tipo, e.descripcion, e.resultado]);
+    this.dataSource.data = this.examenesService.getAll().sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
   applyFilter(ev: Event): void { this.dataSource.filter = (ev.target as HTMLInputElement).value.trim().toLowerCase(); }
   getMascota(id: string): string { return this.mascotasService.getById(id)?.nombre || '-'; }

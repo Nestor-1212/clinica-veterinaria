@@ -10,6 +10,7 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Receta } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -41,6 +42,9 @@ export class ListaRecetasComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Receta>(r => [
+      this.getMascota(r.mascotaId), this.getCliente(r.clienteId), this.getVet(r.veterinarioId), ...r.items.map(i => i.medicamento)
+    ]);
     this.cargar();
   }
 

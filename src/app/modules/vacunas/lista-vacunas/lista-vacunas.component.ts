@@ -7,6 +7,7 @@ import { VacunasService } from '../../../core/services/vacunas.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Vacuna } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -35,7 +36,10 @@ export class ListaVacunasComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngOnInit(): void { this.cargar(); }
+  ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Vacuna>(v => [this.getMascota(v.mascotaId), this.getCliente(v.mascotaId), v.nombre, v.lote, v.laboratorio]);
+    this.cargar();
+  }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
 
   /** Ids de las dosis vigentes que están vencidas o por vencer (B5). */

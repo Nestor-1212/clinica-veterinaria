@@ -8,6 +8,7 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Consulta } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -36,6 +37,9 @@ export class ListaConsultasComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Consulta>(c => [
+      this.getMascota(c.mascotaId), this.getCliente(c.clienteId), this.getVet(c.veterinarioId), c.diagnostico, c.tipo
+    ]);
     this.dataSource.data = this.consultasService.getAll().sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
 

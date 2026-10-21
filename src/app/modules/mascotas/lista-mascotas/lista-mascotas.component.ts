@@ -8,6 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Mascota } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -40,6 +41,7 @@ export class ListaMascotasComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Mascota>(m => [m.nombre, m.tipo, m.raza, m.color, this.getClienteNombre(m.clienteId)]);
     this.cargar();
   }
 

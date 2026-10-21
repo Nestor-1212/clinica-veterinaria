@@ -8,6 +8,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { Cliente } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -40,6 +41,7 @@ export class ListaClientesComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Cliente>(c => [c.nombre, c.cedula, c.telefono, c.correo, c.direccion]);
     this.cargarClientes();
     this.route.queryParams.subscribe(params => {
       if (params.accion === 'atencion') {

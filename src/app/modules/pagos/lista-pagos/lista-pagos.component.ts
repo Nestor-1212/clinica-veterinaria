@@ -12,6 +12,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Pago } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -44,6 +45,9 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = filtroPorTexto<Pago>(p => [
+      this.getCliente(p.clienteId), this.getMascota(p.mascotaId), p.metodoPago, p.estado, p.total.toFixed(2), p.referencia
+    ]);
     this.cargar();
   }
 

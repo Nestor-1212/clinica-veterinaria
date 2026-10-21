@@ -26,6 +26,19 @@ describe('ListaCitasComponent', () => {
     expect(citas.find(c => c.id === 'cita1')?.estado).toBe('cancelada');
   });
 
+  it('B9: la búsqueda encuentra citas por nombre de cliente, mascota y veterinario (sin tildes)', () => {
+    const { componente } = crearComponente(ListaCitasComponent);
+    componente.ngOnInit();
+    const buscar = (texto: string) => {
+      componente.dataSource.filter = texto;
+      return componente.dataSource.filteredData.map(c => c.id).sort();
+    };
+    expect(buscar('perez')).toEqual(['cita2']);
+    expect(buscar('rocky')).toEqual(['cita1']);
+    expect(buscar('victor')).toEqual(['cita1', 'cita2']);
+    expect(buscar('vacunación')).toEqual(['cita1']);
+  });
+
   it('B6: si se descarta el diálogo la cita no cambia', () => {
     const h = crearComponente(ListaCitasComponent);
     h.dialogResult(false);

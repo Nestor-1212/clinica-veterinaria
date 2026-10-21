@@ -10,6 +10,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Cita, EstadoCita } from '../../../core/models';
+import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -46,7 +47,13 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngOnInit(): void { this.cargar(); }
+  ngOnInit(): void {
+    // B9: buscar por los nombres que se muestran, no por los IDs guardados en la fila.
+    this.dataSource.filterPredicate = filtroPorTexto<Cita>(c => [
+      this.getMascota(c.mascotaId), this.getCliente(c.clienteId), this.getVet(c.veterinarioId), c.motivo, c.estado, c.hora
+    ]);
+    this.cargar();
+  }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
 
   cargar(): void {
