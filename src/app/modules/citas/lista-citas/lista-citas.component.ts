@@ -83,12 +83,16 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     });
   }
 
-  eliminar(cita: Cita): void {
+  /**
+   * B6: cancelar una cita cambia su estado a 'cancelada' (antes la borraba físicamente y
+   * dejaba consultas con citaId huérfano). El historial se conserva.
+   */
+  cancelar(cita: Cita): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
-      data: { title: 'Cancelar Cita', message: '¿Cancelar esta cita?', confirmText: 'Sí, cancelar', color: 'warn' }
+      data: { title: 'Cancelar Cita', message: '¿Cancelar esta cita? Quedará en el historial como cancelada.', confirmText: 'Sí, cancelar', color: 'warn' }
     });
     ref.afterClosed().subscribe(ok => {
-      if (ok) { this.citasService.delete(cita.id); this.cargar(); this.snack.open('Cita cancelada', 'OK', { duration: 2000 }); }
+      if (ok) { this.cambiarEstado(cita, 'cancelada'); }
     });
   }
 }

@@ -91,9 +91,8 @@
               <mat-menu #menu>
                 <button mat-menu-item (click)="cambiarEstado(c, 'confirmada')"><mat-icon>check_circle</mat-icon> Confirmar</button>
                 <button mat-menu-item (click)="cambiarEstado(c, 'completada')"><mat-icon>done_all</mat-icon> Completar</button>
-                <button mat-menu-item (click)="cambiarEstado(c, 'cancelada')"><mat-icon>cancel</mat-icon> Cancelar</button>
                 <mat-divider></mat-divider>
-                <button mat-menu-item (click)="eliminar(c)" class="warn-item"><mat-icon>delete</mat-icon> Eliminar</button>
+                <button mat-menu-item (click)="cancelar(c)" class="warn-item"><mat-icon>cancel</mat-icon> Cancelar cita</button>
               </mat-menu>
             </td>
           </ng-container>
