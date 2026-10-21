@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDia
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
 
 export interface ConfirmDialogData {
   title: string;
@@ -21,9 +22,14 @@ export interface ConfirmDialogData {
 @Component({
     selector: 'app-confirm-dialog',
     template: `
-    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <h2 mat-dialog-title class="confirm-title" [class.is-danger]="esDestructivo">
+      @if (esDestructivo) {
+        <mat-icon aria-hidden="true">warning</mat-icon>
+      }
+      {{ data.title }}
+    </h2>
     <mat-dialog-content>
-      <p>{{ data.message }}</p>
+      <p class="confirm-message">{{ data.message }}</p>
       @if (data.input) {
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ data.input.label }}</mat-label>
@@ -32,17 +38,29 @@ export interface ConfirmDialogData {
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ data.cancelText || 'Cancelar' }}</button>
-      <button mat-raised-button [color]="data.color || 'warn'" [disabled]="!puedeConfirmar" (click)="confirmar()">
+      <!-- Foco inicial en Cancelar: Enter accidental no ejecuta la acción destructiva -->
+      <button mat-stroked-button mat-dialog-close cdkFocusInitial>{{ data.cancelText || 'Cancelar' }}</button>
+      <button mat-flat-button [color]="data.color || 'warn'" [disabled]="!puedeConfirmar" (click)="confirmar()">
         {{ data.confirmText || 'Confirmar' }}
       </button>
     </mat-dialog-actions>
   `,
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose, FormsModule, MatFormField, MatLabel, MatInput]
+    styles: [`
+      .confirm-title { display: flex; align-items: center; gap: var(--vs-space-2); }
+      .confirm-title.is-danger mat-icon { color: var(--vs-danger); }
+      .confirm-message { margin: 0; color: var(--vs-text-secondary); }
+      mat-dialog-actions { gap: var(--vs-space-2); }
+    `],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose, FormsModule, MatFormField, MatLabel, MatInput, MatIcon]
 })
 export class ConfirmDialogComponent {
   dialogRef = inject<MatDialogRef<ConfirmDialogComponent>>(MatDialogRef);
   data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
+
+  /** Las confirmaciones son destructivas salvo que se pida color 'primary'. */
+  get esDestructivo(): boolean {
+    return (this.data.color || 'warn') === 'warn';
+  }
   texto = '';
 
   get puedeConfirmar(): boolean {
