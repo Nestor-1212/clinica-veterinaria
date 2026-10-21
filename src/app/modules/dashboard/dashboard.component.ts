@@ -8,6 +8,7 @@ import { VacunasService } from '../../core/services/vacunas.service';
 import { PagosService } from '../../core/services/pagos.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Cita, Vacuna, Pago } from '../../core/models';
+import { Seccion, puedeAcceder } from '../../core/auth/permisos';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardContent, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle } from '@angular/material/card';
@@ -73,6 +74,11 @@ export class DashboardComponent implements OnInit {
     this.pagosPendientes = pendientes.slice(0, 5);
     this.stats.pagosPendientesCount = pendientes.length;
     this.stats.montoPorCobrar = pendientes.reduce((acc, p) => acc + p.total, 0);
+  }
+
+  /** Oculta métricas y paneles que enlazan a secciones sin permiso para el rol actual. */
+  puede(seccion: Seccion): boolean {
+    return puedeAcceder(this.auth.currentUser?.rol, seccion);
   }
 
   esVacunaVencida(v: Vacuna): boolean {

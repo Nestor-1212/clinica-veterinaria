@@ -2,7 +2,7 @@
   <div class="dashboard-header">
     <div>
       <h1>¡Bienvenido, {{ userName }}!</h1>
-      <p>{{ today | date:'EEEE, d MMMM yyyy':'':'es' }} — Resumen del día</p>
+      <p class="fecha-hoy">{{ today | date:"EEEE, d 'de' MMMM 'de' yyyy":'':'es' }} — Resumen del día</p>
     </div>
     <div class="quick-actions">
       <button mat-flat-button class="vs-btn-urgent" (click)="nuevaAtencionInmediata()">
@@ -30,6 +30,7 @@
       </mat-card-content>
     </mat-card></a>
 
+    @if (puede('consultas')) {
     <a class="stat-link" routerLink="/consultas"><mat-card class="stat-card stat-consultas">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>medical_services</mat-icon></div>
@@ -39,8 +40,10 @@
         </div>
       </mat-card-content>
     </mat-card></a>
+    }
 
-    <a class="stat-link" routerLink="/pagos"><mat-card class="stat-card stat-ingresos hero-card">
+    @if (puede('pagos')) {
+    <a class="stat-link" routerLink="/pagos"><mat-card class="stat-card stat-ingresos">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>payments</mat-icon></div>
         <div class="stat-info">
@@ -49,6 +52,7 @@
         </div>
       </mat-card-content>
     </mat-card></a>
+    }
   </div>
 
   <!-- Referencia: totales que rara vez cambian de un día a otro -->
@@ -89,7 +93,7 @@
                 <div matListItemTitle class="cita-info">
                   <strong>{{ cita.hora }}</strong> — {{ cita.motivo }}
                 </div>
-                <mat-chip [class]="'chip-' + cita.estado" small>{{ cita.estado }}</mat-chip>
+                <mat-chip [class]="'chip-' + cita.estado">{{ cita.estado | titlecase }}</mat-chip>
               </mat-list-item>
             }
           </mat-list>
@@ -139,13 +143,14 @@
             }
           </mat-list>
         }
-        <button mat-button color="warn" routerLink="/vacunas" class="ver-mas">
+        <button mat-button color="primary" routerLink="/vacunas" class="ver-mas">
           Ver recordatorios <mat-icon>arrow_forward</mat-icon>
         </button>
       </mat-card-content>
     </mat-card>
 
-    <!-- Pagos pendientes -->
+    <!-- Pagos pendientes (solo roles con acceso a Pagos) -->
+    @if (puede('pagos')) {
     <mat-card class="panel-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="danger-avatar">schedule</mat-icon>
@@ -182,5 +187,6 @@
         </button>
       </mat-card-content>
     </mat-card>
+    }
   </div>
 </div>

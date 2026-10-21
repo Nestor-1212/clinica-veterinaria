@@ -14,6 +14,8 @@
 
   h1 { margin: 0; font: var(--vs-text-h1); color: var(--vs-text); }
   p { margin: 4px 0 0; color: var(--vs-text-secondary); font-size: 14px; }
+  // "miércoles, 21 de octubre de 2026" -> solo la inicial en mayúscula
+  .fecha-hoy::first-letter { text-transform: uppercase; }
 }
 
 .quick-actions {
@@ -78,14 +80,6 @@
   }
 }
 
-.hero-card {
-  background: var(--vs-success) !important;      // blanco 5.13:1
-  border-color: var(--vs-success) !important;
-
-  .stat-icon { background: rgba(255, 255, 255, 0.2); }
-  .stat-value, .stat-label { color: #fff; }
-}
-
 .stat-icon {
   width: 52px;
   height: 52px;
@@ -100,7 +94,9 @@
 .stat-value { font-size: 28px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 .stat-label { font-size: 12px; color: var(--vs-text-secondary); margin-top: 4px; }
 
-.stat-citas { border-left-color: #7b1fa2 !important; .stat-icon { background: #7b1fa2; } }
+/* Métricas sobre superficie blanca; el color de marca va en el icono y el borde */
+.stat-citas { border-left-color: var(--vs-primary) !important; .stat-icon { background: var(--vs-primary); } }
+.stat-ingresos { border-left-color: var(--vs-success) !important; .stat-icon { background: var(--vs-success); } }
 // Naranja de marca: el icono va en texto oscuro (blanco sobre #f57c00 = 2.70:1)
 .stat-consultas {
   border-left-color: var(--vs-accent) !important;
