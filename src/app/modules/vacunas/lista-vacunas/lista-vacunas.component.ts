@@ -38,8 +38,13 @@ export class ListaVacunasComponent implements OnInit, AfterViewInit {
   ngOnInit(): void { this.cargar(); }
   ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
 
+  /** Ids de las dosis vigentes que están vencidas o por vencer (B5). */
+  private pendientesIds = new Set<string>();
+
   cargar(): void {
-    const data = this.mostrarSoloPendientes ? this.vacunasService.getPendientes() : this.vacunasService.getAll();
+    const pendientes = this.vacunasService.getPendientes();
+    this.pendientesIds = new Set(pendientes.map(v => v.id));
+    const data = this.mostrarSoloPendientes ? pendientes : this.vacunasService.getAll();
     this.dataSource.data = data.sort((a, b) => new Date(a.proximaFecha).getTime() - new Date(b.proximaFecha).getTime());
   }
 
@@ -50,10 +55,9 @@ export class ListaVacunasComponent implements OnInit, AfterViewInit {
     return m ? this.clientesService.getById(m.clienteId)?.nombre || '-' : '-';
   }
 
+  /** Una dosis reemplazada por otra posterior ya no se marca como pendiente. */
   esPendiente(v: Vacuna): boolean {
-    const en7 = new Date();
-    en7.setDate(en7.getDate() + 7);
-    return new Date(v.proximaFecha) <= en7;
+    return this.pendientesIds.has(v.id);
   }
 
   editar(v: Vacuna): void { this.router.navigate(['/vacunas/editar', v.id]); }
