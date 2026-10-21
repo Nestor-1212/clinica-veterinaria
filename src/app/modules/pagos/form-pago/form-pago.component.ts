@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
+import { descuentoValido, subtotalLineas, totalPago } from '../../../core/utils/pagos';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PagosService } from '../../../core/services/pagos.service';
@@ -47,12 +48,14 @@ export class FormPagoComponent implements OnInit {
       consultaId: [''],
       fecha: [new Date()],
       items: this.fb.array([this.crearItem()]),
-      descuento: [0, [Validators.min(0)]],
+      descuento: [0, [Validators.min(0), (c: AbstractControl) => this.validarDescuento(c)]],
       metodoPago: ['efectivo', Validators.required],
       estado: ['pagado'],
       referencia: [''],
       notas: ['']
     });
+    // B10: si cambian los ítems, el subtotal cambia y hay que revalidar el descuento.
+    this.items.valueChanges.subscribe(() => this.revalidarDescuento());
   }
 
   ngOnInit(): void {
@@ -85,23 +88,37 @@ export class FormPagoComponent implements OnInit {
   }
 
   agregarItem(): void { this.items.push(this.crearItem()); }
-  removerItem(i: number): void { if (this.items.length > 1) this.items.removeAt(i); }
+  removerItem(i: number): void {
+    if (this.items.length > 1) this.items.removeAt(i);
+    this.revalidarDescuento();
+  }
+
+  /** B10: el descuento no puede superar el subtotal de los ítems. */
+  private validarDescuento(c: AbstractControl): ValidationErrors | null {
+    if (!this.form) return null; // durante la construcción del formulario
+    return descuentoValido(this.subtotal, c.value) ? null : { descuentoMayorQueSubtotal: true };
+  }
+
+  private revalidarDescuento(): void {
+    this.form.get('descuento')?.updateValueAndValidity();
+  }
 
   calcularSubtotal(i: number): void {
     const item = this.items.at(i);
     const sub = (item.get('cantidad')?.value || 0) * (item.get('precioUnitario')?.value || 0);
     item.patchValue({ subtotal: sub });
+    this.revalidarDescuento();
   }
 
   get subtotal(): number {
-    return this.items.controls.reduce((acc, item) => {
-      return acc + (item.get('cantidad')?.value || 0) * (item.get('precioUnitario')?.value || 0);
-    }, 0);
+    return subtotalLineas(this.items.controls.map(item => item.getRawValue()));
   }
 
+  /** Total mostrado en pantalla (nunca negativo mientras el descuento es inválido). */
   get total(): number { return Math.max(0, this.subtotal - (this.form.get('descuento')?.value || 0)); }
 
   onSubmit(): void {
+    this.revalidarDescuento();
     if (this.form.invalid) return;
     const rawItems = this.items.controls.map(c => ({
       ...c.value,
@@ -110,8 +127,9 @@ export class FormPagoComponent implements OnInit {
     const data = {
       ...this.form.value,
       items: rawItems,
+      descuento: Number(this.form.value.descuento) || 0,
       subtotal: this.subtotal,
-      total: this.total
+      total: totalPago(this.subtotal, this.form.value.descuento)
     };
     this.pagosService.create(data);
     this.snack.open('Pago registrado', 'OK', { duration: 2000 });

@@ -110,6 +110,12 @@
             <mat-form-field appearance="outline" style="width:120px">
               <input matInput type="number" formControlName="descuento" min="0" step="0.01">
               <span matPrefix>$&nbsp;</span>
+              @if (form.get('descuento')?.hasError('descuentoMayorQueSubtotal')) {
+                <mat-error>No puede superar el subtotal</mat-error>
+              }
+              @if (form.get('descuento')?.hasError('min')) {
+                <mat-error>No puede ser negativo</mat-error>
+              }
             </mat-form-field>
           </div>
           <div class="total-row total-final"><span>TOTAL:</span><span>${{ total | number:'1.2-2' }}</span></div>
