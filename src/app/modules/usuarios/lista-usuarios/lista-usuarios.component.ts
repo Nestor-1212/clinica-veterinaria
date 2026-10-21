@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { UsuariosService } from '../../../core/services/usuarios.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { RolUsuario, Usuario } from '../../../core/models';
 import { ROL_LABELS } from '../../../core/auth/permisos';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -27,6 +28,7 @@ export class ListaUsuariosComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   displayedColumns = ['nombre', 'correo', 'rol', 'especialidad', 'activo', 'acciones'];
   dataSource = new MatTableDataSource<Usuario>();
@@ -50,6 +52,12 @@ export class ListaUsuariosComponent implements OnInit, AfterViewInit {
   }
 
   eliminar(u: Usuario): void {
+    // B4: no permitir desactivarse a sí mismo ni dejar la clínica sin administradores.
+    const error = this.usuariosService.validarCambio(u.id, { activo: false }, this.auth.currentUser?.id);
+    if (error) {
+      this.snack.open(error, 'OK', { duration: 3000, panelClass: 'snack-error' });
+      return;
+    }
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: { title: 'Desactivar Usuario', message: `¿Desactivar a ${u.nombre} ${u.apellido}?`, confirmText: 'Desactivar', color: 'warn' }
     });

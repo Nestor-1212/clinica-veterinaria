@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UsuariosService } from '../../../core/services/usuarios.service';
-import { RolUsuario } from '../../../core/models';
+import { RolUsuario, Usuario } from '../../../core/models';
+import { AuthService } from '../../../core/services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -23,6 +24,7 @@ export class FormUsuarioComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
+  private auth = inject(AuthService);
 
   form: FormGroup;
   isEdit = false;
@@ -52,8 +54,9 @@ export class FormUsuarioComponent implements OnInit {
       this.isEdit = true;
       const u = this.usuariosService.getById(this.usuarioId);
       if (u) {
-        this.form.patchValue(u);
-        this.form.get('password')?.setValidators([]);
+        // B4: la contraseña actual nunca se carga en el formulario; en edición es opcional.
+        this.form.patchValue({ ...u, password: '' });
+        this.form.get('password')?.setValidators([Validators.minLength(6)]);
         this.form.get('password')?.updateValueAndValidity();
       }
     }
@@ -61,18 +64,28 @@ export class FormUsuarioComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) return;
-    const data = this.form.value;
+    const data: Partial<Usuario> = { ...this.form.value };
 
-    if (this.usuariosService.existeCorreo(data.correo, this.isEdit ? this.usuarioId : undefined)) {
+    if (this.usuariosService.existeCorreo(data.correo ?? '', this.isEdit ? this.usuarioId : undefined)) {
       this.snack.open('Ya existe un usuario con ese correo', 'OK', { duration: 3000, panelClass: 'snack-error' });
       return;
+    }
+
+    if (this.isEdit) {
+      // B4: si el campo queda vacío se conserva la contraseña existente.
+      if (!data.password) delete data.password;
+      const error = this.usuariosService.validarCambio(this.usuarioId, data, this.auth.currentUser?.id);
+      if (error) {
+        this.snack.open(error, 'OK', { duration: 3000, panelClass: 'snack-error' });
+        return;
+      }
     }
 
     if (this.isEdit) {
       this.usuariosService.update(this.usuarioId, data);
       this.snack.open('Usuario actualizado', 'OK', { duration: 2000 });
     } else {
-      this.usuariosService.create(data);
+      this.usuariosService.create(data as Omit<Usuario, 'id' | 'createdAt'>);
       this.snack.open('Usuario creado', 'OK', { duration: 2000 });
     }
     this.router.navigate(['/usuarios']);

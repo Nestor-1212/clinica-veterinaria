@@ -58,6 +58,26 @@ export class UsuariosService {
     this.refresh();
   }
 
+  /**
+   * B4: valida un cambio sobre un usuario existente. Devuelve el mensaje de error o null si es válido.
+   * - Nadie puede desactivar su propia cuenta ni quitarse el rol de administrador.
+   * - Siempre debe quedar al menos un administrador activo.
+   */
+  validarCambio(id: string, cambios: Partial<Usuario>, actorId?: string): string | null {
+    const todos = this.getAll();
+    const actual = todos.find(u => u.id === id);
+    if (!actual) return 'El usuario no existe';
+    const desactiva = actual.activo && cambios.activo === false;
+    const pierdeAdmin = actual.rol === 'admin' && cambios.rol !== undefined && cambios.rol !== 'admin';
+    if (actorId === id && desactiva) return 'No puede desactivar su propia cuenta';
+    if (actorId === id && pierdeAdmin) return 'No puede quitarse el rol de administrador';
+    if (actual.rol === 'admin' && actual.activo && (desactiva || pierdeAdmin)) {
+      const otrosAdmins = todos.filter(u => u.id !== id && u.rol === 'admin' && u.activo).length;
+      if (otrosAdmins === 0) return 'Debe quedar al menos un administrador activo';
+    }
+    return null;
+  }
+
   existeCorreo(correo: string, excludeId?: string): boolean {
     return this.getAll().some(u => u.correo === correo && u.id !== excludeId);
   }
