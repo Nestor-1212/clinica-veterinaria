@@ -6,7 +6,7 @@ import { PagosService } from '../../../core/services/pagos.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
-import { Cliente, Mascota, MetodoPago } from '../../../core/models';
+import { Cliente, ItemPago, Mascota, MetodoPago } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -74,7 +74,7 @@ export class FormPagoComponent implements OnInit {
 
   get items(): FormArray { return this.form.get('items') as FormArray; }
 
-  crearItem(data?: any): FormGroup {
+  crearItem(data?: Partial<ItemPago>): FormGroup {
     return this.fb.group({
       descripcion: [data?.descripcion || '', Validators.required],
       categoria: [data?.categoria || 'consulta', Validators.required],

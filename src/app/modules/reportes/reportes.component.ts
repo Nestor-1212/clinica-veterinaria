@@ -10,6 +10,18 @@ import { MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatCardAvatar } f
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
 import { DecimalPipe, TitleCasePipe, DatePipe } from '@angular/common';
+import { MetodoPago, Vacuna } from '../../core/models';
+
+interface ConsultasPorTipo {
+  tipo: string;
+  cantidad: number;
+  color: string;
+}
+
+interface PagosPorMetodo {
+  metodo: string;
+  cantidad: number;
+}
 
 interface ReporteMes {
   mes: string;
@@ -32,9 +44,9 @@ export class ReportesComponent implements OnInit {
   private citasService = inject(CitasService);
 
   stats = { clientes: 0, mascotas: 0, consultasTotal: 0, consultasMes: 0, ingresosMes: 0, ingresosTotal: 0, vacunasPendientes: 0 };
-  vacunasPendientesList: any[] = [];
-  consultasPorTipo: any[] = [];
-  pagosPorMetodo: any[] = [];
+  vacunasPendientesList: Vacuna[] = [];
+  consultasPorTipo: ConsultasPorTipo[] = [];
+  pagosPorMetodo: PagosPorMetodo[] = [];
   reporteMensual: ReporteMes[] = [];
   meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
@@ -61,9 +73,9 @@ export class ReportesComponent implements OnInit {
     ];
 
     const pagos = this.pagosService.getAll();
-    const metodos: any = {};
+    const metodos: Partial<Record<MetodoPago, number>> = {};
     pagos.forEach(p => { metodos[p.metodoPago] = (metodos[p.metodoPago] || 0) + 1; });
-    this.pagosPorMetodo = Object.keys(metodos).map(k => ({ metodo: k, cantidad: metodos[k] }));
+    this.pagosPorMetodo = Object.entries(metodos).map(([metodo, cantidad]) => ({ metodo, cantidad: cantidad ?? 0 }));
 
     this.reporteMensual = Array.from({ length: 6 }, (_, i) => {
       const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);

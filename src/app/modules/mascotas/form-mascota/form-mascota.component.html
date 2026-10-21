@@ -13,7 +13,8 @@
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="foto-section">
-          <div class="foto-preview" (click)="fotoInput.click()">
+          <div class="foto-preview" role="button" tabindex="0" aria-label="Seleccionar foto de la mascota"
+            (click)="fotoInput.click()" (keydown.enter)="fotoInput.click()" (keydown.space)="$event.preventDefault(); fotoInput.click()">
             @if (fotoPreview) {
               <img [src]="fotoPreview" alt="Foto mascota">
             }

@@ -9,7 +9,7 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PdfService } from '../../../core/services/pdf.service';
-import { Mascota, Cliente, Consulta } from '../../../core/models';
+import { Mascota, Cliente, Consulta, ItemReceta } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -89,7 +89,7 @@ export class FormRecetaComponent implements OnInit {
 
   get items(): FormArray { return this.form.get('items') as FormArray; }
 
-  crearItem(data?: any): FormGroup {
+  crearItem(data?: Partial<ItemReceta>): FormGroup {
     return this.fb.group({
       medicamento: [data?.medicamento || '', Validators.required],
       dosis: [data?.dosis || '', Validators.required],

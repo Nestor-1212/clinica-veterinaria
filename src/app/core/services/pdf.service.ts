@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Receta, Mascota, Cliente, Usuario } from '../models';
+import { Receta, Mascota, Cliente, Usuario, Pago, ItemPago } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -100,7 +100,7 @@ export class PdfService {
     doc.save(`receta_${mascota.nombre}_${new Date(receta.fecha).toLocaleDateString('es-PA').replace(/\//g, '-')}.pdf`);
   }
 
-  async generarFactura(pago: any, cliente: Cliente, mascota: Mascota): Promise<void> {
+  async generarFactura(pago: Pago, cliente: Cliente, mascota: Mascota): Promise<void> {
     const { jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     const pageW = doc.internal.pageSize.getWidth();
@@ -146,7 +146,7 @@ export class PdfService {
 
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
-    pago.items.forEach((item: any, idx: number) => {
+    pago.items.forEach((item: ItemPago, idx: number) => {
       if (idx % 2 === 0) {
         doc.setFillColor(240, 248, 255);
         doc.rect(10, y - 3, pageW - 20, 7, 'F');

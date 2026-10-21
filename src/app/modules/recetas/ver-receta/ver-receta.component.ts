@@ -6,7 +6,7 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { PdfService } from '../../../core/services/pdf.service';
-import { Receta, Mascota, Cliente, Usuario } from '../../../core/models';
+import { Receta, Mascota, Cliente, Usuario, ItemReceta } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
@@ -30,7 +30,7 @@ export class VerRecetaComponent implements OnInit {
   mascota!: Mascota;
   cliente!: Cliente;
   veterinario!: Usuario;
-  dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<ItemReceta>();
   displayedColumns = ['medicamento', 'dosis', 'frecuencia', 'duracion', 'indicaciones'];
 
   ngOnInit(): void {
