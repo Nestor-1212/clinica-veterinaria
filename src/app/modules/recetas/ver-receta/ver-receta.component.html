@@ -6,7 +6,7 @@
         <p>{{ receta.fecha | date:'dd/MM/yyyy' }}</p>
       </div>
       <div class="header-actions">
-        <button mat-raised-button color="primary" (click)="descargarPDF()">
+        <button mat-flat-button color="primary" (click)="descargarPDF()">
           <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
         </button>
         <button mat-stroked-button (click)="editar()"><mat-icon>edit</mat-icon> Editar</button>

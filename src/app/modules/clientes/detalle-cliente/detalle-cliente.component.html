@@ -6,10 +6,10 @@
         <p>Historial completo y datos del propietario</p>
       </div>
       <div class="header-actions">
-        <button mat-raised-button color="warn" (click)="nuevaAtencion()">
+        <button mat-flat-button class="vs-btn-urgent" (click)="nuevaAtencion()">
           <mat-icon>flash_on</mat-icon> Atención Inmediata
         </button>
-        <button mat-raised-button color="primary" (click)="nuevaCita()">
+        <button mat-flat-button color="primary" (click)="nuevaCita()">
           <mat-icon>event</mat-icon> Nueva Cita
         </button>
         <button mat-stroked-button routerLink="/clientes">

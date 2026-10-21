@@ -5,10 +5,10 @@
       <p>{{ today | date:'EEEE, d MMMM yyyy':'':'es' }} — Resumen del día</p>
     </div>
     <div class="quick-actions">
-      <button mat-raised-button color="accent" (click)="nuevaAtencionInmediata()">
+      <button mat-flat-button class="vs-btn-urgent" (click)="nuevaAtencionInmediata()">
         <mat-icon>flash_on</mat-icon> Atención Inmediata
       </button>
-      <button mat-raised-button color="primary" (click)="nuevaCita()">
+      <button mat-flat-button color="primary" (click)="nuevaCita()">
         <mat-icon>event_available</mat-icon> Nueva Cita
       </button>
       <button mat-stroked-button (click)="nuevoCliente()">

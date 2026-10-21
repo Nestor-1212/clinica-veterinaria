@@ -61,7 +61,7 @@
 
         <div class="form-actions">
           <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
+          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
             @if (loading) {
               <mat-spinner diameter="18"></mat-spinner>
             }

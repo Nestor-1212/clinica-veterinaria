@@ -5,10 +5,10 @@
       <p>Agenda y gestión de citas</p>
     </div>
     <div class="header-actions">
-      <button mat-raised-button color="warn" routerLink="/citas/nueva" [queryParams]="{tipo:'inmediata'}">
+      <button mat-flat-button class="vs-btn-urgent" routerLink="/citas/nueva" [queryParams]="{tipo:'inmediata'}">
         <mat-icon>flash_on</mat-icon> Atención Inmediata
       </button>
-      <button mat-raised-button color="primary" routerLink="/citas/nueva">
+      <button mat-flat-button color="primary" routerLink="/citas/nueva">
         <mat-icon>event_available</mat-icon> Nueva Cita
       </button>
     </div>
