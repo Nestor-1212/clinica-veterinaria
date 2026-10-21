@@ -6,7 +6,7 @@
   max-width: 800px;
   margin: 0 auto;
 }
-.receta-header-print { text-align: center; background: #00796b; color: white; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
+.receta-header-print { text-align: center; background: var(--vs-primary); color: white; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
 .clinic-name { font-size: 22px; font-weight: 700; }
 .clinic-sub { font-size: 12px; opacity: 0.85; }
 .receta-title { text-align: center; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 8px; }

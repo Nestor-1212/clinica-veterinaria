@@ -98,7 +98,7 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let r; columns: displayedColumns;" class="table-row"></tr>
+          <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
               <mat-icon>event_busy</mat-icon><p>No se encontraron citas</p>

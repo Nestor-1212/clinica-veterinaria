@@ -1,6 +1,4 @@
-.row-pendiente { background: #fff8e1; }
-.text-warn { color: #e65100; font-weight: 600; }
-.text-ok { color: #2e7d32; }
-.warn-icon { color: #e65100; font-size: 16px; width: 16px; height: 16px; vertical-align: middle; }
-.no-data { text-align: center; padding: 40px; color: #999; mat-icon { font-size: 48px; width: 48px; height: 48px; } }
-.table-toolbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.row-pendiente { background: var(--vs-warning-container); }
+.text-warn { color: var(--vs-warning); font-weight: 600; }
+.text-ok { color: var(--vs-success); }
+.warn-icon { color: var(--vs-warning); font-size: 16px; width: 16px; height: 16px; vertical-align: middle; }

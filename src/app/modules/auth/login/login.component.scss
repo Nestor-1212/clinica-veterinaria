@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #00796b 0%, #004d40 50%, #1a237e 100%);
+  background: linear-gradient(135deg, var(--vs-primary) 0%, #003730 60%, #00201b 100%);
   position: relative;
   overflow: hidden;
 }
@@ -31,7 +31,7 @@
 .login-logo {
   text-align: center;
   padding: 32px 24px 16px;
-  background: linear-gradient(135deg, #00796b, #004d40);
+  background: var(--vs-primary);
   color: white;
   margin: -16px -16px 16px;
 
@@ -67,14 +67,14 @@
 .demo-credentials {
   margin-top: 20px;
   padding: 12px 12px 8px;
-  background: #f5f5f5;
+  background: var(--vs-surface-muted);
   border-radius: 8px;
 
   .demo-title {
     margin: 0 0 8px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: #888;
+    color: var(--vs-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -112,7 +112,7 @@
     line-height: 1.3;
 
     strong { font-size: 13px; }
-    small  { font-size: 11px; opacity: 0.7; }
+    small  { font-size: 12px; color: var(--vs-text-secondary); }
   }
 
   &:hover { transform: translateX(3px); }

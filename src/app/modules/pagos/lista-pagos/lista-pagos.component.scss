@@ -1,6 +1,2 @@
-.total-mes { color: #2e7d32; font-size: 18px; }
-.total-val { color: #1976d2; font-size: 15px; }
-.chip-pagado { background: #e8f5e9 !important; color: #2e7d32 !important; }
-.chip-pendiente { background: #fff3e0 !important; color: #e65100 !important; }
-.chip-anulado { background: #fce4ec !important; color: #c62828 !important; }
-.no-data { text-align: center; padding: 40px; color: #999; mat-icon { font-size: 48px; width: 48px; height: 48px; } }
+.total-mes { color: var(--vs-success); font-size: 18px; }
+.total-val { color: var(--vs-primary); font-size: 15px; }

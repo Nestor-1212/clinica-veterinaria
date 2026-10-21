@@ -7,4 +7,3 @@
 .medicamento-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .med-num { font-weight: 600; color: #7b1fa2; }
 .med-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; .col-full { grid-column: 1 / -1; } @media (max-width: 600px) { grid-template-columns: 1fr; } }
-.full-width { width: 100%; }

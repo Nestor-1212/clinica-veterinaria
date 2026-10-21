@@ -2,16 +2,16 @@
 .cliente-profile { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
 .profile-avatar {
   width: 72px; height: 72px; border-radius: 50%;
-  background: #1976d2; color: white;
+  background: var(--vs-primary-container); color: var(--vs-on-primary-container);
   display: flex; align-items: center; justify-content: center;
   font-size: 32px; font-weight: 700; flex-shrink: 0;
 }
 .profile-info { flex: 1; h3 { margin: 0 0 8px; font-size: 22px; } }
 .info-grid { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-.info-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #555; mat-icon { font-size: 16px; width: 16px; height: 16px; } }
+.info-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--vs-text-secondary); mat-icon { font-size: 16px; width: 16px; height: 16px; } }
 .profile-stats { display: flex; gap: 24px; }
-.pstat { text-align: center; span { display: block; font-size: 24px; font-weight: 700; color: #1976d2; } small { font-size: 11px; color: #666; } }
-.detail-tabs { background: white; border-radius: 8px; }
+.pstat { text-align: center; span { display: block; font-size: 24px; font-weight: 700; color: var(--vs-primary); } small { font-size: 12px; color: var(--vs-text-secondary); } }
+.detail-tabs { background: var(--vs-surface); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-md); overflow: hidden; }
 .tab-content { padding: 16px; }
 .mascotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
 .mascota-card {
@@ -19,18 +19,13 @@
   transition: transform 0.2s;
   &:hover { transform: translateY(-2px); }
   &.add-card {
-    border: 2px dashed #ccc; background: transparent;
+    border: 2px dashed var(--vs-border-strong); background: transparent;
     display: flex; align-items: center; justify-content: center;
-    mat-card-content { text-align: center; color: #999; mat-icon { font-size: 36px; width: 36px; height: 36px; } }
+    mat-card-content { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } }
   }
 }
 .mascota-header { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-.mascota-avatar { width: 40px; height: 40px; border-radius: 10px; background: #00796b; color: white; display: flex; align-items: center; justify-content: center; }
-.mascota-details { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #666; span { display: flex; align-items: center; gap: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } } }
-.list-row { border-bottom: 1px solid #f0f0f0; }
-.chip-inmediata, .chip-pendiente { background: #fff3e0 !important; color: #e65100 !important; }
-.chip-cita, .chip-confirmada, .chip-completada { background: #e8f5e9 !important; color: #2e7d32 !important; }
-.chip-pagado { background: #e8f5e9 !important; color: #2e7d32 !important; }
-.chip-cancelada, .chip-anulado { background: #fce4ec !important; color: #c62828 !important; }
-.estado-pendiente, .estado-inmediata { color: #e65100; }
-.estado-confirmada, .estado-completada { color: #2e7d32; }
+.mascota-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--vs-primary); color: var(--vs-on-primary); display: flex; align-items: center; justify-content: center; }
+.mascota-details { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--vs-text-secondary); span { display: flex; align-items: center; gap: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } } }
+.list-row { border-bottom: 1px solid var(--vs-border); }
+/* Chips .chip-* y colores .estado-* : mapa único en src/styles.scss */

@@ -1,2 +1,1 @@
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; .col-full { grid-column: 1 / -1; } @media (max-width: 600px) { grid-template-columns: 1fr; } }
-.cliente-info { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; background: #f5f5f5; padding: 8px 12px; border-radius: 6px; font-size: 13px; mat-icon { font-size: 16px; color: #1976d2; } }
+.cliente-info { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; background: var(--vs-surface-muted); padding: 8px 12px; border-radius: 6px; font-size: 13px; mat-icon { font-size: 16px; color: var(--vs-primary); } }

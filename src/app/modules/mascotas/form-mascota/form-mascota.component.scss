@@ -1,9 +1,8 @@
 .foto-section { display: flex; justify-content: center; margin-bottom: 24px; }
 .foto-preview {
   width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
-  border: 3px dashed #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border: 3px dashed var(--vs-border-strong); cursor: pointer; display: flex; align-items: center; justify-content: center;
   img { width: 100%; height: 100%; object-fit: cover; }
-  &:hover { border-color: #00796b; }
+  &:hover { border-color: var(--vs-primary); }
 }
-.foto-placeholder { text-align: center; color: #999; mat-icon { font-size: 36px; width: 36px; height: 36px; } span { display: block; font-size: 11px; } }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; .col-full { grid-column: 1 / -1; } @media (max-width: 600px) { grid-template-columns: 1fr; } }
+.foto-placeholder { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } span { display: block; font-size: 12px; } }

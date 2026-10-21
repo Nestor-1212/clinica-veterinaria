@@ -93,14 +93,43 @@ html { scrollbar-color: #879390 transparent; }
 }
 
 /* ===== CARDS ===== */
-mat-card {
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+/* Superficies: tarjeta blanca con borde sutil sobre el fondo --vs-bg
+   (antes la tarjeta M3 #f0f4f2 sobre #f0f2f5 daba 1.01:1 y no se distinguía). */
+html {
+  @include mat.card-overrides((
+    elevated-container-color: var(--vs-surface),
+    elevated-container-shape: var(--vs-radius-md),
+    elevated-container-elevation: var(--vs-shadow-1),
+    outlined-container-color: var(--vs-surface),
+    outlined-outline-color: var(--vs-border),
+    title-text-size: 16px,
+    title-text-line-height: 24px,
+    title-text-weight: 600,
+    subtitle-text-size: 14px,
+    subtitle-text-line-height: 20px,
+    subtitle-text-weight: 500,
+  ));
+  @include mat.table-overrides((
+    background-color: var(--vs-surface),
+  ));
+  @include mat.paginator-overrides((
+    container-background-color: var(--vs-surface),
+  ));
+}
+
+mat-card.mat-mdc-card {
+  border: 1px solid var(--vs-border);
 }
 
 .table-card, .form-card {
-  mat-card-content { padding: 20px !important; }
+  mat-card-content { padding: var(--vs-space-5) !important; }
+  @media (max-width: 600px) {
+    mat-card-content { padding: var(--vs-space-4) !important; }
+  }
 }
+
+/* Formularios: ancho de lectura cómodo en escritorio */
+.form-card { max-width: var(--vs-form-max); }
 
 /* ===== TABLE ===== */
 .table-responsive { overflow-x: auto; width: 100%; }
@@ -140,7 +169,22 @@ mat-card {
   @media (max-width: 600px) { max-width: 100%; }
 }
 
+.table-row {
+  cursor: pointer;
+  &:hover { background: var(--vs-surface-muted); }
+}
+
 /* ===== FORMS ===== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--vs-space-4);
+  .col-full { grid-column: 1 / -1; }
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.form-grid-1 { display: grid; grid-template-columns: 1fr; }
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -148,11 +192,78 @@ mat-card {
   margin-top: var(--vs-space-6);
   flex-wrap: wrap;
 
+  // En móvil la acción principal (último botón) queda arriba
   @media (max-width: 480px) {
-    flex-direction: column;
+    flex-direction: column-reverse;
     button { width: 100%; }
   }
 }
+
+/* ===== BOTONES =====
+   Jerarquía: mat-flat-button color=primary (1 por vista) > mat-stroked-button > mat-button.
+   .vs-btn-urgent: "Atención inmediata", igual en todas las pantallas. */
+.mat-mdc-unelevated-button.vs-btn-urgent:not(:disabled) {
+  --mat-button-filled-container-color: var(--vs-accent-container);
+  --mat-button-filled-label-text-color: var(--vs-on-accent-container);
+  --mat-button-filled-ripple-color: rgba(80, 36, 0, 0.12);
+  --mat-button-filled-state-layer-color: var(--vs-on-accent-container);
+}
+
+/* Destructivo relleno: color="warn" sobre botón flat usa --mat-sys-error (6.45:1) */
+
+/* ===== ESTADOS VACÍOS ===== */
+.vs-empty, .no-data, .empty-state, .empty-tab, .empty-msg {
+  text-align: center;
+  padding: var(--vs-space-7) var(--vs-space-4);
+  color: var(--vs-text-muted);
+  mat-icon { font-size: 48px; width: 48px; height: 48px; color: var(--vs-text-muted); }
+  p { margin: var(--vs-space-2) 0 0; }
+}
+
+/* ===== ESTADOS (chips) =====
+   Un único mapa estado -> significado. El texto del estado siempre se
+   muestra; el color nunca es el único indicador. Ratios medidos:
+   success 7.00 · warning 8.54 · danger 7.23 · info 7.56 · accent 10.23. */
+.vs-status, [class*='chip-'].mat-mdc-chip {
+  font-weight: 600 !important;
+}
+
+@mixin _status($bg, $fg) {
+  --mat-chip-elevated-container-color: #{$bg};
+  --mat-chip-label-text-color: #{$fg};
+  --mat-chip-outline-color: transparent;
+  background: #{$bg} !important;
+  color: #{$fg} !important;
+  .mat-icon, .chip-icon { color: #{$fg}; }
+}
+
+.vs-status--success,
+.mat-mdc-chip:is(.chip-confirmada, .chip-pagado, .chip-activo) {
+  @include _status(var(--vs-success-container), var(--vs-on-success-container));
+}
+.vs-status--warning,
+.mat-mdc-chip:is(.chip-pendiente, .chip-proxima) {
+  @include _status(var(--vs-warning-container), var(--vs-on-warning-container));
+}
+.vs-status--danger,
+.mat-mdc-chip:is(.chip-cancelada, .chip-anulado, .chip-vencida, .chip-inactivo) {
+  @include _status(var(--vs-danger-container), var(--vs-on-danger-container));
+}
+.vs-status--info,
+.mat-mdc-chip:is(.chip-completada, .chip-cita) {
+  @include _status(var(--vs-info-container), var(--vs-on-info-container));
+}
+.vs-status--accent,
+.mat-mdc-chip.chip-inmediata {
+  @include _status(var(--vs-accent-container), var(--vs-on-accent-container));
+}
+
+/* Iconos de estado sueltos (listas del dashboard / expediente) */
+.estado-pendiente, .estado-proxima { color: var(--vs-warning); }
+.estado-confirmada, .estado-pagado { color: var(--vs-success); }
+.estado-completada { color: var(--vs-info); }
+.estado-cancelada, .estado-anulado, .estado-vencida { color: var(--vs-danger); }
+.estado-inmediata { color: var(--vs-accent-text); }
 
 mat-form-field.full-width, .full-width { width: 100%; }
 
