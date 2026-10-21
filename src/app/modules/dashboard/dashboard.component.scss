@@ -44,7 +44,11 @@
   margin-bottom: var(--vs-space-4);
 }
 
-.stats-grid-primary { margin-bottom: var(--vs-space-6); }
+// auto-fit: las 3 métricas del día ocupan todo el ancho (sin media fila vacía)
+.stats-grid-primary {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: var(--vs-space-6);
+}
 
 .stats-grid-secondary {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -152,6 +152,11 @@ mat-card.mat-mdc-card {
     font-size: 13px;
     border-bottom: 1px solid var(--vs-border);
   }
+
+  // Las acciones de fila no se parten en dos líneas: la columna toma su ancho justo
+  @media (min-width: 769px) {
+    td.cell-actions.mat-mdc-cell { white-space: nowrap; width: 1%; }
+  }
 }
 
 .table-toolbar {
