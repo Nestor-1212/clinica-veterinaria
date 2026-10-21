@@ -25,4 +25,27 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/\/citas$/);
   });
+
+  test('las tarjetas de mascota del expediente se abren con teclado', async ({ page }) => {
+    await login(page, 'admin');
+    await page.goto('/clientes');
+    await page.getByRole('button', { name: /^Ver expediente de/ }).first().click();
+    await expect(page).toHaveURL(/\/clientes\/[^/]+$/);
+    const tarjeta = page.getByRole('link', { name: /^Ver historial médico de/ }).first();
+    await tarjeta.focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/\/mascotas\/[^/]+$/);
+  });
+
+  test('recepción no ve métricas ni paneles de secciones sin permiso', async ({ page }) => {
+    await login(page, 'recepcion');
+    await expect(page.locator('a.stat-link[href="/consultas"]')).toHaveCount(0);
+    await expect(page.locator('a.stat-link[href="/pagos"]')).toHaveCount(1);
+  });
+
+  test('veterinario no ve ingresos ni pagos pendientes en el dashboard', async ({ page }) => {
+    await login(page, 'veterinario');
+    await expect(page.locator('a.stat-link[href="/pagos"]')).toHaveCount(0);
+    await expect(page.getByText('Pagos Pendientes')).toHaveCount(0);
+  });
 });
