@@ -20,7 +20,7 @@
   <!-- Hoy y este mes: lo que requiere atención ahora -->
   <div class="section-label">Hoy y este mes</div>
   <div class="stats-grid stats-grid-primary">
-    <mat-card class="stat-card stat-citas" routerLink="/citas">
+    <a class="stat-link" routerLink="/citas"><mat-card class="stat-card stat-citas">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>event</mat-icon></div>
         <div class="stat-info">
@@ -28,9 +28,9 @@
           <div class="stat-label">Citas Hoy</div>
         </div>
       </mat-card-content>
-    </mat-card>
+    </mat-card></a>
 
-    <mat-card class="stat-card stat-consultas" routerLink="/consultas">
+    <a class="stat-link" routerLink="/consultas"><mat-card class="stat-card stat-consultas">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>medical_services</mat-icon></div>
         <div class="stat-info">
@@ -38,9 +38,9 @@
           <div class="stat-label">Consultas Hoy</div>
         </div>
       </mat-card-content>
-    </mat-card>
+    </mat-card></a>
 
-    <mat-card class="stat-card stat-ingresos hero-card" routerLink="/pagos">
+    <a class="stat-link" routerLink="/pagos"><mat-card class="stat-card stat-ingresos hero-card">
       <mat-card-content>
         <div class="stat-icon"><mat-icon>payments</mat-icon></div>
         <div class="stat-info">
@@ -48,22 +48,22 @@
           <div class="stat-label">Ingresos del Mes</div>
         </div>
       </mat-card-content>
-    </mat-card>
+    </mat-card></a>
   </div>
 
   <!-- Referencia: totales que rara vez cambian de un día a otro -->
   <div class="stats-grid stats-grid-secondary">
-    <mat-card class="stat-card-mini" routerLink="/clientes">
+    <a class="stat-link" routerLink="/clientes"><mat-card class="stat-card-mini">
       <mat-icon>people</mat-icon>
       <div class="mini-value">{{ stats.clientes }}</div>
       <div class="mini-label">Clientes Activos</div>
-    </mat-card>
+    </mat-card></a>
 
-    <mat-card class="stat-card-mini" routerLink="/mascotas">
+    <a class="stat-link" routerLink="/mascotas"><mat-card class="stat-card-mini">
       <mat-icon>pets</mat-icon>
       <div class="mini-value">{{ stats.mascotas }}</div>
       <div class="mini-label">Mascotas Registradas</div>
-    </mat-card>
+    </mat-card></a>
   </div>
 
   <div class="dashboard-panels">
