@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -25,7 +26,9 @@ export class FormClienteComponent implements OnInit {
   form: FormGroup;
   isEdit = false;
   clienteId = '';
+  /** true desde que se acepta el envío hasta navegar: evita el doble envío. */
   loading = false;
+  private host = inject(ElementRef, { optional: true });
 
   constructor() {
     this.form = this.fb.group({
@@ -47,7 +50,8 @@ export class FormClienteComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.loading) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
 
     const cedula = this.form.value.cedula;
     if (this.clientesService.existeCedula(cedula, this.isEdit ? this.clienteId : undefined)) {
@@ -63,7 +67,7 @@ export class FormClienteComponent implements OnInit {
       this.clientesService.create(this.form.value);
       this.snack.open('Cliente registrado exitosamente', 'OK', { duration: 2000 });
     }
-    this.loading = false;
+    // loading sigue en true hasta que la navegación desmonte el formulario
     this.router.navigate(['/clientes']);
   }
 

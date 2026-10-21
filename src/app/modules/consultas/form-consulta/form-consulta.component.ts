@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -37,6 +38,9 @@ export class FormConsultaComponent implements OnInit {
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   mascota: Mascota | null = null;
   cliente: Cliente | null = null;
   veterinarios: Usuario[] = [];
@@ -113,14 +117,18 @@ export class FormConsultaComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const consulta = this.guardar();
     this.snack.open(this.isEdit ? 'Consulta actualizada' : 'Consulta registrada', 'OK', { duration: 2000 });
     this.router.navigate(['/recetas/nueva'], { queryParams: { consultaId: consulta.id } });
   }
 
   guardarSinReceta(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     this.guardar();
     this.snack.open('Consulta guardada', 'OK', { duration: 2000 });
     this.router.navigate(['/consultas']);

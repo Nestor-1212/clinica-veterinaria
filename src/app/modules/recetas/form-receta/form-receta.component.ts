@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -38,6 +39,9 @@ export class FormRecetaComponent implements OnInit {
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   mascota: Mascota | null = null;
   cliente: Cliente | null = null;
   consulta: Consulta | null = null;
@@ -104,7 +108,9 @@ export class FormRecetaComponent implements OnInit {
   removerItem(i: number): void { if (this.items.length > 1) this.items.removeAt(i); }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const data = this.form.value;
     let receta;
     if (this.isEdit) {

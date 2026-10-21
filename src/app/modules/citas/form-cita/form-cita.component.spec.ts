@@ -39,6 +39,28 @@ describe('FormCitaComponent: atención inmediata (B1)', () => {
     expect(navigate).toHaveBeenCalledWith(['/citas']);
   });
 
+  it('la mascota se habilita solo al elegir propietario (sin [disabled] en la plantilla)', () => {
+    sesionComo('u-rec');
+    const h = crearComponente(FormCitaComponent);
+    h.componente.ngOnInit();
+    expect(h.componente.form.get('mascotaId')?.disabled).toBe(true);
+    h.componente.onClienteChange('c1');
+    expect(h.componente.form.get('mascotaId')?.enabled).toBe(true);
+    h.componente.onClienteChange('');
+    expect(h.componente.form.get('mascotaId')?.disabled).toBe(true);
+  });
+
+  it('enviar incompleto no crea la cita y marca los errores', () => {
+    sesionComo('u-rec');
+    const h = crearComponente(FormCitaComponent);
+    h.componente.ngOnInit();
+    h.componente.onSubmit();
+    expect(h.componente.form.get('clienteId')?.touched).toBe(true);
+    expect(h.componente.enviando).toBe(false);
+    expect(leer<Cita>('vet_citas')).toHaveLength(0);
+    expect(h.navigate).not.toHaveBeenCalled();
+  });
+
   it('una cita programada vuelve a la agenda', () => {
     sesionComo('u-rec');
     const h = crearComponente(FormCitaComponent, { queryParams: { clienteId: 'c1' } });

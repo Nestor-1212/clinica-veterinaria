@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -27,6 +28,9 @@ export class FormUsuarioComponent implements OnInit {
   private auth = inject(AuthService);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   isEdit = false;
   usuarioId = '';
   roles: { value: RolUsuario, label: string }[] = [
@@ -63,11 +67,14 @@ export class FormUsuarioComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const data: Partial<Usuario> = { ...this.form.value };
 
     if (this.usuariosService.existeCorreo(data.correo ?? '', this.isEdit ? this.usuarioId : undefined)) {
       this.snack.open('Ya existe un usuario con ese correo', 'OK', { duration: 3000, panelClass: 'snack-error' });
+      this.enviando = false;
       return;
     }
 
@@ -77,6 +84,7 @@ export class FormUsuarioComponent implements OnInit {
       const error = this.usuariosService.validarCambio(this.usuarioId, data, this.auth.currentUser?.id);
       if (error) {
         this.snack.open(error, 'OK', { duration: 3000, panelClass: 'snack-error' });
+        this.enviando = false;
         return;
       }
     }

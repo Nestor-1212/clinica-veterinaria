@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { habilitarSi, validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,6 +35,9 @@ export class FormCitaComponent implements OnInit {
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
   veterinarios: Usuario[] = [];
@@ -43,7 +47,8 @@ export class FormCitaComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
-      mascotaId: ['', Validators.required],
+      // Se habilita al elegir propietario (onClienteChange); antes era [disabled] en la plantilla
+      mascotaId: [{ value: '', disabled: true }, Validators.required],
       veterinarioId: ['', Validators.required],
       fecha: [new Date(), Validators.required],
       hora: ['08:00', Validators.required],
@@ -69,12 +74,15 @@ export class FormCitaComponent implements OnInit {
   }
 
   onClienteChange(clienteId: string): void {
+    habilitarSi(this.form.get('mascotaId'), !!clienteId);
     this.mascotas = this.mascotasService.getByCliente(clienteId);
     if (this.mascotas.length === 1) this.form.patchValue({ mascotaId: this.mascotas[0].id });
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const cita = this.citasService.create(this.form.value);
     if (!this.isInmediata) {
       this.snack.open('Cita programada', 'OK', { duration: 2000 });

@@ -169,6 +169,11 @@ mat-card.mat-mdc-card {
   align-items: center;
 }
 
+.filter-field {
+  width: 180px;
+  @media (max-width: 600px) { width: 100%; }
+}
+
 .search-field {
   flex: 1;
   min-width: 200px;

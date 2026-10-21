@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,6 +35,9 @@ export class FormExamenComponent implements OnInit {
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   mascotas: Mascota[] = [];
   veterinarios: Usuario[] = [];
   mascota: Mascota | null = null;
@@ -84,7 +88,9 @@ export class FormExamenComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const data = this.form.value;
     if (this.isEdit) { this.examenesService.update(this.examenId, data); } else { this.examenesService.create(data); }
     this.snack.open('Examen registrado', 'OK', { duration: 2000 });

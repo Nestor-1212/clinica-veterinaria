@@ -34,7 +34,7 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Mascota</mat-label>
-            <mat-select formControlName="mascotaId" [disabled]="!form.get('clienteId')?.value">
+            <mat-select formControlName="mascotaId">
               @for (m of mascotas; track m) {
                 <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
               }
@@ -85,7 +85,7 @@
 
         <div class="form-actions">
           <button mat-stroked-button type="button" routerLink="/citas">Cancelar</button>
-          <button mat-flat-button [color]="isInmediata ? 'warn' : 'primary'" type="submit" [disabled]="form.invalid">
+          <button mat-flat-button [color]="isInmediata ? 'warn' : 'primary'" type="submit" [disabled]="enviando">
             <mat-icon>{{ isInmediata ? 'flash_on' : 'event_available' }}</mat-icon>
             {{ isInmediata ? 'Iniciar Atención' : 'Programar Cita' }}
           </button>

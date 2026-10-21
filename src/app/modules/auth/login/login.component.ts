@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject } from '@angular/core';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -27,6 +28,7 @@ export class LoginComponent {
   form: FormGroup;
   loading = false;
   hidePassword = true;
+  private host = inject(ElementRef, { optional: true });
 
   constructor() {
     this.form = this.fb.group({
@@ -44,14 +46,16 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.loading) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.loading = true;
     const { correo, password } = this.form.value;
     const ok = this.auth.login(correo, password);
-    this.loading = false;
     if (ok) {
+      // loading sigue en true hasta salir del login: evita un segundo envío
       this.router.navigate(['/dashboard']);
     } else {
+      this.loading = false;
       this.snack.open('Credenciales incorrectas', 'Cerrar', { duration: 3000, panelClass: 'snack-error' });
     }
   }

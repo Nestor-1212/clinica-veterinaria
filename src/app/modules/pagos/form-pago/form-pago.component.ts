@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { habilitarSi, validarYEnfocar } from '../../../shared/utils/formulario';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
 import { descuentoValido, subtotalLineas, totalPago } from '../../../core/utils/pagos';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -35,6 +36,9 @@ export class FormPagoComponent implements OnInit {
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
+  /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
+  enviando = false;
+  private host = inject(ElementRef, { optional: true });
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
   cliente: Cliente | null = null;
@@ -44,7 +48,8 @@ export class FormPagoComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
-      mascotaId: ['', Validators.required],
+      // Se habilita al elegir propietario (onClienteChange); antes era [disabled] en la plantilla
+      mascotaId: [{ value: '', disabled: true }, Validators.required],
       consultaId: [''],
       fecha: [new Date()],
       items: this.fb.array([this.crearItem()]),
@@ -70,6 +75,7 @@ export class FormPagoComponent implements OnInit {
   }
 
   onClienteChange(id: string): void {
+    habilitarSi(this.form.get('mascotaId'), !!id);
     this.mascotas = this.mascotasService.getByCliente(id);
     this.cliente = this.clientesService.getById(id) || null;
     if (this.mascotas.length === 1) this.form.patchValue({ mascotaId: this.mascotas[0].id });
@@ -119,7 +125,9 @@ export class FormPagoComponent implements OnInit {
 
   onSubmit(): void {
     this.revalidarDescuento();
-    if (this.form.invalid) return;
+    if (this.enviando) return;
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    this.enviando = true;
     const rawItems = this.items.controls.map(c => ({
       ...c.value,
       subtotal: (c.get('cantidad')?.value || 0) * (c.get('precioUnitario')?.value || 0)

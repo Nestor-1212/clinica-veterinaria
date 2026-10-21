@@ -90,14 +90,14 @@
           }
         </div>
 
-        <mat-form-field appearance="outline" class="full-width" style="margin-top:16px">
+        <mat-form-field appearance="outline" class="full-width observaciones-field">
           <mat-label>Observaciones generales</mat-label>
           <textarea matInput formControlName="observaciones" rows="3"></textarea>
         </mat-form-field>
 
         <div class="form-actions">
           <button mat-stroked-button type="button" routerLink="/recetas">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
             <mat-icon>save</mat-icon> Guardar Receta
           </button>
         </div>

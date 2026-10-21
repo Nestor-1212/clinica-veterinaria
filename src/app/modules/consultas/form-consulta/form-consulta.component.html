@@ -117,10 +117,10 @@
 
         <div class="form-actions">
           <button mat-stroked-button type="button" routerLink="/consultas">Cancelar</button>
-          <button mat-stroked-button color="primary" type="button" (click)="guardarSinReceta()" [disabled]="form.invalid">
+          <button mat-stroked-button color="primary" type="button" (click)="guardarSinReceta()" [disabled]="enviando">
             <mat-icon>save</mat-icon> Guardar sin receta
           </button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
             <mat-icon>medication</mat-icon> Guardar y crear receta
           </button>
         </div>

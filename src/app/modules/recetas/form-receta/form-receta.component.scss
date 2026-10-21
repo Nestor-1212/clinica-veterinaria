@@ -1,9 +1,10 @@
-.paciente-card { border-left: 4px solid #7b1fa2; margin-bottom: 16px; }
+.paciente-card { border-left: 4px solid var(--vs-primary); margin-bottom: 16px; }
 .paciente-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.p-icon { width: 44px; height: 44px; background: #7b1fa2; border-radius: 10px; display: flex; align-items: center; justify-content: center; mat-icon { color: white; } flex-shrink: 0; }
-.consulta-ref { display: flex; align-items: center; gap: 6px; background: #f3e5f5; padding: 6px 10px; border-radius: 8px; font-size: 12px; mat-icon { font-size: 16px; color: #7b1fa2; } }
-.receta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; h3 { margin: 0; font-style: italic; color: #444; } }
-.medicamento-card { margin-bottom: 12px; border: 1px solid #e0e0e0; border-radius: 8px !important; }
+.p-icon { width: 44px; height: 44px; background: var(--vs-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; mat-icon { color: white; } flex-shrink: 0; }
+.consulta-ref { display: flex; align-items: center; gap: 6px; background: var(--vs-primary-soft); padding: 6px 10px; border-radius: 8px; font-size: 12px; mat-icon { font-size: 16px; color: var(--vs-primary); } }
+.receta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; h3 { margin: 0; font-style: italic; color: var(--vs-text-secondary); } }
+.medicamento-card { margin-bottom: 12px; border: 1px solid var(--vs-border); border-radius: 8px !important; }
 .medicamento-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.med-num { font-weight: 600; color: #7b1fa2; }
+.med-num { font-weight: 600; color: var(--vs-primary); }
 .med-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; .col-full { grid-column: 1 / -1; } @media (max-width: 600px) { grid-template-columns: 1fr; } }
+.observaciones-field { margin-top: 16px; }
