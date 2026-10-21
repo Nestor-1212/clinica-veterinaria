@@ -1,5 +1,6 @@
 @use '@angular/material' as mat;
 @use './theme-colors' as theme;
+@use './styles/tokens' as vs;
 
 $theme: mat.define-theme((
   color: (
@@ -8,8 +9,8 @@ $theme: mat.define-theme((
     tertiary: theme.$tertiary-palette,
   ),
   typography: (
-    plain-family: ('Segoe UI', Roboto, sans-serif),
-    brand-family: ('Segoe UI', Roboto, sans-serif),
+    plain-family: ('Inter', 'Segoe UI', Roboto, sans-serif),
+    brand-family: ('Inter', 'Segoe UI', Roboto, sans-serif),
   ),
   density: (scale: 0),
 ));
@@ -21,6 +22,8 @@ html {
   @include mat.system-level-typography($theme);
   // Mantiene funcionando color="primary|accent|warn" en botones, chips, etc.
   @include mat.color-variants-backwards-compatibility($theme);
+  // Tokens semánticos del design system (src/styles/_tokens.scss)
+  @include vs.tokens;
 }
 
 /* ===== RESET & BASE ===== */
@@ -29,22 +32,29 @@ html {
 html, body {
   height: 100%;
   margin: 0;
-  font-family: 'Segoe UI', 'Roboto', sans-serif;
-  background: #f0f2f5;
+  font-family: var(--vs-font);
+  background: var(--vs-bg);
+  color: var(--vs-text);
   -webkit-font-smoothing: antialiased;
 }
 
 /* ===== SCROLLBAR ===== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+html { scrollbar-color: #879390 transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #aaa; }
+::-webkit-scrollbar-thumb {
+  background: #879390;
+  border-radius: var(--vs-radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--vs-border-strong); background-clip: padding-box; }
 
 /* ===== PAGE LAYOUT ===== */
 .page-container {
   max-width: 1400px;
   margin: 0 auto;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn var(--vs-dur) var(--vs-ease);
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
@@ -53,9 +63,9 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: var(--vs-space-6);
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--vs-space-4);
 
   h2 {
     display: flex;
@@ -64,15 +74,15 @@ html, body {
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #1b2a3b;
-    mat-icon { color: #00796b; font-size: 28px; width: 28px; height: 28px; }
+    color: var(--vs-text);
+    mat-icon { color: var(--vs-primary); font-size: 28px; width: 28px; height: 28px; }
   }
 
-  p { margin: 4px 0 0; color: #666; font-size: 14px; }
+  p { margin: 4px 0 0; color: var(--vs-text-secondary); font-size: 14px; }
 
   .header-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--vs-space-2);
     flex-wrap: wrap;
   }
 
@@ -101,24 +111,24 @@ mat-card {
 
   th.mat-mdc-header-cell {
     font-weight: 600;
-    color: #555;
+    color: var(--vs-text-secondary);
     font-size: 13px;
-    background: #fafafa;
-    border-bottom: 2px solid #e0e0e0;
+    background: var(--vs-surface-muted);
+    border-bottom: 2px solid var(--vs-border);
     padding: 12px 16px;
   }
 
   td.mat-mdc-cell {
     padding: 12px 16px;
     font-size: 13px;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--vs-border);
   }
 }
 
 .table-toolbar {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--vs-space-4);
+  margin-bottom: var(--vs-space-4);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -135,7 +145,7 @@ mat-card {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: var(--vs-space-6);
   flex-wrap: wrap;
 
   @media (max-width: 480px) {
@@ -156,7 +166,7 @@ mat-form-field.full-width, .full-width { width: 100%; }
 
 /* ===== CHIPS ===== */
 mat-chip {
-  font-size: 11px !important;
+  font-size: 12px !important;
   height: 22px !important;
   line-height: 22px !important;
   padding: 0 8px !important;
@@ -176,15 +186,27 @@ mat-chip {
 mat-list-item { height: auto !important; min-height: 48px !important; }
 
 /* ===== SIDENAV ===== */
-.mat-drawer-container { background: #f0f2f5 !important; }
+.mat-drawer-container { background: var(--vs-bg) !important; }
 
-/* ===== ACCESSIBLE FOCUS ===== */
+/* ===== ACCESSIBLE FOCUS =====
+   Un único anillo de foco. Las zonas oscuras (sidebar, header) redefinen
+   --vs-focus localmente para mantener >= 3:1 contra su fondo. */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #00796b;
+  outline: 2px solid var(--vs-focus);
   outline-offset: 2px;
+}
+
+/* ===== MOVIMIENTO REDUCIDO ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ===== STATUS CHIPS WITH ICON (color + icon, never color alone) ===== */
@@ -225,13 +247,13 @@ mat-chip.mat-mdc-chip {
     .mat-mdc-row, tr.mat-mdc-row, tr[mat-row] {
       display: block !important;
       height: auto !important;
-      border: 1px solid #e5e7eb !important;
+      border: 1px solid var(--vs-border) !important;
       border-bottom-width: 1px !important;
-      border-radius: 12px;
+      border-radius: var(--vs-radius-md);
       margin-bottom: 12px;
       padding: 4px 14px !important;
-      background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      background: var(--vs-surface);
+      box-shadow: var(--vs-shadow-1);
     }
 
     .mat-mdc-cell, td.mat-mdc-cell {
@@ -241,7 +263,7 @@ mat-chip.mat-mdc-chip {
       justify-content: space-between;
       gap: 12px;
       padding: 8px 0 !important;
-      border-bottom: 1px solid #f2f2f2 !important;
+      border-bottom: 1px solid var(--vs-border) !important;
       text-align: right;
       white-space: normal;
       min-height: 0 !important;
@@ -252,11 +274,11 @@ mat-chip.mat-mdc-chip {
 
       &[data-label]::before {
         content: attr(data-label);
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .04em;
-        color: #888;
+        color: var(--vs-text-muted);
         text-align: left;
         flex-shrink: 0;
       }

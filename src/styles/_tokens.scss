@@ -1,0 +1,105 @@
+// =====================================================================
+// VetSystem — Design tokens (--vs-*)
+// ---------------------------------------------------------------------
+// Capa semántica sobre el tema Material 3 (src/styles.scss y
+// src/_theme-colors.scss). Cuando existe un rol de M3 equivalente se
+// referencia su variable --mat-sys-*, para que tema y tokens no diverjan.
+// Ratios de contraste (WCAG 2.x) medidos para cada par texto/fondo.
+// =====================================================================
+
+@mixin tokens {
+  // ---- Marca --------------------------------------------------------
+  --vs-primary: var(--mat-sys-primary);                 // #006b5e · blanco 6.43:1
+  --vs-on-primary: var(--mat-sys-on-primary);           // #ffffff
+  --vs-primary-hover: #005047;                          // tono 30 · blanco 9.38:1
+  --vs-primary-container: var(--mat-sys-primary-container);
+  --vs-on-primary-container: var(--mat-sys-on-primary-container);
+  --vs-primary-soft: #e5fff8;                           // tono 98 · texto #005047 8.93:1
+  --vs-on-primary-soft: #005047;
+
+  // Naranja de marca: solo como relleno/acento con texto oscuro (blanco = 2.70:1, prohibido)
+  --vs-accent: #f57c00;                                 // texto #311300 6.35:1
+  --vs-on-accent: #311300;
+  --vs-accent-text: #964900;                            // tertiary 40 · 6.46:1 sobre blanco
+  --vs-accent-container: #ffdcc6;                       // tertiary 90
+  --vs-on-accent-container: #502400;                    // 10.23:1
+
+  // ---- Superficies --------------------------------------------------
+  --vs-bg: #f0f4f2;                                     // neutral 96
+  --vs-surface: #ffffff;
+  --vs-surface-muted: #f6faf8;                          // neutral 98 (bloques internos)
+  --vs-surface-elevated: #ffffff;
+
+  // ---- Texto --------------------------------------------------------
+  --vs-text: var(--mat-sys-on-surface);                 // #181d1b · 17.07 / 15.38 (bg)
+  --vs-text-secondary: #434846;                         // neutral 30 · 9.32 / 8.40
+  --vs-text-muted: #5b5f5e;                             // neutral 40 · 6.47 / 5.84
+
+  // ---- Bordes -------------------------------------------------------
+  --vs-border: #dfe3e1;                                 // neutral 90 · decorativo
+  --vs-border-strong: #737876;                          // neutral 50 · 4.49:1 (controles ≥ 3:1)
+
+  // ---- Estados (siempre acompañados de icono + texto) ---------------
+  --vs-success: #2e7d32;                                // 5.13:1 sobre blanco
+  --vs-success-container: #e8f5e9;
+  --vs-on-success-container: #1b5e20;                   // 7.00:1
+  --vs-warning: #8a4300;                                // 7.28:1
+  --vs-warning-container: #fff3e0;
+  --vs-on-warning-container: #723600;                   // 8.54:1
+  --vs-danger: var(--mat-sys-error);                    // #ba1a20 · 6.45:1 (ambos sentidos)
+  --vs-on-danger: var(--mat-sys-on-error);
+  --vs-danger-container: #ffdad6;
+  --vs-on-danger-container: #930010;                    // 7.23:1
+  --vs-info: #1565c0;                                   // 5.75:1
+  --vs-info-container: #e3f2fd;
+  --vs-on-info-container: #0d47a1;                      // 7.56:1
+
+  // ---- Foco ---------------------------------------------------------
+  --vs-focus: var(--mat-sys-primary);                   // 6.43 blanco / 5.80 bg
+  --vs-focus-on-dark: #7ad7c6;                          // primary 80 · 8.58 sidebar / 6.50 activo
+
+  // ---- Zona oscura (sidebar) ----------------------------------------
+  --vs-sidebar-bg: #1b2a3b;
+  --vs-sidebar-header-bg: #16222f;
+  --vs-sidebar-text: #c6cace;                           // 8.84:1
+  --vs-sidebar-text-muted: #a2a7ac;                     // 6.01:1
+  --vs-sidebar-active-bg: #134249;
+  --vs-sidebar-active-text: #97f3e2;                    // 8.53:1
+  --vs-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+
+  // ---- Tipografía ---------------------------------------------------
+  --vs-font: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --vs-text-h1: 700 24px/32px var(--vs-font);
+  --vs-text-h2: 600 20px/28px var(--vs-font);
+  --vs-text-h3: 600 16px/24px var(--vs-font);
+  --vs-text-body: 400 14px/20px var(--vs-font);
+  --vs-text-small: 400 13px/18px var(--vs-font);
+  --vs-text-label: 500 12px/16px var(--vs-font);
+
+  // ---- Espaciado (base 4) -------------------------------------------
+  --vs-space-1: 4px;
+  --vs-space-2: 8px;
+  --vs-space-3: 12px;
+  --vs-space-4: 16px;
+  --vs-space-5: 20px;
+  --vs-space-6: 24px;
+  --vs-space-7: 32px;
+  --vs-space-8: 48px;
+  --vs-form-max: 880px;
+
+  // ---- Radios -------------------------------------------------------
+  --vs-radius-sm: 8px;
+  --vs-radius-md: 12px;
+  --vs-radius-lg: 16px;
+  --vs-radius-full: 999px;
+
+  // ---- Sombras ------------------------------------------------------
+  --vs-shadow-1: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --vs-shadow-2: 0 4px 12px rgba(16, 24, 40, 0.10);
+  --vs-shadow-3: 0 12px 32px rgba(16, 24, 40, 0.18);
+
+  // ---- Movimiento ---------------------------------------------------
+  --vs-dur-fast: 120ms;
+  --vs-dur: 200ms;
+  --vs-ease: cubic-bezier(0.2, 0, 0, 1);
+}
