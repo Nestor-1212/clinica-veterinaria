@@ -1,22 +1,48 @@
 .receta-print {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 32px;
+  background: var(--vs-surface);
+  border: 1px solid var(--vs-border);
+  border-radius: var(--vs-radius-md);
+  padding: var(--vs-space-7);
   max-width: 800px;
   margin: 0 auto;
+
+  @media screen and (max-width: 600px) { padding: var(--vs-space-4); }
 }
-.receta-header-print { text-align: center; background: var(--vs-primary); color: white; padding: 16px; border-radius: 6px; margin-bottom: 16px; }
+.receta-header-print { text-align: center; background: var(--vs-primary); color: var(--vs-on-primary); padding: 16px; border-radius: 6px; margin-bottom: 16px; }
 .clinic-name { font-size: 22px; font-weight: 700; }
-.clinic-sub { font-size: 12px; opacity: 0.85; }
-.receta-title { text-align: center; font-size: 18px; border-bottom: 2px solid #ccc; padding-bottom: 8px; }
-.receta-datos { margin-bottom: 16px; }
-.dato-row { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 6px; span { color: #666; font-size: 13px; } strong { font-size: 13px; } }
+.clinic-sub { font-size: 12px; opacity: 0.9; }
+.receta-title { text-align: center; font-size: 18px; border-bottom: 2px solid var(--vs-border); padding-bottom: 8px; }
+.receta-datos {
+  margin-bottom: 16px;
+  // En móvil todas las etiquetas comparten columna y cada valor queda a su lado
+  @media screen and (max-width: 600px) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+  }
+}
+.dato-row {
+  display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 6px;
+  span { color: var(--vs-text-secondary); font-size: 13px; }
+  strong { font-size: 13px; }
+
+  @media screen and (max-width: 600px) {
+    display: contents;
+    strong { overflow-wrap: anywhere; }
+  }
+}
 .receta-rx { margin: 16px 0; }
-.rx-symbol { font-size: 24px; font-style: italic; color: #333; margin-bottom: 8px; }
-.rx-table { width: 100%; border: 1px solid #e0e0e0; }
-.observaciones { background: #f9f9f9; padding: 12px; border-radius: 6px; margin-top: 16px; }
+.rx-symbol { font-size: 24px; font-style: italic; color: var(--vs-text); margin-bottom: 8px; }
+.rx-table { width: 100%; border: 1px solid var(--vs-border); }
+
+/* Reflow móvil de .rx-table: en src/styles.scss (thead/tbody los crea CDK sin atributo de encapsulación) */
+.observaciones { background: var(--vs-surface-muted); padding: 12px; border-radius: 6px; margin-top: 16px; }
 .firma-section { text-align: center; margin-top: 40px; }
-.firma-line { width: 200px; border-top: 1px solid #333; margin: 0 auto 8px; }
+.firma-line { width: 200px; border-top: 1px solid var(--vs-text); margin: 0 auto 8px; }
 .firma-name { font-weight: 600; }
-.firma-esp { font-size: 13px; color: #666; }
+.firma-esp { font-size: 13px; color: var(--vs-text-secondary); }
+
+@media print {
+  .receta-print { border: none; padding: 0; max-width: none; }
+  .receta-header-print { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

@@ -317,6 +317,56 @@ input:focus-visible,
   outline-offset: 2px;
 }
 
+/* ===== RECETA: tabla de medicamentos en móvil (solo pantalla; la impresión conserva la tabla) ===== */
+@media screen and (max-width: 600px) {
+  .mat-mdc-table.rx-table {
+    display: block;
+    border: none;
+    thead, tr.mat-mdc-header-row { display: none; }
+    tbody { display: block; }
+    tr.mat-mdc-row {
+      display: block;
+      height: auto;
+      border: 1px solid var(--vs-border);
+      border-radius: var(--vs-radius-sm);
+      padding: 4px 12px;
+      margin-bottom: 8px;
+    }
+    td.mat-mdc-cell {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--vs-border);
+      text-align: right;
+      &:last-child { border-bottom: none; }
+      &[data-label]::before {
+        content: attr(data-label);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--vs-text-muted);
+        text-align: left;
+      }
+    }
+    td.rx-med { justify-content: flex-start; text-align: left; font-size: 14px; }
+  }
+}
+
+/* ===== IMPRESIÓN =====
+   Se imprime solo el contenido de la página (p. ej. la receta), sin header,
+   menú lateral ni botones de acción. */
+@media print {
+  app-header, .app-sidenav, .skip-link, .page-header .header-actions, .page-header > button { display: none !important; }
+  .shell-layout, .sidenav-container, .mat-drawer-container, .mat-drawer-content, mat-sidenav-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .mat-drawer-content { margin-left: 0 !important; }
+  html, body, .mat-drawer-container, .main-content { background: #fff !important; }
+  .content-wrapper { padding: 0 !important; }
+  .page-container { animation: none; }
+}
+
 /* ===== MOVIMIENTO REDUCIDO ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
