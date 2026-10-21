@@ -6,6 +6,8 @@ import { CitasService } from '../../../core/services/citas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { puedeAcceder } from '../../../core/auth/permisos';
 import { Cliente, Mascota, Usuario } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -26,6 +28,7 @@ export class FormCitaComponent implements OnInit {
   private clientesService = inject(ClientesService);
   private mascotasService = inject(MascotasService);
   private usuariosService = inject(UsuariosService);
+  private auth = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
@@ -72,12 +75,21 @@ export class FormCitaComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) return;
-    this.citasService.create(this.form.value);
-    this.snack.open(this.isInmediata ? '¡Atención inmediata registrada!' : 'Cita programada', 'OK', { duration: 2000 });
-    if (this.isInmediata) {
-      const { mascotaId, clienteId } = this.form.value;
-      this.router.navigate(['/consultas/nueva'], { queryParams: { mascotaId, clienteId } });
+    const cita = this.citasService.create(this.form.value);
+    if (!this.isInmediata) {
+      this.snack.open('Cita programada', 'OK', { duration: 2000 });
+      this.router.navigate(['/citas']);
+      return;
+    }
+    // B1: la consulta recibe el citaId para quedar vinculada (tipo 'inmediata') y cerrar la cita al guardarse.
+    if (puedeAcceder(this.auth.currentUser?.rol, 'consultas')) {
+      this.snack.open('¡Atención inmediata registrada!', 'OK', { duration: 2000 });
+      this.router.navigate(['/consultas/nueva'], {
+        queryParams: { citaId: cita.id, mascotaId: cita.mascotaId, clienteId: cita.clienteId }
+      });
     } else {
+      // Recepción no tiene acceso a Consultas: el veterinario la iniciará desde Citas.
+      this.snack.open('Atención inmediata registrada. El veterinario iniciará la consulta desde Citas.', 'OK', { duration: 4000 });
       this.router.navigate(['/citas']);
     }
   }

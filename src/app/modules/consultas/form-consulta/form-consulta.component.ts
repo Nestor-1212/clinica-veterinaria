@@ -8,7 +8,7 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { CitasService } from '../../../core/services/citas.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Mascota, Cliente, Usuario } from '../../../core/models';
+import { Mascota, Cliente, Usuario, Consulta } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -86,8 +86,8 @@ export class FormConsultaComponent implements OnInit {
     if (params.citaId) {
       const cita = this.citasService.getById(params.citaId);
       if (cita) {
+        // B2: la cita NO se completa al abrir el formulario, sino al guardar la consulta.
         this.form.patchValue({ citaId: cita.id, tipo: cita.estado === 'inmediata' ? 'inmediata' : 'cita' });
-        this.citasService.update(cita.id, { estado: 'completada' });
       }
     }
   }
@@ -98,28 +98,30 @@ export class FormConsultaComponent implements OnInit {
     if (this.mascota) this.form.patchValue({ peso: this.mascota.peso });
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) return;
+  /** Guarda la consulta y, si es nueva y viene de una cita, marca esa cita como completada. */
+  private guardar(): Consulta {
     const data = this.form.value;
-    let consulta;
     if (this.isEdit) {
       this.consultasService.update(this.consultaId, data);
-      consulta = this.consultasService.getById(this.consultaId)!;
-      this.snack.open('Consulta actualizada', 'OK', { duration: 2000 });
-    } else {
-      consulta = this.consultasService.create(data);
-      this.snack.open('Consulta registrada', 'OK', { duration: 2000 });
+      return this.consultasService.getById(this.consultaId)!;
     }
+    const consulta = this.consultasService.create(data);
+    if (consulta.citaId && this.citasService.getById(consulta.citaId)) {
+      this.citasService.update(consulta.citaId, { estado: 'completada' });
+    }
+    return consulta;
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) return;
+    const consulta = this.guardar();
+    this.snack.open(this.isEdit ? 'Consulta actualizada' : 'Consulta registrada', 'OK', { duration: 2000 });
     this.router.navigate(['/recetas/nueva'], { queryParams: { consultaId: consulta.id } });
   }
 
   guardarSinReceta(): void {
     if (this.form.invalid) return;
-    if (this.isEdit) {
-      this.consultasService.update(this.consultaId, this.form.value);
-    } else {
-      this.consultasService.create(this.form.value);
-    }
+    this.guardar();
     this.snack.open('Consulta guardada', 'OK', { duration: 2000 });
     this.router.navigate(['/consultas']);
   }
