@@ -10,6 +10,7 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Mascota, Cliente, Consulta, ItemReceta } from '../../../core/models';
+import { veterinarioPorDefecto } from '../../../core/auth/permisos';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -56,8 +57,8 @@ export class FormRecetaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const user = this.auth.currentUser;
-    if (user) this.form.patchValue({ veterinarioId: user.id });
+    // B7: la receta la firma el veterinario de la consulta; sin consulta, solo se autoasigna a un veterinario.
+    this.form.patchValue({ veterinarioId: veterinarioPorDefecto(this.auth.currentUser) });
 
     this.recetaId = this.route.snapshot.params.id;
     const params = this.route.snapshot.queryParams;
@@ -118,8 +119,8 @@ export class FormRecetaComponent implements OnInit {
 
   async imprimirPDF(): Promise<void> {
     if (this.form.invalid || !this.mascota || !this.cliente) return;
-    const user = this.auth.currentUser;
-    const vet = user ? this.usuariosService.getById(user.id) : null;
+    // B7: el PDF lo firma el veterinario de la receta, no el usuario que la imprime.
+    const vet = this.usuariosService.getById(this.form.value.veterinarioId);
     if (!vet) return;
     const receta = { ...this.form.value, id: this.recetaId || 'preview' };
     await this.pdfService.generarReceta(receta, this.mascota, this.cliente, vet);

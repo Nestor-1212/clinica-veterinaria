@@ -6,7 +6,9 @@ import { ExamenesService } from '../../../core/services/examenes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Mascota, Cliente } from '../../../core/models';
+import { Mascota, Cliente, Usuario } from '../../../core/models';
+import { UsuariosService } from '../../../core/services/usuarios.service';
+import { veterinarioPorDefecto } from '../../../core/auth/permisos';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -26,12 +28,14 @@ export class FormExamenComponent implements OnInit {
   private mascotasService = inject(MascotasService);
   private clientesService = inject(ClientesService);
   private auth = inject(AuthService);
+  private usuariosService = inject(UsuariosService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
 
   form: FormGroup;
   mascotas: Mascota[] = [];
+  veterinarios: Usuario[] = [];
   mascota: Mascota | null = null;
   cliente: Cliente | null = null;
   isEdit = false;
@@ -43,7 +47,7 @@ export class FormExamenComponent implements OnInit {
       mascotaId: ['', Validators.required],
       clienteId: [''],
       consultaId: [''],
-      veterinarioId: [''],
+      veterinarioId: ['', Validators.required],
       tipo: ['', Validators.required],
       descripcion: ['', Validators.required],
       resultado: ['', Validators.required],
@@ -54,7 +58,9 @@ export class FormExamenComponent implements OnInit {
   ngOnInit(): void {
     this.mascotas = this.mascotasService.getAll().filter(m => m.activo);
     const user = this.auth.currentUser;
-    if (user) this.form.patchValue({ veterinarioId: user.id });
+    // B7: solo se autoasigna si quien registra es veterinario; si no, se elige en el formulario.
+    this.veterinarios = this.usuariosService.getVeterinarios();
+    this.form.patchValue({ veterinarioId: veterinarioPorDefecto(user) });
 
     this.examenId = this.route.snapshot.params.id;
     const params = this.route.snapshot.queryParams;

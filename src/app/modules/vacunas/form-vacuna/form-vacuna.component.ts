@@ -7,7 +7,8 @@ import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Mascota, Cliente } from '../../../core/models';
+import { Mascota, Cliente, Usuario } from '../../../core/models';
+import { veterinarioPorDefecto } from '../../../core/auth/permisos';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
@@ -34,6 +35,7 @@ export class FormVacunaComponent implements OnInit {
 
   form: FormGroup;
   mascotas: Mascota[] = [];
+  veterinarios: Usuario[] = [];
   mascota: Mascota | null = null;
   cliente: Cliente | null = null;
   isEdit = false;
@@ -45,7 +47,7 @@ export class FormVacunaComponent implements OnInit {
     this.form = this.fb.group({
       mascotaId: ['', Validators.required],
       clienteId: [''],
-      veterinarioId: [''],
+      veterinarioId: ['', Validators.required],
       nombre: ['', Validators.required],
       lote: ['', Validators.required],
       fechaAplicacion: [new Date(), Validators.required],
@@ -58,7 +60,9 @@ export class FormVacunaComponent implements OnInit {
   ngOnInit(): void {
     this.mascotas = this.mascotasService.getAll().filter(m => m.activo);
     const user = this.auth.currentUser;
-    if (user) this.form.patchValue({ veterinarioId: user.id });
+    // B7: solo se autoasigna si quien registra es veterinario; si no, se elige en el formulario.
+    this.veterinarios = this.usuariosService.getVeterinarios();
+    this.form.patchValue({ veterinarioId: veterinarioPorDefecto(user) });
 
     this.vacunaId = this.route.snapshot.params.id;
     const params = this.route.snapshot.queryParams;
