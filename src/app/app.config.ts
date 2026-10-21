@@ -4,7 +4,9 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { routes } from './app.routes';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { TituloPaginaStrategy } from './core/i18n/titulo-pagina.strategy';
+import { PaginatorEs } from './core/i18n/paginator-es';
 
 registerLocaleData(localeEs, 'es');
 
@@ -15,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideNativeDateAdapter(),
     { provide: LOCALE_ID, useValue: 'es' },
-    { provide: TitleStrategy, useClass: TituloPaginaStrategy }
+    { provide: TitleStrategy, useClass: TituloPaginaStrategy },
+    { provide: MatPaginatorIntl, useClass: PaginatorEs }
   ]
 };
