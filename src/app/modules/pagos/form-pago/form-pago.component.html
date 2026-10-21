@@ -9,7 +9,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>Cliente *</mat-label>
+            <mat-label>Cliente</mat-label>
             <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
               @for (c of clientes; track c) {
                 <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
@@ -19,7 +19,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Mascota *</mat-label>
+            <mat-label>Mascota</mat-label>
             <mat-select formControlName="mascotaId" [disabled]="!form.get('clienteId')?.value">
               @for (m of mascotas; track m) {
                 <mat-option [value]="m.id">{{ m.nombre }}</mat-option>
@@ -29,7 +29,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Método de Pago *</mat-label>
+            <mat-label>Método de Pago</mat-label>
             <mat-select formControlName="metodoPago">
               @for (m of metodosPago; track m) {
                 <mat-option [value]="m">{{ m | titlecase }}</mat-option>
@@ -73,7 +73,7 @@
           @for (item of items.controls; track item; let i = $index) {
             <div [formGroupName]="i" class="item-row">
               <mat-form-field appearance="outline" class="desc">
-                <mat-label>Descripción *</mat-label>
+                <mat-label>Descripción</mat-label>
                 <input matInput formControlName="descripcion" placeholder="Ej: Consulta general">
                 <mat-error>Requerido</mat-error>
               </mat-form-field>

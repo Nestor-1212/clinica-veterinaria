@@ -1,18 +1,21 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { RecetasService } from '../../../core/services/recetas.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Receta, Mascota, Cliente, Usuario } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-ver-receta',
-  templateUrl: './ver-receta.component.html',
-  styleUrls: ['./ver-receta.component.scss']
+    selector: 'app-ver-receta',
+    templateUrl: './ver-receta.component.html',
+    styleUrls: ['./ver-receta.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe]
 })
 export class VerRecetaComponent implements OnInit {
   private route = inject(ActivatedRoute);

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { VacunasService } from '../../../core/services/vacunas.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
@@ -8,12 +8,18 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Mascota, Cliente } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatError, MatInput, MatSuffix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
-  standalone: false,
-  selector: 'app-form-vacuna',
-  templateUrl: './form-vacuna.component.html',
-  styleUrls: ['./form-vacuna.component.scss']
+    selector: 'app-form-vacuna',
+    templateUrl: './form-vacuna.component.html',
+    styleUrls: ['./form-vacuna.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker]
 })
 export class FormVacunaComponent implements OnInit {
   private fb = inject(FormBuilder);

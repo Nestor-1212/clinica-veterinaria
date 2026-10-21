@@ -1,6 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
+import { Routes } from '@angular/router';
 import { ListaVacunasComponent } from './lista-vacunas/lista-vacunas.component';
 import { FormVacunaComponent } from './form-vacuna/form-vacuna.component';
 
@@ -10,8 +8,4 @@ const routes: Routes = [
   { path: 'editar/:id', component: FormVacunaComponent }
 ];
 
-@NgModule({
-  declarations: [ListaVacunasComponent, FormVacunaComponent],
-  imports: [SharedModule, RouterModule.forChild(routes)]
-})
-export class VacunasModule {}
+export default routes;

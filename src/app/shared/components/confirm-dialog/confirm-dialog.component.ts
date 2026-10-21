@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatButton } from '@angular/material/button';
 
 export interface ConfirmDialogData {
   title: string;
@@ -10,9 +12,8 @@ export interface ConfirmDialogData {
 }
 
 @Component({
-  standalone: false,
-  selector: 'app-confirm-dialog',
-  template: `
+    selector: 'app-confirm-dialog',
+    template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content>
       <p>{{ data.message }}</p>
@@ -23,7 +24,8 @@ export interface ConfirmDialogData {
         {{ data.confirmText || 'Confirmar' }}
       </button>
     </mat-dialog-actions>
-  `
+  `,
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose]
 })
 export class ConfirmDialogComponent {
   dialogRef = inject<MatDialogRef<ConfirmDialogComponent>>(MatDialogRef);

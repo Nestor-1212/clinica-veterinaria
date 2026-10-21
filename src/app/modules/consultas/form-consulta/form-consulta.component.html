@@ -46,7 +46,7 @@
           <h3 class="section-title"><mat-icon>person_outline</mat-icon> Datos de la Consulta</h3>
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>Veterinario *</mat-label>
+              <mat-label>Veterinario</mat-label>
               <mat-select formControlName="veterinarioId">
                 @for (v of veterinarios; track v) {
                   <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
@@ -56,7 +56,7 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Fecha *</mat-label>
+              <mat-label>Fecha</mat-label>
               <input matInput [matDatepicker]="dp" formControlName="fecha">
               <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
               <mat-datepicker #dp></mat-datepicker>
@@ -70,14 +70,14 @@
           <h3 class="section-title"><mat-icon>monitor_heart</mat-icon> Signos Vitales</h3>
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>Temperatura (°C) *</mat-label>
+              <mat-label>Temperatura (°C)</mat-label>
               <input matInput type="number" formControlName="temperatura" step="0.1" placeholder="38.5">
               <mat-icon matSuffix>device_thermostat</mat-icon>
               <mat-error>Temperatura entre 30 y 45 °C</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Peso actual (kg) *</mat-label>
+              <mat-label>Peso actual (kg)</mat-label>
               <input matInput type="number" formControlName="peso" step="0.1">
               <mat-icon matSuffix>monitor_weight</mat-icon>
               <mat-error>Ingrese el peso</mat-error>
@@ -91,19 +91,19 @@
           <h3 class="section-title"><mat-icon>assignment</mat-icon> Historia Clínica</h3>
           <div class="form-grid-1">
             <mat-form-field appearance="outline">
-              <mat-label>Síntomas *</mat-label>
+              <mat-label>Síntomas</mat-label>
               <textarea matInput formControlName="sintomas" rows="3" placeholder="Describe los síntomas observados..."></textarea>
               <mat-error>Los síntomas son requeridos</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Diagnóstico *</mat-label>
+              <mat-label>Diagnóstico</mat-label>
               <textarea matInput formControlName="diagnostico" rows="3" placeholder="Diagnóstico clínico..."></textarea>
               <mat-error>El diagnóstico es requerido</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Tratamiento *</mat-label>
+              <mat-label>Tratamiento</mat-label>
               <textarea matInput formControlName="tratamiento" rows="3" placeholder="Plan de tratamiento..."></textarea>
               <mat-error>El tratamiento es requerido</mat-error>
             </mat-form-field>

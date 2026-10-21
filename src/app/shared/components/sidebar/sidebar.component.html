@@ -12,9 +12,8 @@
   <mat-divider></mat-divider>
 
   <nav class="sidebar-nav">
-    @for (item of visibleItems; track item) {
+    @for (item of visibleItems; track item.route) {
       <a
-        mat-list-item
         [routerLink]="item.route"
         routerLinkActive="active-link"
         class="nav-item">

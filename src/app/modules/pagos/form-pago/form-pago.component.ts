@@ -1,18 +1,27 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PagosService } from '../../../core/services/pagos.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Cliente, Mascota, MetodoPago } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatPrefix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatDivider } from '@angular/material/list';
+import { MatTooltip } from '@angular/material/tooltip';
+import { DecimalPipe, TitleCasePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-form-pago',
-  templateUrl: './form-pago.component.html',
-  styleUrls: ['./form-pago.component.scss']
+    selector: 'app-form-pago',
+    templateUrl: './form-pago.component.html',
+    styleUrls: ['./form-pago.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatSuffix, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatDivider, MatPrefix, MatIconButton, MatTooltip, DecimalPipe, TitleCasePipe]
 })
 export class FormPagoComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -104,7 +113,7 @@ export class FormPagoComponent implements OnInit {
       subtotal: this.subtotal,
       total: this.total
     };
-    const pago = this.pagosService.create(data);
+    this.pagosService.create(data);
     this.snack.open('Pago registrado', 'OK', { duration: 2000 });
     this.router.navigate(['/pagos']);
   }

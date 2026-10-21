@@ -1,15 +1,21 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { RolUsuario } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatError } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
-  standalone: false,
-  selector: 'app-form-usuario',
-  templateUrl: './form-usuario.component.html',
-  styleUrls: ['./form-usuario.component.scss']
+    selector: 'app-form-usuario',
+    templateUrl: './form-usuario.component.html',
+    styleUrls: ['./form-usuario.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, MatCheckbox]
 })
 export class FormUsuarioComponent implements OnInit {
   private fb = inject(FormBuilder);

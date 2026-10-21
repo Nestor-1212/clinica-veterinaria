@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RecetasService } from '../../../core/services/recetas.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
@@ -10,12 +10,18 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Mascota, Cliente, Consulta } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatFormField, MatLabel, MatInput, MatSuffix, MatError } from '@angular/material/input';
+import { SlicePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-form-receta',
-  templateUrl: './form-receta.component.html',
-  styleUrls: ['./form-receta.component.scss']
+    selector: 'app-form-receta',
+    templateUrl: './form-receta.component.html',
+    styleUrls: ['./form-receta.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatIconButton, MatTooltip, MatFormField, MatLabel, MatInput, MatSuffix, MatError, SlicePipe]
 })
 export class FormRecetaComponent implements OnInit {
   private fb = inject(FormBuilder);

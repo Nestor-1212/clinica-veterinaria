@@ -1,21 +1,28 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { Router } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { Router, RouterLink } from '@angular/router';
 import { ConsultasService } from '../../../core/services/consultas.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Consulta } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatChip } from '@angular/material/chips';
+import { SlicePipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-lista-consultas',
-  templateUrl: './lista-consultas.component.html',
-  styleUrls: ['./lista-consultas.component.scss']
+    selector: 'app-lista-consultas',
+    templateUrl: './lista-consultas.component.html',
+    styleUrls: ['./lista-consultas.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, SlicePipe, DatePipe]
 })
-export class ListaConsultasComponent implements OnInit {
+export class ListaConsultasComponent implements OnInit, AfterViewInit {
   private consultasService = inject(ConsultasService);
   private mascotasService = inject(MascotasService);
   private clientesService = inject(ClientesService);

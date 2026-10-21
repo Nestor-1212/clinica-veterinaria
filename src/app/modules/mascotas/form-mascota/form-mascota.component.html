@@ -29,7 +29,7 @@
 
         <div class="form-grid">
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Propietario *</mat-label>
+            <mat-label>Propietario</mat-label>
             <mat-select formControlName="clienteId">
               @for (c of clientes; track c) {
                 <mat-option [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
@@ -40,14 +40,14 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Nombre *</mat-label>
+            <mat-label>Nombre</mat-label>
             <input matInput formControlName="nombre" placeholder="Ej: Max">
             <mat-icon matSuffix>pets</mat-icon>
             <mat-error>El nombre es requerido</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Tipo *</mat-label>
+            <mat-label>Tipo</mat-label>
             <mat-select formControlName="tipo">
               @for (t of tipos; track t) {
                 <mat-option [value]="t">{{ t }}</mat-option>
@@ -56,13 +56,13 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Raza *</mat-label>
+            <mat-label>Raza</mat-label>
             <input matInput formControlName="raza" placeholder="Ej: Golden Retriever">
             <mat-error>La raza es requerida</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Sexo *</mat-label>
+            <mat-label>Sexo</mat-label>
             <mat-select formControlName="sexo">
               <mat-option value="macho">Macho</mat-option>
               <mat-option value="hembra">Hembra</mat-option>
@@ -70,20 +70,20 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Edad (años) *</mat-label>
+            <mat-label>Edad (años)</mat-label>
             <input matInput type="number" formControlName="edad" min="0">
             <mat-error>Ingrese la edad</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Peso (kg) *</mat-label>
+            <mat-label>Peso (kg)</mat-label>
             <input matInput type="number" formControlName="peso" step="0.1" min="0.1">
             <mat-icon matSuffix>monitor_weight</mat-icon>
             <mat-error>Ingrese el peso</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Color *</mat-label>
+            <mat-label>Color</mat-label>
             <input matInput formControlName="color" placeholder="Ej: Dorado con blanco">
             <mat-error>El color es requerido</mat-error>
           </mat-form-field>

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
@@ -7,12 +7,20 @@ import { VacunasService } from '../../../core/services/vacunas.service';
 import { ExamenesService } from '../../../core/services/examenes.service';
 import { RecetasService } from '../../../core/services/recetas.service';
 import { Mascota, Cliente, Consulta, Vacuna, Examen, Receta } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription } from '@angular/material/expansion';
+import { MatChip } from '@angular/material/chips';
+import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
+import { SlicePipe, TitleCasePipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-perfil-mascota',
-  templateUrl: './perfil-mascota.component.html',
-  styleUrls: ['./perfil-mascota.component.scss']
+    selector: 'app-perfil-mascota',
+    templateUrl: './perfil-mascota.component.html',
+    styleUrls: ['./perfil-mascota.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatTabGroup, MatTab, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatChip, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, SlicePipe, TitleCasePipe, DatePipe]
 })
 export class PerfilMascotaComponent implements OnInit {
   private route = inject(ActivatedRoute);

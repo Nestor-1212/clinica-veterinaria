@@ -1,24 +1,35 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CitasService } from '../../../core/services/citas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Cita, EstadoCita } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatChip } from '@angular/material/chips';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatDivider } from '@angular/material/list';
+import { SlicePipe, TitleCasePipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-lista-citas',
-  templateUrl: './lista-citas.component.html',
-  styleUrls: ['./lista-citas.component.scss']
+    selector: 'app-lista-citas',
+    templateUrl: './lista-citas.component.html',
+    styleUrls: ['./lista-citas.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, ReactiveFormsModule, FormsModule, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatMenuTrigger, MatMenu, MatMenuItem, MatDivider, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, SlicePipe, TitleCasePipe, DatePipe]
 })
-export class ListaCitasComponent implements OnInit {
+export class ListaCitasComponent implements OnInit, AfterViewInit {
   private citasService = inject(CitasService);
   private clientesService = inject(ClientesService);
   private mascotasService = inject(MascotasService);

@@ -22,7 +22,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>Propietario *</mat-label>
+            <mat-label>Propietario</mat-label>
             <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
               @for (c of clientes; track c) {
                 <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
@@ -33,7 +33,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Mascota *</mat-label>
+            <mat-label>Mascota</mat-label>
             <mat-select formControlName="mascotaId" [disabled]="!form.get('clienteId')?.value">
               @for (m of mascotas; track m) {
                 <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
@@ -44,7 +44,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Veterinario *</mat-label>
+            <mat-label>Veterinario</mat-label>
             <mat-select formControlName="veterinarioId">
               @for (v of veterinarios; track v) {
                 <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
@@ -55,14 +55,14 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Fecha *</mat-label>
+            <mat-label>Fecha</mat-label>
             <input matInput [matDatepicker]="dp" formControlName="fecha" [readonly]="isInmediata">
             <mat-datepicker-toggle matSuffix [for]="dp" [disabled]="isInmediata"></mat-datepicker-toggle>
             <mat-datepicker #dp></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Hora *</mat-label>
+            <mat-label>Hora</mat-label>
             <mat-select formControlName="hora">
               @for (h of horas; track h) {
                 <mat-option [value]="h">{{ h }}</mat-option>
@@ -72,7 +72,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Motivo de la consulta *</mat-label>
+            <mat-label>Motivo de la consulta</mat-label>
             <textarea matInput formControlName="motivo" rows="2" placeholder="Describe el motivo de la consulta..."></textarea>
             <mat-error>El motivo es requerido</mat-error>
           </mat-form-field>

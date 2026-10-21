@@ -1,24 +1,31 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { RecetasService } from '../../../core/services/recetas.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Receta } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatChip } from '@angular/material/chips';
+import { DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-lista-recetas',
-  templateUrl: './lista-recetas.component.html',
-  styleUrls: ['./lista-recetas.component.scss']
+    selector: 'app-lista-recetas',
+    templateUrl: './lista-recetas.component.html',
+    styleUrls: ['./lista-recetas.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, DatePipe]
 })
-export class ListaRecetasComponent implements OnInit {
+export class ListaRecetasComponent implements OnInit, AfterViewInit {
   private recetasService = inject(RecetasService);
   private mascotasService = inject(MascotasService);
   private clientesService = inject(ClientesService);

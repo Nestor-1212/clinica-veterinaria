@@ -1,5 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/divider';
+import { RouterLinkActive, RouterLink } from '@angular/router';
 
 interface NavItem {
   label: string;
@@ -9,10 +12,10 @@ interface NavItem {
 }
 
 @Component({
-  standalone: false,
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+    selector: 'app-sidebar',
+    templateUrl: './sidebar.component.html',
+    styleUrls: ['./sidebar.component.scss'],
+    imports: [MatIcon, MatDivider, RouterLinkActive, RouterLink]
 })
 export class SidebarComponent {
   auth = inject(AuthService);

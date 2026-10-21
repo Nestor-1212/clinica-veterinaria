@@ -14,7 +14,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="form-grid">
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Nombre Completo *</mat-label>
+            <mat-label>Nombre Completo</mat-label>
             <input matInput formControlName="nombre" placeholder="Ej: Juan Carlos Pérez">
             <mat-icon matSuffix>person</mat-icon>
             @if (form.get('nombre')?.hasError('required')) {
@@ -26,7 +26,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Cédula *</mat-label>
+            <mat-label>Cédula</mat-label>
             <input matInput formControlName="cedula" placeholder="Ej: 8-888-888">
             <mat-icon matSuffix>badge</mat-icon>
             @if (form.get('cedula')?.hasError('required')) {
@@ -35,7 +35,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Teléfono *</mat-label>
+            <mat-label>Teléfono</mat-label>
             <input matInput formControlName="telefono" placeholder="Ej: 6000-0000">
             <mat-icon matSuffix>phone</mat-icon>
             @if (form.get('telefono')?.hasError('required')) {

@@ -1,14 +1,19 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatLabel, MatInput, MatSuffix, MatError } from '@angular/material/input';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
-  standalone: false,
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    imports: [MatCard, MatIcon, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSuffix, MatError, MatIconButton, MatButton, MatProgressSpinner]
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);

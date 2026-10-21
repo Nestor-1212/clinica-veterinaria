@@ -1,22 +1,30 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Mascota } from '../../../core/models';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatChip } from '@angular/material/chips';
 
 @Component({
-  standalone: false,
-  selector: 'app-lista-mascotas',
-  templateUrl: './lista-mascotas.component.html',
-  styleUrls: ['./lista-mascotas.component.scss']
+    selector: 'app-lista-mascotas',
+    templateUrl: './lista-mascotas.component.html',
+    styleUrls: ['./lista-mascotas.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, ReactiveFormsModule, FormsModule, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator]
 })
-export class ListaMascotasComponent implements OnInit {
+export class ListaMascotasComponent implements OnInit, AfterViewInit {
   private mascotasService = inject(MascotasService);
   private clientesService = inject(ClientesService);
   private dialog = inject(MatDialog);

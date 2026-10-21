@@ -1,17 +1,24 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
 import { CitasService } from '../../../core/services/citas.service';
 import { PagosService } from '../../../core/services/pagos.service';
 import { Cliente, Mascota, Consulta, Cita, Pago } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
+import { MatChip } from '@angular/material/chips';
+import { DecimalPipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-detalle-cliente',
-  templateUrl: './detalle-cliente.component.html',
-  styleUrls: ['./detalle-cliente.component.scss']
+    selector: 'app-detalle-cliente',
+    templateUrl: './detalle-cliente.component.html',
+    styleUrls: ['./detalle-cliente.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe]
 })
 export class DetalleClienteComponent implements OnInit {
   private route = inject(ActivatedRoute);

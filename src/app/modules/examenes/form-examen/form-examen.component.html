@@ -8,7 +8,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div class="form-grid">
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Mascota *</mat-label>
+            <mat-label>Mascota</mat-label>
             <mat-select formControlName="mascotaId" (selectionChange)="onMascotaChange($event.value)">
               @for (m of mascotas; track m) {
                 <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
@@ -18,7 +18,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Tipo de examen *</mat-label>
+            <mat-label>Tipo de examen</mat-label>
             <mat-select formControlName="tipo">
               @for (t of tiposExamen; track t) {
                 <mat-option [value]="t">{{ t }}</mat-option>
@@ -28,20 +28,20 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Fecha *</mat-label>
+            <mat-label>Fecha</mat-label>
             <input matInput [matDatepicker]="dp" formControlName="fecha">
             <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
             <mat-datepicker #dp></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Descripción / Muestra *</mat-label>
+            <mat-label>Descripción / Muestra</mat-label>
             <textarea matInput formControlName="descripcion" rows="2" placeholder="Descripción del examen solicitado..."></textarea>
             <mat-error>La descripción es requerida</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Resultados *</mat-label>
+            <mat-label>Resultados</mat-label>
             <textarea matInput formControlName="resultado" rows="4" placeholder="Resultados del examen..."></textarea>
             <mat-error>Los resultados son requeridos</mat-error>
           </mat-form-field>

@@ -1,21 +1,28 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { Router } from '@angular/router';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { Router, RouterLink } from '@angular/router';
 import { PagosService } from '../../../core/services/pagos.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Pago } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatChip } from '@angular/material/chips';
+import { DecimalPipe, TitleCasePipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-lista-pagos',
-  templateUrl: './lista-pagos.component.html',
-  styleUrls: ['./lista-pagos.component.scss']
+    selector: 'app-lista-pagos',
+    templateUrl: './lista-pagos.component.html',
+    styleUrls: ['./lista-pagos.component.scss'],
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, DecimalPipe, TitleCasePipe, DatePipe]
 })
-export class ListaPagosComponent implements OnInit {
+export class ListaPagosComponent implements OnInit, AfterViewInit {
   private pagosService = inject(PagosService);
   private clientesService = inject(ClientesService);
   private mascotasService = inject(MascotasService);

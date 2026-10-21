@@ -1,16 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Cliente, TipoMascota } from '../../../core/models';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatFormField, MatLabel, MatSuffix, MatError, MatInput } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
-  standalone: false,
-  selector: 'app-form-mascota',
-  templateUrl: './form-mascota.component.html',
-  styleUrls: ['./form-mascota.component.scss']
+    selector: 'app-form-mascota',
+    templateUrl: './form-mascota.component.html',
+    styleUrls: ['./form-mascota.component.scss'],
+    imports: [MatIcon, MatButton, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker]
 })
 export class FormMascotaComponent implements OnInit {
   private fb = inject(FormBuilder);

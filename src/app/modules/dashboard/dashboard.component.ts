@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ClientesService } from '../../core/services/clientes.service';
 import { MascotasService } from '../../core/services/mascotas.service';
 import { CitasService } from '../../core/services/citas.service';
@@ -8,12 +8,18 @@ import { VacunasService } from '../../core/services/vacunas.service';
 import { PagosService } from '../../core/services/pagos.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Cita, Vacuna, Pago } from '../../core/models';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatCard, MatCardContent, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle } from '@angular/material/card';
+import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
+import { MatChip } from '@angular/material/chips';
+import { DecimalPipe, TitleCasePipe, DatePipe } from '@angular/common';
 
 @Component({
-  standalone: false,
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+    selector: 'app-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['./dashboard.component.scss'],
+    imports: [MatButton, MatIcon, MatCard, RouterLink, MatCardContent, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatChip, MatListItemLine, DecimalPipe, TitleCasePipe, DatePipe]
 })
 export class DashboardComponent implements OnInit {
   private clientesService = inject(ClientesService);

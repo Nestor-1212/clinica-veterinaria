@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { DemoSeedService } from './core/services/demo-seed.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  standalone: false,
-  selector: 'app-root',
-  template: '<router-outlet></router-outlet>'
+    selector: 'app-root',
+    template: '<router-outlet></router-outlet>',
+    imports: [RouterOutlet]
 })
 export class AppComponent {
   constructor() {
