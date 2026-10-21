@@ -9,7 +9,6 @@
 
 # dependencies
 /node_modules
-package-lock.json
 
 # profiling files
 chrome-profiler-events*.json
@@ -48,3 +47,8 @@ Thumbs.db
 
 # Angular cache
 /.angular/cache
+
+# Playwright
+/test-results
+/playwright-report
+/playwright/.cache
