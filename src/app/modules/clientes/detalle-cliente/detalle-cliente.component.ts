@@ -12,13 +12,13 @@ import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card'
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
 import { MatChip } from '@angular/material/chips';
-import { DecimalPipe, DatePipe } from '@angular/common';
+import { DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
 
 @Component({
     selector: 'app-detalle-cliente',
     templateUrl: './detalle-cliente.component.html',
     styleUrls: ['./detalle-cliente.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe, TitleCasePipe]
 })
 export class DetalleClienteComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -57,10 +57,6 @@ export class DetalleClienteComponent implements OnInit {
 
   nuevaAtencion(): void {
     this.router.navigate(['/citas/nueva'], { queryParams: { clienteId: this.cliente.id, tipo: 'inmediata' } });
-  }
-
-  verMascota(mascota: Mascota): void {
-    this.router.navigate(['/mascotas', mascota.id]);
   }
 
   get totalPagado(): number {

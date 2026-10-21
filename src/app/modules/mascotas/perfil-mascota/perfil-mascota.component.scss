@@ -6,7 +6,7 @@
   .foto-default { width: 100%; height: 100%; background: var(--vs-primary); display: flex; align-items: center; justify-content: center; mat-icon { color: white; font-size: 60px; width: 60px; height: 60px; } }
 }
 .mascota-data { flex: 1; min-width: 200px; h3 { margin: 0 0 4px; font-size: 22px; } }
-.tipo-badge { display: inline-block; background: var(--vs-primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 12px; }
+.tipo-badge { display: inline-block; background: var(--vs-surface-muted); color: var(--vs-text-secondary); border: 1px solid var(--vs-border); padding: 2px 10px; border-radius: var(--vs-radius-full); font-size: 12px; font-weight: 600; margin: 0 0 12px; }
 .datos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; div { span { display: block; font-size: 12px; color: var(--vs-text-muted); } strong { font-size: 13px; } } }
 .alergias-alert { display: flex; align-items: center; gap: 8px; background: var(--vs-warning-container); padding: 8px 12px; border-radius: 8px; color: var(--vs-on-warning-container); margin-top: 12px; font-size: 13px; }
 .propietario-info { display: flex; gap: 12px; align-items: flex-start; background: var(--vs-surface-muted); padding: 12px; border-radius: 8px; mat-icon { color: var(--vs-primary); } strong { display: block; } p { margin: 2px 0; font-size: 12px; color: var(--vs-text-secondary); } }

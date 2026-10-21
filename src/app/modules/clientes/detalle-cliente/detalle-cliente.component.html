@@ -54,7 +54,8 @@
         <div class="tab-content">
           <div class="mascotas-grid">
             @for (m of mascotas; track m) {
-              <mat-card class="mascota-card" (click)="verMascota(m)">
+              <a class="mascota-link" [routerLink]="['/mascotas', m.id]" [attr.aria-label]="'Ver historial médico de ' + m.nombre">
+              <mat-card class="mascota-card">
                 <mat-card-content>
                   <div class="mascota-header">
                     <div class="mascota-avatar">
@@ -72,13 +73,16 @@
                   </div>
                 </mat-card-content>
               </mat-card>
+              </a>
             }
-            <mat-card class="mascota-card add-card" (click)="nuevaMascota()">
+            <a class="mascota-link" routerLink="/mascotas/nueva" [queryParams]="{ clienteId: cliente.id }">
+            <mat-card class="mascota-card add-card">
               <mat-card-content>
                 <mat-icon>add_circle</mat-icon>
                 <p>Agregar Mascota</p>
               </mat-card-content>
             </mat-card>
+            </a>
           </div>
         </div>
       </mat-tab>
@@ -90,13 +94,11 @@
                 <mat-icon matListItemIcon [class]="'estado-' + cita.estado">event</mat-icon>
                 <div matListItemTitle><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
                 <div matListItemLine>{{ cita.motivo }}</div>
-                <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado }}</mat-chip>
+                <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado | titlecase }}</mat-chip>
               </mat-list-item>
             }
             @if (citas.length === 0) {
-              <mat-list-item>
-                <p>No hay citas registradas</p>
-              </mat-list-item>
+              <div class="vs-empty"><p>No hay citas registradas</p></div>
             }
           </mat-list>
         </div>
@@ -109,13 +111,11 @@
                 <mat-icon matListItemIcon>medical_services</mat-icon>
                 <div matListItemTitle><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
                 <div matListItemLine>{{ c.diagnostico }}</div>
-                <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo }}</mat-chip>
+                <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo | titlecase }}</mat-chip>
               </mat-list-item>
             }
             @if (consultas.length === 0) {
-              <mat-list-item>
-                <p>No hay consultas registradas</p>
-              </mat-list-item>
+              <div class="vs-empty"><p>No hay consultas registradas</p></div>
             }
           </mat-list>
         </div>
@@ -125,16 +125,14 @@
           <mat-list>
             @for (p of pagos; track p) {
               <mat-list-item class="list-row">
-                <mat-icon matListItemIcon [style.color]="p.estado === 'pagado' ? '#2e7d32' : '#e65100'">payments</mat-icon>
+                <mat-icon matListItemIcon [class]="'estado-' + p.estado">payments</mat-icon>
                 <div matListItemTitle><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
                 <div matListItemLine>{{ p.metodoPago }}</div>
-                <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado }}</mat-chip>
+                <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado | titlecase }}</mat-chip>
               </mat-list-item>
             }
             @if (pagos.length === 0) {
-              <mat-list-item>
-                <p>No hay pagos registrados</p>
-              </mat-list-item>
+              <div class="vs-empty"><p>No hay pagos registrados</p></div>
             }
           </mat-list>
         </div>

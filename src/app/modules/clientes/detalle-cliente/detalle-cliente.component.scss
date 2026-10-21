@@ -14,11 +14,23 @@
 .detail-tabs { background: var(--vs-surface); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-md); overflow: hidden; }
 .tab-content { padding: 16px; }
 .mascotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+/* Cada tarjeta es un enlace (<a routerLink>): se opera con teclado y lector de pantalla */
+.mascota-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--vs-radius-md);
+  > .mascota-card { height: 100%; }
+  &:hover .mascota-card { box-shadow: var(--vs-shadow-2) !important; border-color: var(--vs-border-strong); }
+  &:hover .add-card { border-color: var(--vs-primary); color: var(--vs-primary); }
+}
 .mascota-card {
-  cursor: pointer; border-radius: 10px !important;
-  transition: transform 0.2s;
-  &:hover { transform: translateY(-2px); }
+  border-radius: var(--vs-radius-md) !important;
+  transition: box-shadow var(--vs-dur) var(--vs-ease), border-color var(--vs-dur) var(--vs-ease);
+  h4 { margin: 0; font-size: 15px; font-weight: 600; }
+  p { margin: 2px 0 0; font-size: 13px; color: var(--vs-text-secondary); }
   &.add-card {
+    min-height: 120px;
     border: 2px dashed var(--vs-border-strong); background: transparent;
     display: flex; align-items: center; justify-content: center;
     mat-card-content { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } }
