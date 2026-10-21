@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Usuario } from '../../../core/models';
+import { ROL_LABELS } from '../../../core/auth/permisos';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -25,8 +26,7 @@ export class HeaderComponent {
   }
 
   get rolLabel(): string {
-    const roles: any = { admin: 'Administrador', veterinario: 'Veterinario', recepcion: 'Recepción' };
-    return this.user ? roles[this.user.rol] : '';
+    return this.user ? ROL_LABELS[this.user.rol] : '';
   }
 
   logout(): void {

@@ -3,12 +3,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider } from '@angular/material/divider';
 import { RouterLinkActive, RouterLink } from '@angular/router';
+import { Seccion, puedeAcceder } from '../../../core/auth/permisos';
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
-  roles: string[];
+  seccion: Seccion;
 }
 
 @Component({
@@ -21,21 +22,21 @@ export class SidebarComponent {
   auth = inject(AuthService);
 
   navItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['admin', 'veterinario', 'recepcion'] },
-    { label: 'Clientes', icon: 'people', route: '/clientes', roles: ['admin', 'veterinario', 'recepcion'] },
-    { label: 'Mascotas', icon: 'pets', route: '/mascotas', roles: ['admin', 'veterinario', 'recepcion'] },
-    { label: 'Citas', icon: 'event', route: '/citas', roles: ['admin', 'veterinario', 'recepcion'] },
-    { label: 'Consultas', icon: 'medical_services', route: '/consultas', roles: ['admin', 'veterinario'] },
-    { label: 'Recetas', icon: 'medication', route: '/recetas', roles: ['admin', 'veterinario'] },
-    { label: 'Vacunas', icon: 'vaccines', route: '/vacunas', roles: ['admin', 'veterinario', 'recepcion'] },
-    { label: 'Laboratorio', icon: 'biotech', route: '/examenes', roles: ['admin', 'veterinario'] },
-    { label: 'Pagos', icon: 'payments', route: '/pagos', roles: ['admin', 'recepcion'] },
-    { label: 'Reportes', icon: 'bar_chart', route: '/reportes', roles: ['admin'] },
-    { label: 'Usuarios', icon: 'manage_accounts', route: '/usuarios', roles: ['admin'] }
+    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', seccion: 'dashboard' },
+    { label: 'Clientes', icon: 'people', route: '/clientes', seccion: 'clientes' },
+    { label: 'Mascotas', icon: 'pets', route: '/mascotas', seccion: 'mascotas' },
+    { label: 'Citas', icon: 'event', route: '/citas', seccion: 'citas' },
+    { label: 'Consultas', icon: 'medical_services', route: '/consultas', seccion: 'consultas' },
+    { label: 'Recetas', icon: 'medication', route: '/recetas', seccion: 'recetas' },
+    { label: 'Vacunas', icon: 'vaccines', route: '/vacunas', seccion: 'vacunas' },
+    { label: 'Laboratorio', icon: 'biotech', route: '/examenes', seccion: 'examenes' },
+    { label: 'Pagos', icon: 'payments', route: '/pagos', seccion: 'pagos' },
+    { label: 'Reportes', icon: 'bar_chart', route: '/reportes', seccion: 'reportes' },
+    { label: 'Usuarios', icon: 'manage_accounts', route: '/usuarios', seccion: 'usuarios' }
   ];
 
   get visibleItems(): NavItem[] {
     const rol = this.auth.currentUser?.rol;
-    return this.navItems.filter(item => rol && item.roles.includes(rol));
+    return this.navItems.filter(item => puedeAcceder(rol, item.seccion));
   }
 }

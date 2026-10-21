@@ -6,7 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { UsuariosService } from '../../../core/services/usuarios.service';
-import { Usuario } from '../../../core/models';
+import { RolUsuario, Usuario } from '../../../core/models';
+import { ROL_LABELS } from '../../../core/auth/permisos';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -40,8 +41,7 @@ export class ListaUsuariosComponent implements OnInit, AfterViewInit {
   editar(u: Usuario): void { this.router.navigate(['/usuarios/editar', u.id]); }
 
   getRolLabel(rol: string): string {
-    const labels: any = { admin: 'Administrador', veterinario: 'Veterinario', recepcion: 'Recepción' };
-    return labels[rol] || rol;
+    return ROL_LABELS[rol as RolUsuario] || rol;
   }
 
   iconoRol(rol: string): string {
