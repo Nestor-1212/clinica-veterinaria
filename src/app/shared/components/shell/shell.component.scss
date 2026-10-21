@@ -5,6 +5,24 @@
   overflow: hidden;
 }
 
+// "Saltar al contenido": visible solo al recibir foco con teclado (WCAG 2.4.1)
+.skip-link {
+  position: absolute;
+  top: var(--vs-space-2);
+  left: var(--vs-space-2);
+  z-index: 2000;
+  padding: var(--vs-space-2) var(--vs-space-4);
+  border-radius: var(--vs-radius-sm);
+  background: var(--vs-surface);
+  color: var(--vs-primary);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--vs-shadow-2);
+  transform: translateY(-200%);
+
+  &:focus-visible { transform: none; }
+}
+
 .sidenav-container {
   flex: 1;
   overflow: hidden;
@@ -13,18 +31,23 @@
 .app-sidenav {
   width: 240px;
   border-right: none !important;
+  border-radius: 0;
   box-shadow: 2px 0 8px rgba(0,0,0,0.15);
 }
 
 .main-content {
-  background: #f0f2f5;
+  background: var(--vs-bg);
 }
 
 .content-wrapper {
-  padding: 24px;
+  display: block;
+  padding: var(--vs-space-6);
   min-height: 100%;
 
+  // Recibe foco programático desde el skip link; no necesita anillo propio
+  &:focus { outline: none; }
+
   @media (max-width: 600px) {
-    padding: 12px;
+    padding: var(--vs-space-3);
   }
 }

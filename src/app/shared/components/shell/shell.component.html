@@ -1,4 +1,6 @@
 <div class="shell-layout">
+  <a class="skip-link" href="#contenido" (click)="irAlContenido($event)">Saltar al contenido</a>
+
   <app-header (menuToggle)="toggleSidenav()"></app-header>
 
   <mat-sidenav-container class="sidenav-container">
@@ -10,9 +12,9 @@
     </mat-sidenav>
 
     <mat-sidenav-content class="main-content">
-      <div class="content-wrapper">
+      <main id="contenido" class="content-wrapper" tabindex="-1" #contenido>
         <router-outlet></router-outlet>
-      </div>
+      </main>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

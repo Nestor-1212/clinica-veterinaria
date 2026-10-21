@@ -3,9 +3,9 @@ import { ListaUsuariosComponent } from './lista-usuarios/lista-usuarios.componen
 import { FormUsuarioComponent } from './form-usuario/form-usuario.component';
 
 const routes: Routes = [
-  { path: '', component: ListaUsuariosComponent },
-  { path: 'nuevo', component: FormUsuarioComponent },
-  { path: 'editar/:id', component: FormUsuarioComponent }
+  { path: '', component: ListaUsuariosComponent, title: 'Usuarios' },
+  { path: 'nuevo', component: FormUsuarioComponent, title: 'Nuevo usuario' },
+  { path: 'editar/:id', component: FormUsuarioComponent, title: 'Editar usuario' }
 ];
 
 export default routes;

@@ -1,26 +1,28 @@
 .app-header {
-  background: linear-gradient(90deg, #00796b, #004d40) !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  // Zona sobre el primario: foco en blanco (6.43:1 contra #006b5e)
+  --vs-focus: #ffffff;
+
+  background: var(--vs-primary) !important;
+  color: var(--vs-on-primary);
+  box-shadow: var(--vs-shadow-2);
   z-index: 1000;
   position: sticky;
   top: 0;
 }
 
-.menu-btn { color: white; }
+.menu-btn { color: var(--vs-on-primary); }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: white;
+  gap: var(--vs-space-2);
+  color: var(--vs-on-primary);
 
   &-icon { font-size: 28px; width: 28px; height: 28px; }
   &-name {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-
-    @media (max-width: 480px) { display: none; }
+    letter-spacing: 0.2px;
   }
 }
 
@@ -30,8 +32,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--vs-on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,13 +43,12 @@
 
 .user-menu-header {
   padding: 12px 16px;
-  pointer-events: none;
 
   .user-info {
     display: flex;
     flex-direction: column;
-    strong { font-size: 14px; }
-    small { font-size: 12px; color: #666; }
-    .correo { color: #999; }
+    strong { font-size: 14px; color: var(--vs-text); }
+    small { font-size: 12px; color: var(--vs-text-secondary); }
+    .correo { color: var(--vs-text-muted); }
   }
 }

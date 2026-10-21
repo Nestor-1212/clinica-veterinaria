@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { HeaderComponent } from '../header/header.component';
@@ -15,6 +15,7 @@ export class ShellComponent implements OnInit {
   private bp = inject(BreakpointObserver);
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
+  @ViewChild('contenido') contenido!: ElementRef<HTMLElement>;
   isMobile = false;
 
   ngOnInit(): void {
@@ -26,5 +27,14 @@ export class ShellComponent implements OnInit {
 
   toggleSidenav(): void {
     this.sidenav.toggle();
+  }
+
+  /**
+   * Enlace "Saltar al contenido": mueve el foco al <main> sin cambiar la URL
+   * (con <base href="/"> un href="#contenido" navegaría a la raíz).
+   */
+  irAlContenido(event: Event): void {
+    event.preventDefault();
+    this.contenido.nativeElement.focus();
   }
 }

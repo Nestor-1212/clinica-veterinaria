@@ -3,9 +3,9 @@ import { ListaExamenesComponent } from './lista-examenes/lista-examenes.componen
 import { FormExamenComponent } from './form-examen/form-examen.component';
 
 const routes: Routes = [
-  { path: '', component: ListaExamenesComponent },
-  { path: 'nuevo', component: FormExamenComponent },
-  { path: 'editar/:id', component: FormExamenComponent }
+  { path: '', component: ListaExamenesComponent, title: 'Laboratorio' },
+  { path: 'nuevo', component: FormExamenComponent, title: 'Nuevo examen' },
+  { path: 'editar/:id', component: FormExamenComponent, title: 'Editar examen' }
 ];
 
 export default routes;
