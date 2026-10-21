@@ -92,18 +92,22 @@
   gap: 10px;
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  // Sin opacidad ni colores por rol: texto 17:1 / 9.3:1 sobre blanco, icono de marca
+  border: 1px solid var(--vs-border);
+  border-radius: var(--vs-radius-sm);
   cursor: pointer;
   text-align: left;
-  transition: all 0.18s ease;
-  background: white;
+  font: inherit;
+  color: var(--vs-text);
+  background: var(--vs-surface);
+  transition: background-color var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+    color: var(--vs-primary);
   }
 
   .demo-btn-info {
@@ -115,27 +119,9 @@
     small  { font-size: 12px; color: var(--vs-text-secondary); }
   }
 
-  &:hover { transform: translateX(3px); }
-
-  &.demo-admin {
-    border-color: #c8e6c9;
-    color: #2e7d32;
-    mat-icon { color: #2e7d32; }
-    &:hover { background: #e8f5e9; }
-  }
-
-  &.demo-vet {
-    border-color: #bbdefb;
-    color: #1565c0;
-    mat-icon { color: #1565c0; }
-    &:hover { background: #e3f2fd; }
-  }
-
-  &.demo-rec {
-    border-color: #ffe0b2;
-    color: #e65100;
-    mat-icon { color: #e65100; }
-    &:hover { background: #fff3e0; }
+  &:hover {
+    background: var(--vs-primary-soft);
+    border-color: var(--vs-primary);
   }
 }
 
