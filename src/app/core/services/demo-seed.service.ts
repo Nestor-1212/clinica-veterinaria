@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from './storage.service';
+import { DEMO_MODE } from '../config/demo-mode.token';
 import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna } from '../models';
 
 function addDays(base: Date, days: number): Date {
@@ -11,9 +12,11 @@ function addDays(base: Date, days: number): Date {
 @Injectable({ providedIn: 'root' })
 export class DemoSeedService {
   private storage = inject(StorageService);
+  private demo = inject(DEMO_MODE);
 
-
+  /** Siembra datos de ejemplo solo en modo demo y si no hay clientes. */
   seedIfEmpty(): void {
+    if (!this.demo) return;
     if (this.storage.get<Cliente>('vet_clientes').length > 0) return;
 
     const today = new Date();

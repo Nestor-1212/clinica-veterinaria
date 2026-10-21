@@ -1,16 +1,10 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
-
+// Entorno de desarrollo. En el build de producción se reemplaza por environment.prod.ts
+// (ver `fileReplacements` en angular.json).
 export const environment = {
-  production: false
+  production: false,
+  /**
+   * Modo demo: siembra datos de ejemplo y muestra los botones de acceso rápido del login.
+   * Sin backend es la única forma de tener usuarios iniciales, por eso está activo.
+   */
+  demo: true
 };
-
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

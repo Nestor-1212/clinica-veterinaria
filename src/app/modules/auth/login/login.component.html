@@ -46,35 +46,37 @@
           </button>
         </form>
 
-        <div class="demo-credentials">
-          <p class="demo-title">Acceso rápido:</p>
-          <div class="demo-buttons">
-            <button type="button" class="demo-btn demo-admin"
-              (click)="fillCredentials('admin@clinica.com', 'admin123')">
-              <mat-icon>admin_panel_settings</mat-icon>
-              <span class="demo-btn-info">
-                <strong>Admin</strong>
-                <small>admin@clinica.com</small>
-              </span>
-            </button>
-            <button type="button" class="demo-btn demo-vet"
-              (click)="fillCredentials('vet@clinica.com', 'vet123')">
-              <mat-icon>medical_services</mat-icon>
-              <span class="demo-btn-info">
-                <strong>Veterinario</strong>
-                <small>vet@clinica.com</small>
-              </span>
-            </button>
-            <button type="button" class="demo-btn demo-rec"
-              (click)="fillCredentials('recepcion@clinica.com', 'rec123')">
-              <mat-icon>support_agent</mat-icon>
-              <span class="demo-btn-info">
-                <strong>Recepción</strong>
-                <small>recepcion@clinica.com</small>
-              </span>
-            </button>
+        @if (demo) {
+          <div class="demo-credentials">
+            <p class="demo-title">Acceso rápido:</p>
+            <div class="demo-buttons">
+              <button type="button" class="demo-btn demo-admin"
+                (click)="fillCredentials('admin@clinica.com', 'admin123')">
+                <mat-icon>admin_panel_settings</mat-icon>
+                <span class="demo-btn-info">
+                  <strong>Admin</strong>
+                  <small>admin@clinica.com</small>
+                </span>
+              </button>
+              <button type="button" class="demo-btn demo-vet"
+                (click)="fillCredentials('vet@clinica.com', 'vet123')">
+                <mat-icon>medical_services</mat-icon>
+                <span class="demo-btn-info">
+                  <strong>Veterinario</strong>
+                  <small>vet@clinica.com</small>
+                </span>
+              </button>
+              <button type="button" class="demo-btn demo-rec"
+                (click)="fillCredentials('recepcion@clinica.com', 'rec123')">
+                <mat-icon>support_agent</mat-icon>
+                <span class="demo-btn-info">
+                  <strong>Recepción</strong>
+                  <small>recepcion@clinica.com</small>
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
+        }
       </mat-card-content>
     </mat-card>
   </div>

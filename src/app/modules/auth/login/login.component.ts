@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
+import { DEMO_MODE } from '../../../core/config/demo-mode.token';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatLabel, MatInput, MatSuffix, MatError } from '@angular/material/input';
@@ -20,6 +21,8 @@ export class LoginComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
   private snack = inject(MatSnackBar);
+  /** Los botones de acceso rápido solo se muestran en modo demo. */
+  readonly demo = inject(DEMO_MODE);
 
   form: FormGroup;
   loading = false;
