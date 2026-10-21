@@ -9,6 +9,7 @@ import { PagosService } from '../../core/services/pagos.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Cita, Vacuna, Pago } from '../../core/models';
 import { Seccion, puedeAcceder } from '../../core/auth/permisos';
+import { estadoRecordatorio } from '../../core/utils/vacunas';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardContent, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle } from '@angular/material/card';
@@ -82,7 +83,7 @@ export class DashboardComponent implements OnInit {
   }
 
   esVacunaVencida(v: Vacuna): boolean {
-    return new Date(v.proximaFecha) < this.today;
+    return estadoRecordatorio(v, this.today) === 'vencida';
   }
 
   getClienteNombre(clienteId: string): string {

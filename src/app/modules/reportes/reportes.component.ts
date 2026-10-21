@@ -6,11 +6,13 @@ import { VacunasService } from '../../core/services/vacunas.service';
 import { PagosService } from '../../core/services/pagos.service';
 import { CitasService } from '../../core/services/citas.service';
 import { MatIcon } from '@angular/material/icon';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatCardAvatar } from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatCardAvatar, MatCardSubtitle } from '@angular/material/card';
+import { MatChip } from '@angular/material/chips';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
 import { DecimalPipe, TitleCasePipe, DatePipe } from '@angular/common';
 import { MetodoPago, Vacuna } from '../../core/models';
+import { EstadoRecordatorio, estadoRecordatorio, porProximaFecha } from '../../core/utils/vacunas';
 
 interface ConsultasPorTipo {
   tipo: string;
@@ -33,7 +35,7 @@ interface ReporteMes {
     selector: 'app-reportes',
     templateUrl: './reportes.component.html',
     styleUrls: ['./reportes.component.scss'],
-    imports: [MatIcon, MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatProgressBar, MatCardAvatar, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, DecimalPipe, TitleCasePipe, DatePipe]
+    imports: [MatIcon, MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatProgressBar, MatCardAvatar, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatCardSubtitle, MatChip, DecimalPipe, TitleCasePipe, DatePipe]
 })
 export class ReportesComponent implements OnInit {
   private clientesService = inject(ClientesService);
@@ -48,6 +50,7 @@ export class ReportesComponent implements OnInit {
   consultasPorTipo: ConsultasPorTipo[] = [];
   pagosPorMetodo: PagosPorMetodo[] = [];
   reporteMensual: ReporteMes[] = [];
+  private hoy = new Date();
   meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
   ngOnInit(): void {
@@ -62,7 +65,7 @@ export class ReportesComponent implements OnInit {
     this.stats.ingresosMes = this.pagosService.getTotalMes();
     this.stats.ingresosTotal = this.pagosService.getAll().filter(p => p.estado === 'pagado').reduce((a, p) => a + p.total, 0);
     this.stats.vacunasPendientes = this.vacunasService.getPendientes().length;
-    this.vacunasPendientesList = this.vacunasService.getPendientes().slice(0, 10);
+    this.vacunasPendientesList = this.vacunasService.getPendientes().sort(porProximaFecha).slice(0, 10);
 
     const consultas = this.consultasService.getAll();
     const citas = consultas.filter(c => c.tipo === 'cita').length;
@@ -90,6 +93,24 @@ export class ReportesComponent implements OnInit {
       }).reduce((a, p) => a + p.total, 0);
       return { mes, consultas: consultasM, ingresos: ingresosM };
     });
+  }
+
+  /** Etiqueta del recordatorio: una vacuna con fecha pasada se muestra como vencida, no como próxima. */
+  estadoVacuna(v: Vacuna): EstadoRecordatorio {
+    return estadoRecordatorio(v, this.hoy);
+  }
+
+  get vacunasVencidas(): number {
+    return this.vacunasPendientesList.filter(v => this.estadoVacuna(v) === 'vencida').length;
+  }
+
+  /** Texto alternativo de los gráficos de barras (lectores de pantalla). */
+  get resumenConsultas(): string {
+    return 'Consultas por mes: ' + this.reporteMensual.map(r => r.mes + ' ' + r.consultas).join(', ');
+  }
+
+  get resumenIngresos(): string {
+    return 'Ingresos por mes en dólares: ' + this.reporteMensual.map(r => r.mes + ' ' + Math.round(r.ingresos)).join(', ');
   }
 
   get maxConsultas(): number { return Math.max(...this.reporteMensual.map(r => r.consultas), 1); }

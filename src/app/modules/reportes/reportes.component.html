@@ -3,25 +3,43 @@
     <div><h1><mat-icon>bar_chart</mat-icon> Reportes y Estadísticas</h1><p>Panel de análisis de la clínica</p></div>
   </div>
 
-  <!-- KPIs -->
+  <!-- KPIs: superficie blanca; el color de marca solo en el icono -->
   <div class="kpi-grid">
-    <mat-card class="kpi-card kpi-blue">
-      <mat-card-content><mat-icon>people</mat-icon><div><span>{{ stats.clientes }}</span><small>Clientes Activos</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--primary">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">people</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">{{ stats.clientes }}</span><small>Clientes activos</small></div>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="kpi-card kpi-green">
-      <mat-card-content><mat-icon>pets</mat-icon><div><span>{{ stats.mascotas }}</span><small>Mascotas</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--primary">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">pets</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">{{ stats.mascotas }}</span><small>Mascotas</small></div>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="kpi-card kpi-purple">
-      <mat-card-content><mat-icon>medical_services</mat-icon><div><span>{{ stats.consultasMes }}</span><small>Consultas del Mes</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--accent">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">medical_services</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">{{ stats.consultasMes }}</span><small>Consultas del mes</small></div>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="kpi-card kpi-orange">
-      <mat-card-content><mat-icon>medical_services</mat-icon><div><span>{{ stats.consultasTotal }}</span><small>Consultas Totales</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--accent">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">history</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">{{ stats.consultasTotal }}</span><small>Consultas totales</small></div>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="kpi-card kpi-teal">
-      <mat-card-content><mat-icon>payments</mat-icon><div><span>${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del Mes</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--success">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">payments</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del mes</small></div>
+      </mat-card-content>
     </mat-card>
-    <mat-card class="kpi-card kpi-red">
-      <mat-card-content><mat-icon>vaccines</mat-icon><div><span>{{ stats.vacunasPendientes }}</span><small>Vacunas Pendientes</small></div></mat-card-content>
+    <mat-card class="kpi-card kpi--warning">
+      <mat-card-content>
+        <div class="kpi-icon"><mat-icon aria-hidden="true">vaccines</mat-icon></div>
+        <div class="kpi-data"><span class="kpi-value">{{ stats.vacunasPendientes }}</span><small>Vacunas pendientes</small></div>
+      </mat-card-content>
     </mat-card>
   </div>
 
@@ -32,11 +50,11 @@
         <mat-card-title>Consultas — Últimos 6 meses</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="bar-chart">
+        <div class="bar-chart" role="img" [attr.aria-label]="resumenConsultas">
           @for (r of reporteMensual; track r) {
-            <div class="bar-item">
+            <div class="bar-item" aria-hidden="true">
               <div class="bar-value">{{ r.consultas }}</div>
-              <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100" [style.background]="'#1976d2'"></div>
+              <div class="bar bar--primary" [style.height.%]="(r.consultas / maxConsultas) * 100"></div>
               <div class="bar-label">{{ r.mes }}</div>
             </div>
           }
@@ -50,11 +68,11 @@
         <mat-card-title>Ingresos — Últimos 6 meses ($)</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="bar-chart">
+        <div class="bar-chart" role="img" [attr.aria-label]="resumenIngresos">
           @for (r of reporteMensual; track r) {
-            <div class="bar-item">
+            <div class="bar-item" aria-hidden="true">
               <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
-              <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100" [style.background]="'#2e7d32'"></div>
+              <div class="bar bar--success" [style.height.%]="(r.ingresos / maxIngresos) * 100"></div>
               <div class="bar-label">{{ r.mes }}</div>
             </div>
           }
@@ -74,7 +92,9 @@
               <span>{{ item.tipo }}</span>
               <span>{{ item.cantidad }}</span>
             </div>
-            <mat-progress-bar mode="determinate" [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0" [color]="item.tipo === 'Cita programada' ? 'primary' : 'warn'"></mat-progress-bar>
+            <mat-progress-bar mode="determinate" color="primary"
+              [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0"
+              [attr.aria-label]="item.tipo + ': ' + item.cantidad + ' de ' + stats.consultasTotal"></mat-progress-bar>
           </div>
         }
       </mat-card-content>
@@ -92,30 +112,45 @@
               <span>{{ item.metodo | titlecase }}</span>
               <span>{{ item.cantidad }}</span>
             </div>
-            <mat-progress-bar mode="determinate" [value]="(item.cantidad / pagosTotal) * 100"></mat-progress-bar>
+            <mat-progress-bar mode="determinate" color="primary"
+              [value]="(item.cantidad / pagosTotal) * 100"
+              [attr.aria-label]="(item.metodo | titlecase) + ': ' + item.cantidad + ' pagos'"></mat-progress-bar>
           </div>
         }
         @if (pagosPorMetodo.length === 0) {
-          <p class="empty-msg">No hay pagos registrados</p>
+          <p class="vs-empty">No hay pagos registrados</p>
         }
       </mat-card-content>
     </mat-card>
   </div>
 
-  <!-- Vacunas pendientes -->
+  <!-- Vacunas pendientes (vencidas y de los próximos 7 días) -->
   @if (vacunasPendientesList.length > 0) {
     <mat-card class="alert-card">
       <mat-card-header>
-        <mat-icon mat-card-avatar class="warn-avatar">vaccines</mat-icon>
-        <mat-card-title>Vacunas Próximas (7 días)</mat-card-title>
+        <mat-icon mat-card-avatar class="warn-avatar" aria-hidden="true">vaccines</mat-icon>
+        <mat-card-title>Vacunas pendientes</mat-card-title>
+        <mat-card-subtitle>
+          @if (vacunasVencidas > 0) {
+            {{ vacunasVencidas }} vencida{{ vacunasVencidas === 1 ? '' : 's' }} ·
+          }
+          próximos 7 días
+        </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <mat-list>
           @for (v of vacunasPendientesList; track v) {
             <mat-list-item>
-              <mat-icon matListItemIcon class="warn-icon">vaccines</mat-icon>
+              <mat-icon matListItemIcon [class]="estadoVacuna(v) === 'vencida' ? 'danger-icon' : 'warn-icon'" aria-hidden="true">
+                {{ estadoVacuna(v) === 'vencida' ? 'error' : 'vaccines' }}
+              </mat-icon>
               <div matListItemTitle>{{ v.nombre }}</div>
-              <div matListItemLine class="prox-fecha">Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
+              <div matListItemLine [class]="estadoVacuna(v) === 'vencida' ? 'fecha-vencida' : 'prox-fecha'">
+                {{ estadoVacuna(v) === 'vencida' ? 'Vencida desde' : 'Próxima:' }} {{ v.proximaFecha | date:'dd/MM/yyyy' }}
+              </div>
+              <mat-chip [class]="estadoVacuna(v) === 'vencida' ? 'chip-vencida' : 'chip-proxima'">
+                {{ estadoVacuna(v) === 'vencida' ? 'Vencida' : 'Próxima' }}
+              </mat-chip>
             </mat-list-item>
           }
         </mat-list>
