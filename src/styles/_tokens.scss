@@ -8,62 +8,85 @@
 // =====================================================================
 
 @mixin tokens {
+  // ---- Sistema de color: "Restrained" ------------------------------
+  // El teal de la marca manda; neutros teñidos de teal (no grises); UN solo
+  // cálido (ámbar) reservado para "requiere atención"; rojo solo para lo
+  // crítico (eliminar, error, alergias). Éxito e información son variantes
+  // del teal y del neutro: no añaden matices. Ratios WCAG 2.x medidos sobre
+  // superficie #ffffff / fondo #ebf1ef salvo que se indique otro fondo.
+
   // ---- Marca --------------------------------------------------------
-  --vs-primary: var(--mat-sys-primary);                 // #006b5e · blanco 6.43:1
+  --vs-primary: var(--mat-sys-primary);                 // #006b5e · 6.43 / 5.62; blanco encima 6.43
   --vs-on-primary: var(--mat-sys-on-primary);           // #ffffff
   --vs-primary-hover: #005047;                          // tono 30 · blanco 9.38:1
+  // Contenedor de marca (M3 primary-container, redefinido en styles.scss):
+  // antes menta #97f3e2, saturado; ahora teal pálido #cdeae3 · texto #00201b 13.48:1
   --vs-primary-container: var(--mat-sys-primary-container);
   --vs-on-primary-container: var(--mat-sys-on-primary-container);
-  --vs-primary-soft: #e5fff8;                           // tono 98 · texto #005047 8.93:1
-  --vs-on-primary-soft: #005047;
+  // Tinte de marca (fila "siguiente", avatares): antes menta #e5fff8
+  --vs-primary-soft: #e3f1ed;                           // texto #00453d 9.42 · primario 5.54
+  --vs-on-primary-soft: #00453d;
+  // Botón tonal (secundario): contenedor teal claro, sin borde
+  --vs-tonal: #cfe7e0;                                  // texto #0b3d36 9.31:1
+  --vs-on-tonal: #0b3d36;
 
-  // Naranja de marca: solo como relleno/acento con texto oscuro (blanco = 2.70:1, prohibido)
-  --vs-accent: #f57c00;                                 // texto #311300 6.35:1
-  --vs-on-accent: #311300;
-  --vs-accent-text: #964900;                            // tertiary 40 · 6.46:1 sobre blanco
-  --vs-accent-container: #ffdcc6;                       // tertiary 90
-  --vs-on-accent-container: #502400;                    // 10.23:1
+  // ---- Atención: el único cálido -----------------------------------
+  // Ámbar limpio (no durazno con café). Como línea/punto/borde ≥ 3:1; el texto
+  // usa su tono oscuro. Nunca blanco encima en texto normal (4.21:1).
+  --vs-attention: #c45f00;                              // 4.21 / 3.68 (componentes ≥ 3)
+  --vs-attention-text: #9a4800;                         // 6.36 / 5.56
+  --vs-attention-container: #fbefe4;                    // pastilla excepcional · texto #7a3700 7.82
+  --vs-on-attention-container: #7a3700;
+  --vs-attention-surface: #fcf4ec;                      // bloque "por cobrar hoy" · texto #13201d 15.41, ámbar 5.84
+  // Alias históricos (antes naranja #f57c00 / durazno #ffdcc6 / café #502400)
+  --vs-accent: var(--vs-attention);
+  --vs-on-accent: #ffffff;
+  --vs-accent-text: var(--vs-attention-text);
+  --vs-accent-container: var(--vs-attention-container);
+  --vs-on-accent-container: var(--vs-on-attention-container);
 
-  // ---- Superficies --------------------------------------------------
-  --vs-bg: #f0f4f2;                                     // neutral 96
+  // ---- Superficies (escalones de valor claros) ----------------------
+  --vs-bg: #ebf1ef;                                     // neutro teñido de teal · blanco encima 1.14:1
   --vs-surface: #ffffff;
-  --vs-surface-muted: #f6faf8;                          // neutral 98 (bloques internos)
+  --vs-surface-muted: #f4f8f7;                          // bloques internos, cabecera de tabla
   --vs-surface-elevated: #ffffff;
   // Superficie "escenario": la única superficie elevada de una vista (el protagonista).
-  // Sin borde; la separa del fondo una sombra con desplazamiento y desenfoque suave.
-  --vs-stage-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 10px 28px -12px rgba(16, 24, 40, 0.16);
-  // Bloque urgente (por cobrar hoy, atención inmediata): naranja de acento tono 95.
-  // Texto --vs-on-accent-container #502400 sobre él: 11.3:1; --vs-accent-text #964900: 5.9:1.
-  --vs-surface-urgent: #ffede3;
-  // Fila "siguiente" de la agenda: primario tono 98 (= --vs-primary-soft)
+  // Sin borde; sombra con desplazamiento y desenfoque suave, teñida de teal profundo.
+  --vs-stage-shadow: 0 1px 2px rgba(12, 56, 51, 0.06), 0 12px 32px -14px rgba(12, 56, 51, 0.22);
+  --vs-surface-urgent: var(--vs-attention-surface);
+  // Fila "siguiente" de la agenda
   --vs-surface-next: var(--vs-primary-soft);
 
-  // ---- Texto --------------------------------------------------------
-  --vs-text: var(--mat-sys-on-surface);                 // #181d1b · 17.07 / 15.38 (bg)
-  --vs-text-secondary: #434846;                         // neutral 30 · 9.32 / 8.40
-  --vs-text-muted: #5b5f5e;                             // neutral 40 · 6.47 / 5.84
+  // ---- Texto (teñido de teal) ---------------------------------------
+  --vs-text: #13201d;                                   // 16.77 / 14.66
+  --vs-text-secondary: #3a4a46;                         // 9.34 / 8.17
+  --vs-text-muted: #55655f;                             // 6.15 / 5.38 · 5.29 sobre primary-soft
 
   // ---- Bordes -------------------------------------------------------
-  --vs-border: #dfe3e1;                                 // neutral 90 · decorativo
-  --vs-border-strong: #737876;                          // neutral 50 · 4.49:1 (controles ≥ 3:1)
+  --vs-border: #d6e1dd;                                 // decorativo · 1.34 / 1.17
+  --vs-border-strong: #6b7d78;                          // controles 4.35 / 3.80 (≥ 3:1)
 
-  // ---- Estados (siempre acompañados de icono + texto) ---------------
-  --vs-success: #2e7d32;                                // 5.13:1 sobre blanco
-  --vs-success-container: #e8f5e9;
-  --vs-on-success-container: #1b5e20;                   // 7.00:1
-  --vs-warning: #8a4300;                                // 7.28:1
-  --vs-warning-container: #fff3e0;
-  --vs-on-warning-container: #723600;                   // 8.54:1
-  --vs-danger: var(--mat-sys-error);                    // #ba1a20 · 6.45:1 (ambos sentidos)
+  // ---- Estados (siempre acompañados de icono o punto + texto) -------
+  // Éxito: variante verde del teal (matiz ~160°), no un verde ajeno.
+  --vs-success: #17694f;                                // 6.62 / 5.79
+  --vs-success-container: #dfefe8;
+  --vs-on-success-container: #0f5640;                   // 7.28
+  // Aviso = atención (mismo ámbar: un solo cálido en toda la app)
+  --vs-warning: var(--vs-attention-text);
+  --vs-warning-container: var(--vs-attention-container);
+  --vs-on-warning-container: var(--vs-on-attention-container);
+  // Crítico: rojo con moderación (eliminar, error, alergias)
+  --vs-danger: var(--mat-sys-error);                    // #ba1a20 · 6.45 / 5.64
   --vs-on-danger: var(--mat-sys-on-error);
-  --vs-danger-container: #ffdad6;
-  --vs-on-danger-container: #930010;                    // 7.23:1
-  --vs-info: #1565c0;                                   // 5.75:1
-  --vs-info-container: #e3f2fd;
-  --vs-on-info-container: #0d47a1;                      // 7.56:1
+  --vs-danger-container: #fde3e0;
+  --vs-on-danger-container: #8c1016;                    // 7.83
+  // Información / hecho: neutro teñido (antes azul #1565c0, un séptimo matiz)
+  --vs-info: #3a5853;                                   // 7.78
+  --vs-info-container: #e6eeec;
+  --vs-on-info-container: #2c403c;                      // 9.34
 
   // ---- Foco ---------------------------------------------------------
-  --vs-focus: var(--mat-sys-primary);                   // 6.43 blanco / 5.80 bg
+  --vs-focus: var(--mat-sys-primary);                   // 6.43 blanco / 5.62 bg
   --vs-focus-on-dark: #7ad7c6;                          // primary 80 · 7.59 sidebar / 5.30 activo
 
   // ---- Zona oscura (sidebar): teal profundo de la familia de la marca ----
@@ -111,9 +134,9 @@
   --vs-radius-full: 999px;
 
   // ---- Sombras ------------------------------------------------------
-  --vs-shadow-1: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
-  --vs-shadow-2: 0 4px 12px rgba(16, 24, 40, 0.10);
-  --vs-shadow-3: 0 12px 32px rgba(16, 24, 40, 0.18);
+  --vs-shadow-1: 0 1px 2px rgba(12, 56, 51, 0.06), 0 1px 3px rgba(12, 56, 51, 0.08);
+  --vs-shadow-2: 0 4px 12px rgba(12, 56, 51, 0.10);
+  --vs-shadow-3: 0 12px 32px rgba(12, 56, 51, 0.18);
 
   // Gráficos: una sola serie en teal más saturado (el primario #006b5e se lee gris en datos;
   // validado con dataviz/validate_palette: luminosidad, croma y contraste >= 3:1)

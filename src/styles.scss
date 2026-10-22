@@ -24,6 +24,17 @@ html {
   @include mat.color-variants-backwards-compatibility($theme);
   // Tokens semánticos del design system (src/styles/_tokens.scss)
   @include vs.tokens;
+
+  // Roles M3 alineados con los tokens: neutros teñidos de teal y un contenedor
+  // de marca sereno (la paleta generada daba menta #97f3e2 y grises #737876).
+  --mat-sys-on-surface: var(--vs-text);
+  --mat-sys-on-surface-variant: var(--vs-text-secondary);
+  --mat-sys-outline: var(--vs-border-strong);
+  --mat-sys-outline-variant: var(--vs-border);
+  --mat-sys-primary-container: #cdeae3;
+  --mat-sys-on-primary-container: #00201b;
+  --mat-sys-secondary-container: var(--vs-tonal);
+  --mat-sys-on-secondary-container: var(--vs-on-tonal);
 }
 
 /* ===== RESET & BASE ===== */
@@ -39,11 +50,11 @@ html, body {
 }
 
 /* ===== SCROLLBAR ===== */
-html { scrollbar-color: #879390 transparent; }
+html { scrollbar-color: #9fb3ad transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #879390;
+  background: #9fb3ad;
   border-radius: var(--vs-radius-full);
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -212,13 +223,44 @@ mat-card.mat-mdc-card {
 }
 
 /* ===== BOTONES =====
-   Jerarquía: mat-flat-button color=primary (1 por vista) > mat-stroked-button > mat-button.
-   .vs-btn-urgent: "Atención inmediata", igual en todas las pantallas. */
-.mat-mdc-unelevated-button.vs-btn-urgent:not(:disabled) {
-  --mat-button-filled-container-color: var(--vs-accent-container);
-  --mat-button-filled-label-text-color: var(--vs-on-accent-container);
-  --mat-button-filled-ripple-color: rgba(80, 36, 0, 0.12);
-  --mat-button-filled-state-layer-color: var(--vs-on-accent-container);
+   Jerarquía única en toda la app:
+   1. Primaria  mat-flat-button       teal relleno (1 por vista)
+   2. Secundaria mat-stroked-button   filete fino teal claro, texto teal
+      (o tonal: matButton="tonal", contenedor --vs-tonal)
+   3. Terciaria mat-button            solo texto (acciones repetidas en filas)
+   Urgente: .vs-btn-urgent sobre mat-stroked-button, "Atención inmediata":
+   superficie blanca, filete y texto ámbar, rayo ámbar. Mismo trato en toda la app. */
+html {
+  @include mat.button-overrides((
+    outlined-outline-color: #a9c2bb,                    // filete fino teñido (decorativo; el texto identifica)
+    tonal-container-color: var(--vs-tonal),
+    tonal-label-text-color: var(--vs-on-tonal),
+  ));
+}
+.mat-mdc-outlined-button.vs-btn-urgent:not(:disabled) {
+  --mat-button-outlined-outline-color: var(--vs-attention);        // 4.21:1 sobre blanco
+  --mat-button-outlined-label-text-color: var(--vs-attention-text); // 6.36:1
+  --mat-button-outlined-state-layer-color: var(--vs-attention);
+  --mat-button-outlined-ripple-color: rgba(196, 95, 0, 0.14);
+  background: var(--vs-surface);
+  .mat-icon { color: var(--vs-attention); }
+}
+
+/* Acciones de fila en tablas: iconos neutros; el color aparece al pasar o enfocar.
+   Cuatro colores por fila (teal, naranja, gris, rojo) eran ruido repetido. */
+td.cell-actions .mat-mdc-icon-button:not(:disabled) {
+  --mat-icon-button-icon-color: var(--vs-text-secondary);         // 9.34:1
+  color: var(--vs-text-secondary);
+  &:hover, &:focus-visible { color: var(--vs-primary); }
+  &.mat-warn:hover, &.mat-warn:focus-visible { color: var(--vs-danger); }
+  &.mat-accent:hover, &.mat-accent:focus-visible { color: var(--vs-attention-text); }
+}
+
+/* Diálogos sobre superficie blanca, como las tarjetas */
+html {
+  @include mat.dialog-overrides((
+    container-color: var(--vs-surface),
+  ));
 }
 
 /* Destructivo relleno: color="warn" sobre botón flat usa --mat-sys-error (6.45:1) */
@@ -234,21 +276,31 @@ mat-card.mat-mdc-card {
 
 /* ===== ESTADOS (chips) =====
    Un único mapa estado -> significado. El texto del estado siempre se
-   muestra; el color nunca es el único indicador. Ratios medidos:
-   success 7.00 · warning 8.54 · danger 7.23 · info 7.56 · accent 10.23. */
-.vs-status, [class*='chip-'].mat-mdc-chip {
+   muestra; el color nunca es el único indicador. Tres familias: teal (éxito),
+   ámbar (requiere atención) y rojo (crítico); lo hecho es neutro. Ratios:
+   success 7.28 · atención 7.82 · danger 7.83 · neutro 9.34. */
+[class*='chip-'].mat-mdc-chip {
   font-weight: 600 !important;
 }
-// Estado como etiqueta suelta (fuera de mat-chip): misma forma compacta que el chip
+// Estado como etiqueta suelta (listas del dashboard): punto + texto coloreado, sin
+// pastilla. En filas repetidas una pastilla saturada por fila es ruido; la pastilla
+// (.vs-status--pill) se reserva para lo excepcional.
 span.vs-status {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: var(--vs-radius-full);
-  font-size: 12px;
+  gap: 6px;
+  font-size: 13px;
   line-height: 18px;
+  font-weight: 500;
   white-space: nowrap;
+  color: var(--vs-status-fg, var(--vs-text-secondary));
+  &::before { content: ''; flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--vs-status-dot, currentColor); }
+  &.vs-status--pill { padding: 2px 8px; border-radius: var(--vs-radius-full); background: var(--vs-status-bg); color: var(--vs-status-on); }
 }
+span.vs-status--success { --vs-status-fg: var(--vs-success); --vs-status-bg: var(--vs-success-container); --vs-status-on: var(--vs-on-success-container); }
+span.vs-status--warning, span.vs-status--accent { --vs-status-fg: var(--vs-attention-text); --vs-status-dot: var(--vs-attention); --vs-status-bg: var(--vs-attention-container); --vs-status-on: var(--vs-on-attention-container); }
+span.vs-status--danger { --vs-status-fg: var(--vs-danger); --vs-status-bg: var(--vs-danger-container); --vs-status-on: var(--vs-on-danger-container); }
+span.vs-status--info, span.vs-status--neutral { --vs-status-fg: var(--vs-text-muted); --vs-status-dot: #8fa39d; --vs-status-bg: var(--vs-info-container); --vs-status-on: var(--vs-on-info-container); }
 
 @mixin _status($bg, $fg) {
   --mat-chip-elevated-container-color: #{$bg};
@@ -259,23 +311,15 @@ span.vs-status {
   .mat-icon, .chip-icon { color: #{$fg}; }
 }
 
-.vs-status--success,
 .mat-mdc-chip:is(.chip-confirmada, .chip-pagado, .chip-activo) {
   @include _status(var(--vs-success-container), var(--vs-on-success-container));
 }
-.vs-status--warning,
-.mat-mdc-chip:is(.chip-pendiente, .chip-proxima) {
+.mat-mdc-chip:is(.chip-pendiente, .chip-proxima, .chip-vencida) {
   @include _status(var(--vs-warning-container), var(--vs-on-warning-container));
 }
-.vs-status--danger,
-.mat-mdc-chip:is(.chip-cancelada, .chip-anulado, .chip-vencida, .chip-inactivo) {
-  @include _status(var(--vs-danger-container), var(--vs-on-danger-container));
-}
-.vs-status--info,
-.mat-mdc-chip:is(.chip-completada, .chip-cita) {
+.mat-mdc-chip:is(.chip-completada, .chip-cita, .chip-cancelada, .chip-anulado, .chip-inactivo) {
   @include _status(var(--vs-info-container), var(--vs-on-info-container));
 }
-.vs-status--accent,
 .mat-mdc-chip.chip-inmediata {
   @include _status(var(--vs-accent-container), var(--vs-on-accent-container));
 }
@@ -288,8 +332,9 @@ span.vs-status {
 /* Iconos de estado sueltos (listas del dashboard / expediente) */
 .estado-pendiente, .estado-proxima { color: var(--vs-warning); }
 .estado-confirmada, .estado-pagado { color: var(--vs-success); }
-.estado-completada { color: var(--vs-info); }
-.estado-cancelada, .estado-anulado, .estado-vencida { color: var(--vs-danger); }
+.estado-completada { color: var(--vs-text-muted); }
+.estado-vencida { color: var(--vs-attention-text); }
+.estado-cancelada, .estado-anulado { color: var(--vs-text-muted); }
 .estado-inmediata { color: var(--vs-accent-text); }
 
 mat-form-field.full-width, .full-width { width: 100%; }
