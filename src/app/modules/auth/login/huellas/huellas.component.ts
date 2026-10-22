@@ -25,8 +25,8 @@ export type TonoHuellas = 'claro' | 'marca';
 const TONOS: Record<TonoHuellas, { color: string; base: number; cursor: number }> = {
   // --vs-primary-soft sobre la franja teal
   claro: { color: '229, 255, 248', base: 0.13, cursor: 0.3 },
-  // --vs-primary (#006b5e) sobre el fondo claro de la app
-  marca: { color: '0, 107, 94', base: 0.09, cursor: 0.2 }
+  // Verde puro (#00965a), de la familia de la marca, sobre el fondo claro de la app
+  marca: { color: '0, 150, 90', base: 0.28, cursor: 0.45 }
 };
 const RADIO_CURSOR = 150;
 const VIDA_MS = 4200;
