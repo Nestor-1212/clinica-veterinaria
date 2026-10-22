@@ -1,0 +1,19 @@
+// Pestaña Negocio: el escenario une la cifra del mes (con sus secundarias debajo,
+// separadas por filetes) y el gráfico de 6 meses a todo el ancho restante. El contexto
+// (servicios, cobros, asistencia, veterinarios) va debajo, sobre el fondo.
+.ingresos { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: var(--vs-space-6) var(--vs-space-8); }
+.ingresos-cifra { display: grid; align-content: start; gap: var(--vs-space-6); padding-right: var(--vs-space-6); border-right: 1px solid var(--vs-border); }
+.ingresos-secundarias { display: grid;
+  > app-kpi { padding: var(--vs-space-3) 0; border-top: 1px solid var(--vs-border); } }
+.contexto { --columnas: 4; }
+
+@media (max-width: 1600px) { .contexto { --columnas: 2; } }
+@media (max-width: 960px) {
+  .ingresos { grid-template-columns: minmax(0, 1fr); }
+  .ingresos-cifra { padding-right: 0; border-right: 0; }
+  .ingresos-secundarias { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--vs-space-5); }
+}
+@media (max-width: 720px) { .contexto { --columnas: 1; } }
+@media (max-width: 600px) {
+  .ingresos-secundarias { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--vs-space-4); }
+}

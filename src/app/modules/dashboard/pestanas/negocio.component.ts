@@ -5,20 +5,21 @@ import { asistenciaMes, ingresosPorCategoria, ingresosPorMes, porCobrar, porVete
 import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
 import { Columna, GraficoColumnasComponent } from '../../../shared/components/graficos/grafico-columnas.component';
 import { Barra, GraficoBarrasComponent } from '../../../shared/components/graficos/grafico-barras.component';
-import { DatosDashboard, entero, moneda, tramoAnterior } from '../dashboard-datos';
+import { DatosDashboard, entero, moneda, plural, tramoAnterior } from '../dashboard-datos';
 
 /** Pestaña "Negocio" (solo administración): cómo va el mes y de dónde viene el dinero. */
 @Component({
   selector: 'app-dashboard-negocio',
   imports: [RouterLink, MatIcon, KpiComponent, GraficoColumnasComponent, GraficoBarrasComponent],
   templateUrl: './negocio.component.html',
-  styleUrls: ['./pestanas.scss'],
+  styleUrls: ['./pestanas.scss', './negocio.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NegocioComponent {
   readonly datos = input.required<DatosDashboard>();
   readonly moneda = moneda;
   readonly entero = entero;
+  readonly plural = plural;
 
   readonly ingresos = computed(() => resumenIngresos(this.datos().pagos, this.datos().hoy));
   readonly contra = computed(() => tramoAnterior(this.datos().hoy));

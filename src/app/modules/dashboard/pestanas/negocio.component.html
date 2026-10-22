@@ -1,31 +1,34 @@
-<div class="kpis">
-  <app-kpi etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
-    [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
-    [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mes anterior completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
-  <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
-    [delta]="ingresos().variacionTicket === null ? null : { porcentaje: ingresos().variacionTicket!, contra: contra(), subirEsBueno: true }"
-    [ayuda]="entero(ingresos().cobros) + ' cobros este mes'"></app-kpi>
-  <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
-    [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
-    [ayuda]="asistencia().inmediatas + ' inmediatas · ' + asistencia().tasaInasistencia + ' % no asistió'"></app-kpi>
-  <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos"
-    [ayuda]="entero(cobrar().cantidad) + ' pendientes' + (atrasado() ? ' · ' + moneda(atrasado()) + ' con más de 30 días' : '')"></app-kpi>
-</div>
-
-<div class="rejilla rejilla--2-1">
-  <section class="panel" aria-labelledby="titulo-ingresos">
-    <header class="panel-cabecera">
+<section class="escenario ingresos" aria-labelledby="titulo-ingresos">
+  <div class="ingresos-cifra">
+    <app-kpi hero etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
+      [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
+      [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mes anterior completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
+    <div class="ingresos-secundarias">
+      <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
+        [delta]="ingresos().variacionTicket === null ? null : { porcentaje: ingresos().variacionTicket!, contra: contra(), subirEsBueno: true }"
+        [ayuda]="plural(ingresos().cobros, 'cobro') + ' este mes'"></app-kpi>
+      <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
+        [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
+        [ayuda]="plural(asistencia().inmediatas, 'inmediata') + ' · ' + asistencia().tasaInasistencia + ' % no asistieron'"></app-kpi>
+      <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos" [tono]="atrasado() ? 'atencion' : null"
+        [ayuda]="plural(cobrar().cantidad, 'pendiente') + (atrasado() ? ' · ' + moneda(atrasado()) + ' con más de 30 días' : '')"></app-kpi>
+    </div>
+  </div>
+  <div class="ingresos-grafico">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-ingresos">Ingresos de los últimos 6 meses</h2>
         <p>Cobros registrados, en dólares</p>
       </div>
     </header>
-    <app-grafico-columnas [datos]="meses()" titulo="Ingresos cobrados por mes, últimos 6 meses" [formato]="moneda"
+    <app-grafico-columnas [datos]="meses()" titulo="Ingresos cobrados por mes, últimos 6 meses" [formato]="moneda" [alto]="300"
       notaParcial="Mes en curso: suma hasta hoy."></app-grafico-columnas>
-  </section>
+  </div>
+</section>
 
-  <section class="panel" aria-labelledby="titulo-categorias">
-    <header class="panel-cabecera">
+<div class="contexto">
+  <section class="seccion" aria-labelledby="titulo-categorias">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-categorias">Qué se vende este mes</h2>
         <p>Facturado por tipo de servicio, antes de descuentos</p>
@@ -34,27 +37,25 @@
     @if (categorias().length) {
       <app-grafico-barras [datos]="categorias()" titulo="Facturado por tipo de servicio este mes" [formato]="moneda"></app-grafico-barras>
     } @else {
-      <div class="vs-empty"><mat-icon aria-hidden="true">receipt_long</mat-icon><p>Aún no hay cobros este mes.</p></div>
+      <p class="vacio"><mat-icon aria-hidden="true">receipt_long</mat-icon>Aún no hay cobros este mes.</p>
     }
   </section>
-</div>
 
-<div class="rejilla rejilla--3">
-  <section class="panel" aria-labelledby="titulo-cobrar">
-    <header class="panel-cabecera">
+  <section class="seccion" aria-labelledby="titulo-cobrar">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-cobrar">Por cobrar según antigüedad</h2>
-        <p>{{ moneda(cobrar().total) }} en {{ cobrar().cantidad }} pagos pendientes</p>
+        <p>{{ moneda(cobrar().total) }} en {{ plural(cobrar().cantidad, 'pago pendiente', 'pagos pendientes') }}</p>
       </div>
     </header>
     <app-grafico-barras [datos]="tramos()" titulo="Pagos pendientes según días desde la atención" [formato]="moneda"></app-grafico-barras>
     @if (cobrar().pendientes.length) {
-      <a class="ver-mas" routerLink="/pagos">Gestionar cobros</a>
+      <a class="ver-mas" routerLink="/pagos">Gestionar cobros <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
     }
   </section>
 
-  <section class="panel" aria-labelledby="titulo-asistencia">
-    <header class="panel-cabecera">
+  <section class="seccion" aria-labelledby="titulo-asistencia">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-asistencia">Asistencia del mes</h2>
         <p>Citas cuya hora ya pasó, desde el día 1</p>
@@ -69,8 +70,8 @@
     </dl>
   </section>
 
-  <section class="panel" aria-labelledby="titulo-vets">
-    <header class="panel-cabecera">
+  <section class="seccion" aria-labelledby="titulo-vets">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-vets">Por veterinario</h2>
         <p>Atenciones e ingresos cobrados del mes</p>

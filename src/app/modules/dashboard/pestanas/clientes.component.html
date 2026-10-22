@@ -1,35 +1,36 @@
-<div class="kpis">
+<div class="banda">
+  <app-kpi hero etiqueta="Clientes para recuperar" [valor]="entero(resumen().sinVolver.length)"
+    ayuda="Más de 90 días sin venir y sin cita"></app-kpi>
   <app-kpi etiqueta="Clientes activos" [valor]="entero(resumen().activos)" enlace="/clientes"
     ayuda="Con alguna visita en los últimos 90 días"></app-kpi>
   <app-kpi etiqueta="Clientes nuevos" [valor]="entero(resumen().nuevosMes)"
     [delta]="variacionNuevos() === null ? null : { porcentaje: variacionNuevos()!, contra: 'vs. mes anterior', subirEsBueno: true }"
     [ayuda]="comparacionNuevos()"></app-kpi>
-  <app-kpi etiqueta="Para recuperar" [valor]="entero(resumen().sinVolver.length)"
-    ayuda="Más de 90 días sin venir y sin cita"></app-kpi>
   <app-kpi etiqueta="Mascotas activas" [valor]="entero(mascotasActivas())" enlace="/mascotas"
     [ayuda]="plural(vacunas().length, 'vacuna vence', 'vacunas vencen') + ' en 30 días'"></app-kpi>
 </div>
 
-<div class="rejilla rejilla--3">
-  <section class="panel" aria-labelledby="titulo-recuperar">
-    <header class="panel-cabecera">
+<div class="columnas clientes-columnas">
+  <section class="escenario" aria-labelledby="titulo-recuperar">
+    <header class="cabecera">
       <div>
         <h2 id="titulo-recuperar">Para recuperar</h2>
-        <p>Clientes que no vuelven, del más reciente al más antiguo</p>
+        <p>Clientes que no vuelven, del más reciente al más antiguo · llamar o escribir para agendar un chequeo</p>
       </div>
     </header>
     @if (resumen().sinVolver.length === 0) {
-      <div class="vs-empty"><mat-icon aria-hidden="true">favorite</mat-icon><p>Todos los clientes han venido en los últimos 90 días.</p></div>
+      <p class="vacio"><mat-icon aria-hidden="true">favorite</mat-icon>Todos los clientes han venido en los últimos 90 días.</p>
     } @else {
-      <ul class="lista">
-        @for (s of resumen().sinVolver.slice(0, 8); track s.cliente.id) {
+      <ul class="lista recuperar">
+        @for (s of resumen().sinVolver.slice(0, 12); track s.cliente.id) {
           <li class="lista-fila">
             <div class="lista-cuerpo">
               <a class="lista-titulo" [routerLink]="['/clientes', s.cliente.id]">{{ s.cliente.nombre }}</a>
-              <span class="lista-detalle"><span class="recorte">{{ s.mascotas.join(', ') || 'Sin mascotas activas' }}</span><span class="dato">Vino {{ enDias(-s.dias) }}</span></span>
+              <span class="lista-detalle">{{ s.mascotas.join(', ') || 'Sin mascotas activas' }}</span>
+              <span class="lista-meta">Vino {{ enDias(-s.dias) }}</span>
             </div>
             <span class="contacto">
-              <a mat-button [href]="tel(s.cliente.telefono)" [attr.aria-label]="'Llamar a ' + s.cliente.nombre"><mat-icon>call</mat-icon></a>
+              <a mat-button [href]="tel(s.cliente.telefono)" [attr.aria-label]="'Llamar a ' + s.cliente.nombre + ', ' + s.cliente.telefono"><mat-icon>call</mat-icon>{{ s.cliente.telefono }}</a>
               @if (whatsappRecuperar(s); as wa) {
                 <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + s.cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
               }
@@ -37,64 +38,71 @@
           </li>
         }
       </ul>
-      @if (resumen().sinVolver.length > 8) {
-        <p class="lista-pie">Y {{ resumen().sinVolver.length - 8 }} más.</p>
+      @if (resumen().sinVolver.length > 12) {
+        <p class="lista-pie">Y {{ resumen().sinVolver.length - 12 }} más.</p>
       }
     }
   </section>
 
-  <section class="panel" aria-labelledby="titulo-vacunas30">
-    <header class="panel-cabecera">
-      <div>
-        <h2 id="titulo-vacunas30">Vacunas de los próximos 30 días</h2>
-        <p>Avisar con tiempo para agendar</p>
-      </div>
-    </header>
-    @if (vacunas().length === 0) {
-      <div class="vs-empty"><mat-icon aria-hidden="true">vaccines</mat-icon><p>No hay vacunas por vencer este mes.</p></div>
-    } @else {
-      <ul class="lista">
-        @for (r of vacunas().slice(0, 8); track r.vacuna.id) {
-          <li class="lista-fila">
-            <div class="lista-cuerpo">
-              <span class="lista-titulo">{{ r.mascota.nombre }} · {{ r.vacuna.nombre }}</span>
-              <span class="lista-detalle"><span class="recorte">{{ r.cliente.nombre }}</span><span class="dato">{{ r.vacuna.proximaFecha | date: 'd MMM' }} · {{ enDias(r.dias) }}</span></span>
-            </div>
-            <span class="contacto">
-              <a mat-button [href]="tel(r.cliente.telefono)" [attr.aria-label]="'Llamar a ' + r.cliente.nombre"><mat-icon>call</mat-icon></a>
-              @if (whatsappVacuna(r); as wa) {
-                <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + r.cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
-              }
-            </span>
-          </li>
+  <div class="lateral">
+    <section class="seccion" aria-labelledby="titulo-vacunas30">
+      <header class="cabecera">
+        <div>
+          <h2 id="titulo-vacunas30">Vacunas de los próximos 30 días</h2>
+          <p>Avisar con tiempo para agendar</p>
+        </div>
+      </header>
+      @if (vacunas().length === 0) {
+        <p class="vacio"><mat-icon aria-hidden="true">vaccines</mat-icon>No hay vacunas por vencer este mes.</p>
+      } @else {
+        <ul class="lista">
+          @for (r of vacunas().slice(0, 6); track r.vacuna.id) {
+            <li class="lista-fila">
+              <div class="lista-cuerpo">
+                <span class="lista-titulo">{{ r.mascota.nombre }} · {{ r.vacuna.nombre }}</span>
+                <span class="lista-detalle">{{ r.cliente.nombre }}</span>
+                <span class="lista-meta">{{ r.vacuna.proximaFecha | date: "d 'de' MMMM" }} · {{ enDias(r.dias) }}</span>
+              </div>
+              <span class="contacto">
+                <a mat-button [href]="tel(r.cliente.telefono)" [attr.aria-label]="'Llamar a ' + r.cliente.nombre + ', ' + r.cliente.telefono"><mat-icon>call</mat-icon>{{ r.cliente.telefono }}</a>
+                @if (whatsappVacuna(r); as wa) {
+                  <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + r.cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+        @if (vacunas().length > 6) {
+          <a class="ver-mas" routerLink="/vacunas">Ver las {{ vacunas().length }} vacunas <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
         }
-      </ul>
-      @if (vacunas().length > 8) {
-        <a class="ver-mas" routerLink="/vacunas">Ver las {{ vacunas().length }} vacunas</a>
       }
-    }
-  </section>
+    </section>
 
-  <section class="panel" aria-labelledby="titulo-nuevos">
-    <header class="panel-cabecera">
-      <div>
-        <h2 id="titulo-nuevos">Nuevos este mes</h2>
-        <p>Bienvenida y primera visita</p>
-      </div>
-    </header>
-    @if (resumen().nuevos.length === 0) {
-      <div class="vs-empty"><mat-icon aria-hidden="true">person_add</mat-icon><p>Aún no hay clientes nuevos este mes.</p></div>
-    } @else {
-      <ul class="lista">
-        @for (c of resumen().nuevos.slice(0, 8); track c.id) {
-          <li class="lista-fila">
-            <div class="lista-cuerpo">
-              <a class="lista-titulo" [routerLink]="['/clientes', c.id]">{{ c.nombre }}</a>
-              <span class="lista-detalle"><span class="recorte">{{ mascotasDe(c.id) }}</span><span class="dato">{{ c.fechaRegistro | date: 'd MMM' }}</span></span>
-            </div>
-          </li>
+    <section class="seccion" aria-labelledby="titulo-nuevos">
+      <header class="cabecera">
+        <div>
+          <h2 id="titulo-nuevos">Nuevos este mes</h2>
+          <p>Bienvenida y primera visita</p>
+        </div>
+      </header>
+      @if (resumen().nuevos.length === 0) {
+        <p class="vacio"><mat-icon aria-hidden="true">person_add</mat-icon>Aún no hay clientes nuevos este mes.</p>
+      } @else {
+        <ul class="lista">
+          @for (c of resumen().nuevos.slice(0, 6); track c.id) {
+            <li class="lista-fila">
+              <div class="lista-cuerpo">
+                <a class="lista-titulo" [routerLink]="['/clientes', c.id]">{{ c.nombre }}</a>
+                <span class="lista-detalle">{{ mascotasDe(c.id) }}</span>
+              </div>
+              <span class="lista-meta">{{ c.fechaRegistro | date: 'd MMM' }}</span>
+            </li>
+          }
+        </ul>
+        @if (resumen().nuevos.length > 6) {
+          <p class="lista-pie">Y {{ resumen().nuevos.length - 6 }} más.</p>
         }
-      </ul>
-    }
-  </section>
+      }
+    </section>
+  </div>
 </div>
