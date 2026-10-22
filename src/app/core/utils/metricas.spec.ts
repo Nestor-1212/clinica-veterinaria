@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Cita, Cliente, Consulta, Mascota, Pago, Vacuna } from '../models';
 import {
-  asistenciaMes, enlaceWhatsApp, ingresosPorCategoria, ingresosPorMes, porCobrar, recordatoriosVacuna,
+  asistenciaMes, enlaceWhatsApp, esInasistencia, ingresosPorCategoria, ingresosPorMes, mismoMomentoMesAnterior, momentoCita, porCobrar, porCobrarHoy, recordatoriosVacuna,
   resumenClientes, resumenIngresos, siguienteDiaHabil, variacion
 } from './metricas';
 
@@ -79,6 +79,37 @@ describe('métricas del dashboard', () => {
       cita(new Date(2026, 9, 6), 'cancelada'), cita(new Date(2026, 9, 25), 'pendiente')
     ], [consulta('c1', new Date(2026, 9, 4), 'inmediata')], HOY);
     expect(a).toMatchObject({ programadas: 3, atendidas: 2, canceladas: 1, tasaCancelacion: 33, inmediatas: 1 });
+  });
+
+  it('cuenta como "no asistió" la cita pasada que sigue pendiente o confirmada, usando su hora real', () => {
+    const conHora = (dia: number, hora: string, estado: Cita['estado']) => ({ ...cita(new Date(2026, 9, dia), estado), hora });
+    const a = asistenciaMes([
+      conHora(3, '09:00', 'completada'),
+      conHora(5, '10:00', 'confirmada'),   // pasada sin atender: no llegó
+      conHora(22, '11:30', 'pendiente'),   // hoy a las 11:30, ya pasó (son las 12:00): no llegó
+      conHora(22, '16:00', 'confirmada')   // hoy más tarde: aún no cuenta
+    ], [], HOY);
+    expect(a.programadas).toBe(3);
+    expect(a.noAsistieron).toBe(2);
+    expect(a.tasaInasistencia).toBe(67);
+    expect(esInasistencia(conHora(22, '16:00', 'confirmada'), HOY)).toBe(false);
+    expect(momentoCita({ fecha: new Date(2026, 9, 22), hora: '16:30' }).getHours()).toBe(16);
+  });
+
+  it('el tramo anterior se corta a la misma hora del mismo día del mes anterior', () => {
+    const corte = mismoMomentoMesAnterior(HOY);
+    expect([corte.getMonth(), corte.getDate(), corte.getHours()]).toEqual([8, 22, 12]);
+    // 31 de marzo se compara con el último día de febrero
+    expect(mismoMomentoMesAnterior(new Date(2026, 2, 31, 9)).getDate()).toBe(28);
+    const r = resumenIngresos([pago(new Date(2026, 8, 22, 11), 40), pago(new Date(2026, 8, 22, 18), 999)], HOY);
+    expect(r.mismoTramoAnterior).toBe(40);
+  });
+
+  it('por cobrar hoy: solo las atenciones de hoy con pago pendiente', () => {
+    const lista = porCobrarHoy([
+      pago(new Date(2026, 9, 22, 9), 30, 'pendiente'), pago(new Date(2026, 9, 21, 9), 50, 'pendiente'), pago(new Date(2026, 9, 22, 10), 70)
+    ], HOY);
+    expect(lista.map(p => p.total)).toEqual([30]);
   });
 
   it('detecta clientes que no vuelven hace más de 90 días y sin cita futura', () => {

@@ -3,7 +3,7 @@
     ayuda="Con alguna visita en los últimos 90 días"></app-kpi>
   <app-kpi etiqueta="Clientes nuevos" [valor]="entero(resumen().nuevosMes)"
     [delta]="variacionNuevos() === null ? null : { porcentaje: variacionNuevos()!, contra: 'vs. mes anterior', subirEsBueno: true }"
-    [ayuda]="resumen().nuevosMesAnterior + ' el mes anterior'"></app-kpi>
+    [ayuda]="comparacionNuevos()"></app-kpi>
   <app-kpi etiqueta="Para recuperar" [valor]="entero(resumen().sinVolver.length)"
     ayuda="Más de 90 días sin venir y sin cita"></app-kpi>
   <app-kpi etiqueta="Mascotas activas" [valor]="entero(mascotasActivas())" enlace="/mascotas"
@@ -26,7 +26,7 @@
           <li class="lista-fila">
             <div class="lista-cuerpo">
               <a class="lista-titulo" [routerLink]="['/clientes', s.cliente.id]">{{ s.cliente.nombre }}</a>
-              <span class="lista-detalle">{{ s.mascotas.join(', ') || 'Sin mascotas activas' }} · última visita {{ enDias(-s.dias) }}</span>
+              <span class="lista-detalle"><span class="recorte">{{ s.mascotas.join(', ') || 'Sin mascotas activas' }}</span><span class="dato">Vino {{ enDias(-s.dias) }}</span></span>
             </div>
             <span class="contacto">
               <a mat-button [href]="tel(s.cliente.telefono)" [attr.aria-label]="'Llamar a ' + s.cliente.nombre"><mat-icon>call</mat-icon></a>
@@ -58,7 +58,7 @@
           <li class="lista-fila">
             <div class="lista-cuerpo">
               <span class="lista-titulo">{{ r.mascota.nombre }} · {{ r.vacuna.nombre }}</span>
-              <span class="lista-detalle">{{ r.cliente.nombre }} · {{ r.vacuna.proximaFecha | date: 'd MMM' }} ({{ enDias(r.dias) }})</span>
+              <span class="lista-detalle"><span class="recorte">{{ r.cliente.nombre }}</span><span class="dato">{{ r.vacuna.proximaFecha | date: 'd MMM' }} · {{ enDias(r.dias) }}</span></span>
             </div>
             <span class="contacto">
               <a mat-button [href]="tel(r.cliente.telefono)" [attr.aria-label]="'Llamar a ' + r.cliente.nombre"><mat-icon>call</mat-icon></a>
@@ -90,7 +90,7 @@
           <li class="lista-fila">
             <div class="lista-cuerpo">
               <a class="lista-titulo" [routerLink]="['/clientes', c.id]">{{ c.nombre }}</a>
-              <span class="lista-detalle">{{ mascotasDe(c.id) }} · desde el {{ c.fechaRegistro | date: 'd MMM' }}</span>
+              <span class="lista-detalle"><span class="recorte">{{ mascotasDe(c.id) }}</span><span class="dato">{{ c.fechaRegistro | date: 'd MMM' }}</span></span>
             </div>
           </li>
         }

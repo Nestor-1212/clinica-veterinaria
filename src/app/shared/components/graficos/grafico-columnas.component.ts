@@ -106,6 +106,7 @@ function techoLimpio(max: number): number {
       th, td { padding: 8px 4px; border-bottom: 1px solid var(--vs-border); text-align: left; }
       td { text-align: right; font-variant-numeric: tabular-nums; }
       thead th { font-size: 12px; color: var(--vs-text-secondary); font-weight: 600; }
+      thead th:last-child { text-align: right; }
       tbody th { font-weight: 400; }
     }
     .alternar { margin-top: var(--vs-space-2); padding: 4px 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--vs-primary); cursor: pointer; text-underline-offset: 3px;

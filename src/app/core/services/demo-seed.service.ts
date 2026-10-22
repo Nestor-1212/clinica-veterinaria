@@ -7,7 +7,7 @@ import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna
  * Versión de los datos de demostración. Al subirla, los navegadores en modo demo
  * regeneran los datos una vez (se reemplazan las colecciones clínicas; los usuarios se conservan).
  */
-export const VERSION_DATOS_DEMO = 5;
+export const VERSION_DATOS_DEMO = 6;
 const CLAVE_VERSION = 'vet_demo_version';
 const COLECCIONES_CLINICAS = ['vet_clientes', 'vet_mascotas', 'vet_citas', 'vet_consultas', 'vet_examenes', 'vet_recetas', 'vet_pagos', 'vet_vacunas'];
 
@@ -247,7 +247,8 @@ export class DemoSeedService {
           const motivo = inmediata ? `Atención inmediata — ${servicio.motivo.toLowerCase()}` : servicio.motivo;
 
           let estado: Cita['estado'];
-          if (pasado) estado = azar.prob(0.09) ? 'cancelada' : 'completada';
+          // Pasado: ~9 % canceladas, ~5 % sin atender (no llegó: queda pendiente/confirmada) y el resto atendidas
+          if (pasado) estado = azar.pesado([['completada', 86], ['cancelada', 9], ['confirmada', 3], ['pendiente', 2]] as const);
           else if (d === 0 && hora < this.sumarMinutos(ahoraHora, 45) && azar.prob(0.15)) estado = 'inmediata';
           else estado = d <= 1 ? azar.pesado([['confirmada', 60], ['pendiente', 40]] as const) : azar.pesado([['pendiente', 70], ['confirmada', 30]] as const);
 
@@ -285,7 +286,7 @@ export class DemoSeedService {
           const subtotal = items.reduce((s, i) => s + i.subtotal, 0);
           const descuento = azar.prob(0.08) ? Math.round(subtotal * 0.1) : 0;
           // Los cobros recientes pueden seguir pendientes; casi todo lo antiguo está cobrado
-          const probPendiente = d >= -25 ? 0.12 : d >= -75 ? 0.025 : 0;
+          const probPendiente = d >= -2 ? 0.3 : d >= -25 ? 0.12 : d >= -75 ? 0.025 : 0;
           const estadoPago = azar.prob(probPendiente) ? 'pendiente' : azar.prob(0.012) ? 'anulado' : 'pagado';
           const metodo = azar.pesado<MetodoPago>([['yappy', 34], ['tarjeta', 32], ['efectivo', 24], ['transferencia', 10]]);
           pagos.push({

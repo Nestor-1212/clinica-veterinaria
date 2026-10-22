@@ -7,10 +7,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Cita, Consulta } from '../../../core/models';
 import { CitasService } from '../../../core/services/citas.service';
 import { puedeAcceder } from '../../../core/auth/permisos';
-import { citasDelDia, enlaceWhatsApp, recordatoriosVacuna, siguienteDiaHabil, Recordatorio } from '../../../core/utils/metricas';
+import { citasDelDia, enlaceWhatsApp, esInasistencia, porCobrarHoy, recordatoriosVacuna, siguienteDiaHabil, Recordatorio } from '../../../core/utils/metricas';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
-import { DatosDashboard, ICONO_ESPECIE, enDias, entero, plural } from '../dashboard-datos';
+import { DatosDashboard, ICONO_ESPECIE, enDias, entero, moneda, plural } from '../dashboard-datos';
 
 const ESTADO_TEXTO: Record<Cita['estado'], string> = {
   pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Atendida', cancelada: 'Cancelada', inmediata: 'Inmediata'
@@ -71,6 +71,15 @@ export class HoyComponent {
   });
 
   readonly manana = computed(() => siguienteDiaHabil(this.datos().hoy));
+  /** "mañana" si el siguiente día hábil es mañana; si no, su nombre ("el lunes 26"). */
+  readonly cuandoManana = computed(() => {
+    const m = this.manana();
+    const diferencia = Math.round((m.getTime() - new Date(this.datos().hoy).setHours(0, 0, 0, 0)) / 86400000);
+    return diferencia === 1 ? 'mañana' : 'el ' + m.toLocaleDateString('es-PA', { weekday: 'long', day: 'numeric' });
+  });
+  /** Atenciones de hoy con el pago pendiente: a quién cobrar antes de que se vaya. */
+  readonly cobrarHoy = computed(() => porCobrarHoy(this.datos().pagos, this.datos().hoy));
+  readonly totalCobrarHoy = computed(() => this.cobrarHoy().reduce((s, p) => s + p.total, 0));
   readonly porConfirmar = computed(() =>
     citasDelDia(this.datos().citas, this.manana()).filter(c => c.estado === 'pendiente' && !this.confirmadas().has(c.id)));
 
@@ -94,6 +103,7 @@ export class HoyComponent {
   });
 
   readonly entero = entero;
+  readonly moneda = moneda;
   readonly plural = plural;
 
   nombreMascota(id: string): string { return this.datos().mascota.get(id)?.nombre ?? 'Mascota'; }
@@ -103,6 +113,11 @@ export class HoyComponent {
   nombreVet(id: string): string {
     const u = this.datos().usuario.get(id);
     return u ? `${u.nombre} ${u.apellido.charAt(0)}.` : '';
+  }
+
+  /** La hora de la cita ya pasó y sigue sin atender: el paciente no llegó. */
+  noLlego(cita: Cita): boolean {
+    return esInasistencia(cita, this.datos().hoy);
   }
 
   iniciarConsulta(cita: Cita): void {
@@ -117,7 +132,7 @@ export class HoyComponent {
 
   whatsappConfirmar(cita: Cita): string | null {
     return enlaceWhatsApp(this.telefono(cita.clienteId),
-      `Hola ${this.nombreCliente(cita.clienteId)}, le escribimos de la clínica veterinaria para confirmar la cita de ${this.nombreMascota(cita.mascotaId)} mañana a las ${cita.hora}. ¿Nos confirma su asistencia?`);
+      `Hola ${this.nombreCliente(cita.clienteId)}, le escribimos de la clínica veterinaria para confirmar la cita de ${this.nombreMascota(cita.mascotaId)} ${this.cuandoManana()} a las ${cita.hora}. ¿Nos confirma su asistencia?`);
   }
 
   whatsappVacuna(r: Recordatorio): string | null {

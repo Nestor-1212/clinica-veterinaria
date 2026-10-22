@@ -34,7 +34,9 @@
 .lista-cuerpo { display: grid; min-width: 0; }
 .lista-titulo { font-size: 14px; font-weight: 600; color: var(--vs-text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 a.lista-titulo:hover { text-decoration: underline; text-underline-offset: 3px; }
-.lista-detalle { font-size: 13px; color: var(--vs-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lista-detalle { display: flex; gap: 6px; min-width: 0; font-size: 13px; color: var(--vs-text-muted); white-space: nowrap; }
+.recorte { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dato { flex-shrink: 0; font-variant-numeric: tabular-nums; &::before { content: "·"; margin-right: 6px; } }
 .lista-estado { justify-self: start; margin-top: 4px; }
 .lista-pie { margin: var(--vs-space-2) 0 0; font-size: 13px; color: var(--vs-text-muted); }
 .contacto { display: inline-flex; align-items: center; gap: 2px;
@@ -58,6 +60,7 @@ a.lista-titulo:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 1200px) {
   .rejilla--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 960px) {
   .columnas, .rejilla--2-1, .rejilla--3 { grid-template-columns: minmax(0, 1fr); }

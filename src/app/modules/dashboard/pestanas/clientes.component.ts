@@ -25,7 +25,18 @@ export class ClientesComponent {
     const d = this.datos();
     return resumenClientes(d.clientes, d.mascotas, d.consultas, d.citas, d.hoy);
   });
-  readonly variacionNuevos = computed(() => variacion(this.resumen().nuevosMes, this.resumen().nuevosMesAnterior));
+  /** Con menos de 5 altas el mes anterior, un porcentaje exagera: se muestra la diferencia absoluta. */
+  readonly variacionNuevos = computed(() => {
+    const r = this.resumen();
+    return r.nuevosMesAnterior >= 5 ? variacion(r.nuevosMes, r.nuevosMesAnterior) : null;
+  });
+  readonly comparacionNuevos = computed(() => {
+    const r = this.resumen();
+    const mes = new Date(this.datos().hoy.getFullYear(), this.datos().hoy.getMonth() - 1, 1).toLocaleDateString('es-PA', { month: 'long' });
+    if (r.nuevosMesAnterior >= 5) return `${r.nuevosMesAnterior} en ${mes}`;
+    const dif = r.nuevosMes - r.nuevosMesAnterior;
+    return `${dif > 0 ? '+' : ''}${dif} vs. ${mes} (${r.nuevosMesAnterior})`;
+  });
   readonly vacunas = computed(() => {
     const d = this.datos();
     return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, 30, 0).filter(r => r.dias >= 0);

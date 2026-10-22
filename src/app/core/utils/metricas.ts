@@ -54,21 +54,35 @@ export interface ResumenIngresos {
   mesAnterior: number;
   cobros: number;
   ticketPromedio: number;
+  /** Ticket promedio del mismo tramo del mes anterior y su variación. */
+  ticketTramoAnterior: number;
+  variacionTicket: number | null;
+}
+
+/**
+ * Mismo momento del mes anterior (mismo día y hora; si el mes anterior es más corto,
+ * su último día). Así "1–22 oct hasta las 12:00" se compara con "1–22 sep hasta las 12:00".
+ */
+export function mismoMomentoMesAnterior(hoy: Date): Date {
+  const ultimoDiaAnt = new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
+  return new Date(hoy.getFullYear(), hoy.getMonth() - 1, Math.min(hoy.getDate(), ultimoDiaAnt), hoy.getHours(), hoy.getMinutes(), hoy.getSeconds());
 }
 
 export function resumenIngresos(pagos: Pago[], hoy: Date): ResumenIngresos {
   const ini = inicioMes(hoy);
   const iniAnt = inicioMes(hoy, -1);
-  const finTramoAnt = new Date(iniAnt.getFullYear(), iniAnt.getMonth(), Math.min(hoy.getDate(), new Date(ini.getTime() - 1).getDate()), 23, 59, 59);
+  const finTramoAnt = mismoMomentoMesAnterior(hoy);
   const ok = cobrados(pagos);
   const delMes = ok.filter(p => fechaIngreso(p) >= ini && fechaIngreso(p) <= hoy);
   const tramoAnt = ok.filter(p => fechaIngreso(p) >= iniAnt && fechaIngreso(p) <= finTramoAnt);
   const mesAnt = ok.filter(p => fechaIngreso(p) >= iniAnt && fechaIngreso(p) < ini);
   const mes = sumar(delMes);
   const mismoTramoAnterior = sumar(tramoAnt);
+  const ticketPromedio = delMes.length ? Math.round(mes / delMes.length) : 0;
+  const ticketTramoAnterior = tramoAnt.length ? Math.round(mismoTramoAnterior / tramoAnt.length) : 0;
   return {
     mes, mismoTramoAnterior, variacion: variacion(mes, mismoTramoAnterior), mesAnterior: sumar(mesAnt),
-    cobros: delMes.length, ticketPromedio: delMes.length ? Math.round(mes / delMes.length) : 0
+    cobros: delMes.length, ticketPromedio, ticketTramoAnterior, variacionTicket: variacion(ticketPromedio, ticketTramoAnterior)
   };
 }
 
@@ -153,26 +167,59 @@ export function porCobrar(pagos: Pago[], hoy: Date): PorCobrar {
   };
 }
 
+/**
+ * Momento real de una cita: su día con la hora de `cita.hora`. Las citas creadas desde
+ * el formulario guardan la fecha a medianoche, así que la hora sale del campo `hora`.
+ */
+export function momentoCita(c: Pick<Cita, 'fecha' | 'hora'>): Date {
+  const d = new Date(c.fecha);
+  const [h, m] = (c.hora || '00:00').split(':').map(Number);
+  d.setHours(h || 0, m || 0, 0, 0);
+  return d;
+}
+
+/** Cita cuya hora ya pasó y que sigue pendiente o confirmada: el paciente no llegó. */
+export function esInasistencia(c: Cita, ahora: Date): boolean {
+  return (c.estado === 'pendiente' || c.estado === 'confirmada') && momentoCita(c) < ahora;
+}
+
 export interface Asistencia {
-  /** Citas del mes ya pasadas (sin contar las de hoy aún por llegar). */
+  /** Citas del mes cuya hora ya pasó (no cuenta las de hoy aún por llegar). */
   programadas: number;
   atendidas: number;
   canceladas: number;
+  noAsistieron: number;
   tasaCancelacion: number;
+  tasaInasistencia: number;
   inmediatas: number;
+  /** Atendidas en el mismo tramo del mes anterior y su variación. */
+  atendidasTramoAnterior: number;
+  variacionAtendidas: number | null;
 }
 
 export function asistenciaMes(citas: Cita[], consultas: Consulta[], hoy: Date): Asistencia {
   const ini = inicioMes(hoy);
-  const pasadas = citas.filter(c => { const f = new Date(c.fecha); return f >= ini && f <= hoy; });
+  const iniAnt = inicioMes(hoy, -1);
+  const finAnt = mismoMomentoMesAnterior(hoy);
+  const pasadas = citas.filter(c => { const f = momentoCita(c); return f >= ini && f <= hoy; });
   const atendidas = pasadas.filter(c => c.estado === 'completada').length;
   const canceladas = pasadas.filter(c => c.estado === 'cancelada').length;
-  const cerradas = atendidas + canceladas;
+  const noAsistieron = pasadas.filter(c => esInasistencia(c, hoy)).length;
+  const cerradas = atendidas + canceladas + noAsistieron;
+  const atendidasTramoAnterior = citas.filter(c => { const f = momentoCita(c); return c.estado === 'completada' && f >= iniAnt && f <= finAnt; }).length;
   return {
-    programadas: pasadas.length, atendidas, canceladas,
+    programadas: pasadas.length, atendidas, canceladas, noAsistieron,
     tasaCancelacion: cerradas ? Math.round((canceladas / cerradas) * 100) : 0,
-    inmediatas: consultas.filter(c => c.tipo === 'inmediata' && new Date(c.fecha) >= ini && new Date(c.fecha) <= hoy).length
+    tasaInasistencia: cerradas ? Math.round((noAsistieron / cerradas) * 100) : 0,
+    inmediatas: consultas.filter(c => c.tipo === 'inmediata' && new Date(c.fecha) >= ini && new Date(c.fecha) <= hoy).length,
+    atendidasTramoAnterior, variacionAtendidas: variacion(atendidas, atendidasTramoAnterior)
   };
+}
+
+/** Atenciones de hoy con el pago aún pendiente: lo que recepción debe cobrar antes de cerrar. */
+export function porCobrarHoy(pagos: Pago[], hoy: Date): Pago[] {
+  return pagos.filter(p => p.estado === 'pendiente' && mismoDia(p.fecha, hoy))
+    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
 }
 
 export interface FilaVeterinario {

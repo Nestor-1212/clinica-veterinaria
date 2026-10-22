@@ -7,8 +7,10 @@
     <app-kpi etiqueta="Por confirmar" [valor]="entero(porConfirmar().length)"
       [ayuda]="'Citas del ' + (manana() | date: 'EEEE d')"></app-kpi>
   }
-  <app-kpi etiqueta="Vacunas por avisar" [valor]="entero(avisos().length)" enlace="/vacunas"
-    ayuda="Vencidas o vencen en 7 días"></app-kpi>
+  @if (!esVet()) {
+    <app-kpi etiqueta="Vacunas por avisar" [valor]="entero(avisos().length)" enlace="/vacunas"
+      ayuda="Vencidas o vencen en 7 días"></app-kpi>
+  }
 </div>
 
 <div class="columnas">
@@ -43,7 +45,11 @@
               </a>
               <span class="cita-motivo">{{ c.motivo }}@if (!esVet() || !soloMias()) { · {{ nombreVet(c.veterinarioId) }} }</span>
             </div>
-            <span [class]="'vs-status ' + ESTADO_CLASE[c.estado]">{{ ESTADO_TEXTO[c.estado] }}</span>
+            @if (noLlego(c)) {
+              <span class="vs-status vs-status--danger">No llegó</span>
+            } @else {
+              <span [class]="'vs-status ' + ESTADO_CLASE[c.estado]">{{ ESTADO_TEXTO[c.estado] }}</span>
+            }
             @if (puedeConsultar() && c.estado !== 'completada') {
               <button mat-stroked-button type="button" class="cita-accion" (click)="iniciarConsulta(c)"
                 [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Atender</button>
@@ -58,6 +64,31 @@
   </section>
 
   <div class="lateral">
+    @if (!esVet()) {
+      <section class="panel" [class.panel--destacado]="cobrarHoy().length" aria-labelledby="titulo-cobrar-hoy">
+        <header class="panel-cabecera">
+          <div>
+            <h2 id="titulo-cobrar-hoy">Por cobrar hoy</h2>
+            <p>{{ cobrarHoy().length ? plural(cobrarHoy().length, 'atención', 'atenciones') + ' de hoy sin pagar · ' + moneda(totalCobrarHoy()) : 'Atenciones de hoy con pago pendiente' }}</p>
+          </div>
+        </header>
+        @if (cobrarHoy().length === 0) {
+          <div class="vs-empty"><mat-icon aria-hidden="true">price_check</mat-icon><p>Todo lo atendido hoy está cobrado.</p></div>
+        } @else {
+        <ul class="lista">
+          @for (p of cobrarHoy(); track p.id) {
+            <li class="lista-fila">
+              <div class="lista-cuerpo">
+                <span class="lista-titulo">{{ nombreMascota(p.mascotaId) }} · {{ moneda(p.total) }}</span>
+                <span class="lista-detalle"><span class="recorte">{{ nombreCliente(p.clienteId) }}</span><span class="dato">{{ p.items[0]?.descripcion }}</span></span>
+              </div>
+            </li>
+          }
+        </ul>
+        <a class="ver-mas" routerLink="/pagos">Ir a cobrar</a>
+        }
+      </section>
+    }
     @if (proximo(); as p) {
       <section class="panel panel--destacado" aria-labelledby="titulo-proximo">
         <header class="panel-cabecera">
@@ -99,7 +130,7 @@
             <li class="lista-fila">
               <div class="lista-cuerpo">
                 <span class="lista-titulo">{{ r.mascota.nombre }} · {{ r.vacuna.nombre }}</span>
-                <span class="lista-detalle">{{ r.cliente.nombre }} · {{ r.cliente.telefono }}</span>
+                <span class="lista-detalle"><span class="recorte">{{ r.cliente.nombre }}</span><span class="dato">{{ r.cliente.telefono }}</span></span>
                 <span [class]="'vs-status lista-estado ' + (r.dias < 0 ? 'vs-status--danger' : 'vs-status--warning')">
                   {{ r.dias < 0 ? 'Vencida ' + enDias(r.dias) : 'Vence ' + enDias(r.dias) }}
                 </span>
@@ -124,7 +155,7 @@
         <header class="panel-cabecera">
           <div>
             <h2 id="titulo-confirmar">Confirmar citas</h2>
-            <p>{{ manana() | date: "EEEE d 'de' MMMM" }}</p>
+            <p>{{ manana() | date: "EEEE d 'de' MMMM" }} · {{ cuandoManana() }}</p>
           </div>
         </header>
         @if (porConfirmar().length === 0) {
@@ -135,7 +166,7 @@
               <li class="lista-fila">
                 <div class="lista-cuerpo">
                   <span class="lista-titulo">{{ c.hora }} · {{ nombreMascota(c.mascotaId) }}</span>
-                  <span class="lista-detalle">{{ nombreCliente(c.clienteId) }} · {{ telefono(c.clienteId) }}</span>
+                  <span class="lista-detalle"><span class="recorte">{{ nombreCliente(c.clienteId) }}</span><span class="dato">{{ telefono(c.clienteId) }}</span></span>
                 </div>
                 <span class="contacto">
                   @if (whatsappConfirmar(c); as wa) {

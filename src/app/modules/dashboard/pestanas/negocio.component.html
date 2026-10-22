@@ -3,9 +3,11 @@
     [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
     [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mes anterior completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
   <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
+    [delta]="ingresos().variacionTicket === null ? null : { porcentaje: ingresos().variacionTicket!, contra: contra(), subirEsBueno: true }"
     [ayuda]="entero(ingresos().cobros) + ' cobros este mes'"></app-kpi>
   <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
-    [ayuda]="asistencia().inmediatas + ' inmediatas · ' + asistencia().tasaCancelacion + ' % de citas canceladas'"></app-kpi>
+    [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
+    [ayuda]="asistencia().inmediatas + ' inmediatas · ' + asistencia().tasaInasistencia + ' % no asistió'"></app-kpi>
   <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos"
     [ayuda]="entero(cobrar().cantidad) + ' pendientes' + (atrasado() ? ' · ' + moneda(atrasado()) + ' con más de 30 días' : '')"></app-kpi>
 </div>
@@ -55,13 +57,14 @@
     <header class="panel-cabecera">
       <div>
         <h2 id="titulo-asistencia">Asistencia del mes</h2>
-        <p>Citas desde el día 1 hasta ahora</p>
+        <p>Citas cuya hora ya pasó, desde el día 1</p>
       </div>
     </header>
     <dl class="cifras">
       <div><dt>Citas programadas</dt><dd>{{ entero(asistencia().programadas) }}</dd></div>
       <div><dt>Atendidas</dt><dd>{{ entero(asistencia().atendidas) }}</dd></div>
       <div><dt>Canceladas</dt><dd>{{ entero(asistencia().canceladas) }} <span class="cifras-detalle">{{ asistencia().tasaCancelacion }} %</span></dd></div>
+      <div><dt>No asistieron</dt><dd>{{ entero(asistencia().noAsistieron) }} <span class="cifras-detalle">{{ asistencia().tasaInasistencia }} %</span></dd></div>
       <div><dt>Atenciones inmediatas</dt><dd>{{ entero(asistencia().inmediatas) }}</dd></div>
     </dl>
   </section>

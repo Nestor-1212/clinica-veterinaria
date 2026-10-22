@@ -44,6 +44,6 @@
 
 @media (max-width: 600px) {
   .cita { grid-template-columns: 44px minmax(0, 1fr) auto; }
-  .cita .vs-status { display: none; }
+  .cita .vs-status { grid-column: 2; justify-self: start; }
   .cita-accion { grid-column: 2 / -1; justify-self: start; }
 }

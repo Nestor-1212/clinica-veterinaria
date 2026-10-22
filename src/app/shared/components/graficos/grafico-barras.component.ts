@@ -22,7 +22,7 @@ export interface Barra {
         <li class="fila">
           <span class="etiqueta">{{ b.etiqueta }}</span>
           <span class="pista" aria-hidden="true">
-            <span class="barra" [class.barra--alerta]="b.alerta" [style.width.%]="max() ? (b.valor / max()) * 100 : 0"></span>
+            <span class="barra" [class.barra--alerta]="b.alerta" [style.width.%]="max() ? (b.valor / max()) * 100 : 0" [class.barra--vacia]="b.valor === 0"></span>
           </span>
           <span class="valor">
             <strong>{{ formato()(b.valor) }}</strong>
@@ -43,6 +43,7 @@ export interface Barra {
     .pista { height: 12px; }
     .barra { display: block; height: 100%; min-width: 2px; background: var(--vs-chart-1); border-radius: 0 4px 4px 0; }
     .barra--alerta { background: var(--vs-warning); }
+    .barra--vacia { min-width: 0; }
     .valor { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; font-variant-numeric: tabular-nums;
       strong { font-weight: 600; color: var(--vs-text); } }
     .detalle { font-size: 12px; color: var(--vs-text-muted); }
