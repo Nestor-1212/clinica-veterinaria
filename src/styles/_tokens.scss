@@ -64,16 +64,17 @@
 
   // ---- Foco ---------------------------------------------------------
   --vs-focus: var(--mat-sys-primary);                   // 6.43 blanco / 5.80 bg
-  --vs-focus-on-dark: #7ad7c6;                          // primary 80 · 8.58 sidebar / 6.50 activo
+  --vs-focus-on-dark: #7ad7c6;                          // primary 80 · 7.59 sidebar / 5.30 activo
 
-  // ---- Zona oscura (sidebar) ----------------------------------------
-  --vs-sidebar-bg: #1b2a3b;
-  --vs-sidebar-header-bg: #16222f;
-  --vs-sidebar-text: #c6cace;                           // 8.84:1
-  --vs-sidebar-text-muted: #a2a7ac;                     // 6.01:1
-  --vs-sidebar-active-bg: #134249;
-  --vs-sidebar-active-text: #97f3e2;                    // 8.53:1
-  --vs-sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+  // ---- Zona oscura (sidebar): teal profundo de la familia de la marca ----
+  // (antes gris azulado #1b2a3b, frío y ajeno al verde). Textos teñidos de menta.
+  --vs-sidebar-bg: #0c3833;
+  --vs-sidebar-header-bg: #092f2a;
+  --vs-sidebar-text: #d3e9e4;                           // 10.16:1
+  --vs-sidebar-text-muted: #9cc2ba;                     // 6.65:1
+  --vs-sidebar-active-bg: #12524a;
+  --vs-sidebar-active-text: #97f3e2;                    // 6.96:1
+  --vs-sidebar-hover-bg: rgba(151, 243, 226, 0.08);
 
   // ---- Tipografía ---------------------------------------------------
   --vs-font: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -119,7 +120,7 @@
   --vs-chart-1: #00876f;
   --vs-chart-1-soft: #8fd0c3;                           // mismo tono, periodo en curso (rotulado)
   // Línea de tiempo de la agenda: tramo pasado (recesivo) y tramo por venir (serie)
-  --vs-timeline-past: #c9d1ce;                          // neutral 80 · decorativo, el estado va en texto
+  --vs-timeline-past: #b9d2cc;                          // gris teñido de teal · decorativo, el estado va en texto
   --vs-timeline-next: var(--vs-chart-1-soft);
 
   // ---- Movimiento ---------------------------------------------------
