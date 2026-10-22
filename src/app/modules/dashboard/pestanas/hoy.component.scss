@@ -1,0 +1,49 @@
+// Estilos propios de la pestaña Hoy (agenda, línea de ahora, próximo paciente)
+.segmentado {
+  display: inline-flex; padding: 2px; border: 1px solid var(--vs-border-strong); border-radius: var(--vs-radius-full);
+  button { min-height: 32px; padding: 0 var(--vs-space-3); border: 0; border-radius: var(--vs-radius-full); background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--vs-text-secondary); cursor: pointer; }
+  button[aria-pressed='true'] { background: var(--vs-primary-container); color: var(--vs-on-primary-container); font-weight: 600; }
+}
+
+/* ----- Agenda ----- */
+.agenda { list-style: none; margin: 0; padding: 0; }
+.cita {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) auto auto; align-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-3) 0; border-bottom: 1px solid var(--vs-border);
+  &:last-child { border-bottom: 0; }
+}
+.cita--pasada { .cita-titulo, .cita-hora { color: var(--vs-text-muted); } }
+.cita-hora { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--vs-text); }
+.cita-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.cita-titulo {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0; font-weight: 600; color: var(--vs-text); text-decoration: none;
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
+.cita-dueno { font-weight: 400; color: var(--vs-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cita-motivo { font-size: 13px; color: var(--vs-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cita-accion { min-width: 0; }
+.ahora {
+  position: relative; display: flex; align-items: center; gap: var(--vs-space-2); margin: 2px 0;
+  font-size: 12px; font-weight: 700; color: var(--vs-on-accent-container);
+  &::after { content: ''; flex: 1; height: 2px; background: var(--vs-accent); border-radius: 1px; }
+  span { padding: 2px 8px; border-radius: var(--vs-radius-full); background: var(--vs-accent-container); }
+}
+
+/* ----- Próximo paciente ----- */
+.paciente-nombre { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; font-size: 20px; line-height: 28px; font-weight: 700;
+  mat-icon { color: var(--vs-primary); } }
+.paciente-datos, .paciente-ultima { margin: 4px 0 0; font-size: 14px; color: var(--vs-text-secondary); }
+.paciente-motivo { margin: var(--vs-space-3) 0 0; font-size: 14px; }
+.alerta-clinica {
+  display: flex; align-items: center; gap: var(--vs-space-2); margin: var(--vs-space-3) 0 0; padding: var(--vs-space-2) var(--vs-space-3);
+  border-radius: var(--vs-radius-sm); background: var(--vs-danger-container); color: var(--vs-on-danger-container); font-size: 14px; font-weight: 600;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+.ancho { width: 100%; margin-top: var(--vs-space-4); }
+
+@media (max-width: 600px) {
+  .cita { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .cita .vs-status { display: none; }
+  .cita-accion { grid-column: 2 / -1; justify-self: start; }
+}

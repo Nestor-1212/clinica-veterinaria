@@ -98,6 +98,11 @@
   --vs-shadow-2: 0 4px 12px rgba(16, 24, 40, 0.10);
   --vs-shadow-3: 0 12px 32px rgba(16, 24, 40, 0.18);
 
+  // Gráficos: una sola serie en teal más saturado (el primario #006b5e se lee gris en datos;
+  // validado con dataviz/validate_palette: luminosidad, croma y contraste >= 3:1)
+  --vs-chart-1: #00876f;
+  --vs-chart-1-soft: #8fd0c3;                           // mismo tono, periodo en curso (rotulado)
+
   // ---- Movimiento ---------------------------------------------------
   --vs-dur-fast: 120ms;
   --vs-dur: 200ms;

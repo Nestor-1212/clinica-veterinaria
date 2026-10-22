@@ -1,0 +1,91 @@
+<div class="kpis">
+  <app-kpi etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
+    [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
+    [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mes anterior completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
+  <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
+    [ayuda]="entero(ingresos().cobros) + ' cobros este mes'"></app-kpi>
+  <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
+    [ayuda]="asistencia().inmediatas + ' inmediatas · ' + asistencia().tasaCancelacion + ' % de citas canceladas'"></app-kpi>
+  <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos"
+    [ayuda]="entero(cobrar().cantidad) + ' pendientes' + (atrasado() ? ' · ' + moneda(atrasado()) + ' con más de 30 días' : '')"></app-kpi>
+</div>
+
+<div class="rejilla rejilla--2-1">
+  <section class="panel" aria-labelledby="titulo-ingresos">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-ingresos">Ingresos de los últimos 6 meses</h2>
+        <p>Cobros registrados, en dólares</p>
+      </div>
+    </header>
+    <app-grafico-columnas [datos]="meses()" titulo="Ingresos cobrados por mes, últimos 6 meses" [formato]="moneda"
+      notaParcial="Mes en curso: suma hasta hoy."></app-grafico-columnas>
+  </section>
+
+  <section class="panel" aria-labelledby="titulo-categorias">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-categorias">Qué se vende este mes</h2>
+        <p>Facturado por tipo de servicio, antes de descuentos</p>
+      </div>
+    </header>
+    @if (categorias().length) {
+      <app-grafico-barras [datos]="categorias()" titulo="Facturado por tipo de servicio este mes" [formato]="moneda"></app-grafico-barras>
+    } @else {
+      <div class="vs-empty"><mat-icon aria-hidden="true">receipt_long</mat-icon><p>Aún no hay cobros este mes.</p></div>
+    }
+  </section>
+</div>
+
+<div class="rejilla rejilla--3">
+  <section class="panel" aria-labelledby="titulo-cobrar">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-cobrar">Por cobrar según antigüedad</h2>
+        <p>{{ moneda(cobrar().total) }} en {{ cobrar().cantidad }} pagos pendientes</p>
+      </div>
+    </header>
+    <app-grafico-barras [datos]="tramos()" titulo="Pagos pendientes según días desde la atención" [formato]="moneda"></app-grafico-barras>
+    @if (cobrar().pendientes.length) {
+      <a class="ver-mas" routerLink="/pagos">Gestionar cobros</a>
+    }
+  </section>
+
+  <section class="panel" aria-labelledby="titulo-asistencia">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-asistencia">Asistencia del mes</h2>
+        <p>Citas desde el día 1 hasta ahora</p>
+      </div>
+    </header>
+    <dl class="cifras">
+      <div><dt>Citas programadas</dt><dd>{{ entero(asistencia().programadas) }}</dd></div>
+      <div><dt>Atendidas</dt><dd>{{ entero(asistencia().atendidas) }}</dd></div>
+      <div><dt>Canceladas</dt><dd>{{ entero(asistencia().canceladas) }} <span class="cifras-detalle">{{ asistencia().tasaCancelacion }} %</span></dd></div>
+      <div><dt>Atenciones inmediatas</dt><dd>{{ entero(asistencia().inmediatas) }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="titulo-vets">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-vets">Por veterinario</h2>
+        <p>Atenciones e ingresos cobrados del mes</p>
+      </div>
+    </header>
+    <table class="tabla">
+      <thead>
+        <tr><th scope="col">Veterinario</th><th scope="col" class="num">Atenciones</th><th scope="col" class="num">Ingresos</th></tr>
+      </thead>
+      <tbody>
+        @for (v of veterinarios(); track v.id) {
+          <tr>
+            <th scope="row"><span class="tabla-nombre">{{ v.nombre }}</span>@if (v.especialidad) {<span class="tabla-detalle">{{ v.especialidad }}</span>}</th>
+            <td class="num">{{ entero(v.atenciones) }}</td>
+            <td class="num">{{ moneda(v.ingresos) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>

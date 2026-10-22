@@ -1,192 +1,36 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
+<div class="page-container dashboard">
+  <header class="page-header">
     <div>
-      <h1>¡Bienvenido, {{ userName }}!</h1>
-      <p class="fecha-hoy">{{ today | date:"EEEE, d 'de' MMMM 'de' yyyy":'':'es' }} — Resumen del día</p>
+      <h1>Hola, {{ nombre }}</h1>
+      <p class="fecha">{{ datos.hoy | date: "EEEE, d 'de' MMMM 'de' yyyy" }}</p>
     </div>
-    <div class="quick-actions">
-      <button mat-flat-button class="vs-btn-urgent" (click)="nuevaAtencionInmediata()">
-        <mat-icon>flash_on</mat-icon> Atención Inmediata
-      </button>
-      <button mat-flat-button color="primary" (click)="nuevaCita()">
-        <mat-icon>event_available</mat-icon> Nueva Cita
-      </button>
-      <button mat-stroked-button (click)="nuevoCliente()">
-        <mat-icon>person_add</mat-icon> Nuevo Cliente
-      </button>
+    <div class="header-actions">
+      @if (puedeClientes()) {
+        <button mat-flat-button class="vs-btn-urgent" type="button" (click)="nuevaAtencionInmediata()">
+          <mat-icon>bolt</mat-icon> Atención inmediata
+        </button>
+      }
+      @if (puedeCitas()) {
+        <button mat-flat-button type="button" (click)="nuevaCita()"><mat-icon>event_available</mat-icon> Nueva cita</button>
+      }
+      @if (puedeClientes()) {
+        <button mat-stroked-button type="button" (click)="nuevoCliente()"><mat-icon>person_add</mat-icon> Nuevo cliente</button>
+      }
     </div>
-  </div>
+  </header>
 
-  <!-- Hoy y este mes: lo que requiere atención ahora -->
-  <div class="section-label">Hoy y este mes</div>
-  <div class="stats-grid stats-grid-primary">
-    <a class="stat-link" routerLink="/citas"><mat-card class="stat-card stat-citas">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>event</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.citasHoy }}</div>
-          <div class="stat-label">Citas Hoy</div>
-        </div>
-      </mat-card-content>
-    </mat-card></a>
-
-    @if (puede('consultas')) {
-    <a class="stat-link" routerLink="/consultas"><mat-card class="stat-card stat-consultas">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>medical_services</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.consultasHoy }}</div>
-          <div class="stat-label">Consultas Hoy</div>
-        </div>
-      </mat-card-content>
-    </mat-card></a>
+  <mat-tab-group class="vistas" [selectedIndex]="indice()" (selectedIndexChange)="cambiarVista($event)"
+    mat-stretch-tabs="false" mat-align-tabs="start" animationDuration="0ms" aria-label="Vistas del dashboard">
+    @for (v of vistas; track v) {
+      <mat-tab [label]="etiquetas[v]">
+        <ng-template matTabContent>
+          @switch (v) {
+            @case ('hoy') { <app-dashboard-hoy [datos]="datos" /> }
+            @case ('negocio') { <app-dashboard-negocio [datos]="datos" /> }
+            @case ('clientes') { <app-dashboard-clientes [datos]="datos" /> }
+          }
+        </ng-template>
+      </mat-tab>
     }
-
-    @if (puede('pagos')) {
-    <a class="stat-link" routerLink="/pagos"><mat-card class="stat-card stat-ingresos">
-      <mat-card-content>
-        <div class="stat-icon"><mat-icon>payments</mat-icon></div>
-        <div class="stat-info">
-          <div class="stat-value">${{ stats.ingresosMes | number:'1.2-2' }}</div>
-          <div class="stat-label">Ingresos del Mes</div>
-        </div>
-      </mat-card-content>
-    </mat-card></a>
-    }
-  </div>
-
-  <!-- Referencia: totales que rara vez cambian de un día a otro -->
-  <div class="stats-grid stats-grid-secondary">
-    <a class="stat-link" routerLink="/clientes"><mat-card class="stat-card-mini">
-      <mat-icon>people</mat-icon>
-      <div class="mini-value">{{ stats.clientes }}</div>
-      <div class="mini-label">Clientes Activos</div>
-    </mat-card></a>
-
-    <a class="stat-link" routerLink="/mascotas"><mat-card class="stat-card-mini">
-      <mat-icon>pets</mat-icon>
-      <div class="mini-value">{{ stats.mascotas }}</div>
-      <div class="mini-label">Mascotas Registradas</div>
-    </mat-card></a>
-  </div>
-
-  <div class="dashboard-panels">
-    <!-- Citas de hoy -->
-    <mat-card class="panel-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar>event</mat-icon>
-        <mat-card-title>Citas de Hoy</mat-card-title>
-        <mat-card-subtitle>{{ citasHoy.length }} programadas</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        @if (citasHoy.length === 0) {
-          <div class="empty-state">
-            <mat-icon>event_available</mat-icon>
-            <p>No hay citas programadas para hoy</p>
-          </div>
-        }
-        @if (citasHoy.length > 0) {
-          <mat-list>
-            @for (cita of citasHoy; track cita) {
-              <mat-list-item class="cita-item">
-                <mat-icon matListItemIcon [class]="'estado-' + cita.estado">schedule</mat-icon>
-                <div matListItemTitle class="cita-info">
-                  <strong>{{ cita.hora }}</strong> — {{ cita.motivo }}
-                </div>
-                <mat-chip [class]="'chip-' + cita.estado">{{ cita.estado | titlecase }}</mat-chip>
-              </mat-list-item>
-            }
-          </mat-list>
-        }
-        <button mat-button color="primary" routerLink="/citas" class="ver-mas">
-          Ver todas las citas <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Vacunas próximas -->
-    <mat-card class="panel-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar class="warn-icon">vaccines</mat-icon>
-        <mat-card-title>Vacunas Próximas</mat-card-title>
-        @if (stats.vacunasVencidas > 0) {
-          <mat-card-subtitle class="subtitle-alert">
-            {{ stats.vacunasVencidas }} vencida{{ stats.vacunasVencidas === 1 ? '' : 's' }} · {{ stats.vacunasPendientes - stats.vacunasVencidas }} próxima{{ (stats.vacunasPendientes - stats.vacunasVencidas) === 1 ? '' : 's' }}
-          </mat-card-subtitle>
-        }
-        @if (stats.vacunasVencidas === 0) {
-          <mat-card-subtitle>{{ stats.vacunasPendientes }} en los próximos 7 días</mat-card-subtitle>
-        }
-      </mat-card-header>
-      <mat-card-content>
-        @if (vacunasPendientes.length === 0) {
-          <div class="empty-state">
-            <mat-icon>check_circle</mat-icon>
-            <p>No hay vacunas pendientes</p>
-          </div>
-        }
-        @if (vacunasPendientes.length > 0) {
-          <mat-list>
-            @for (vac of vacunasPendientes; track vac) {
-              <mat-list-item class="vacuna-item">
-                <mat-icon matListItemIcon [class]="esVacunaVencida(vac) ? 'danger-icon' : 'warn-icon'">
-                  {{ esVacunaVencida(vac) ? 'error' : 'vaccines' }}
-                </mat-icon>
-                <div matListItemTitle>
-                  <strong>{{ vac.nombre }}</strong>
-                </div>
-                <div matListItemLine class="fecha-vac">{{ vac.proximaFecha | date:'dd/MM/yyyy' }}</div>
-                <mat-chip [class]="esVacunaVencida(vac) ? 'chip-vencida' : 'chip-proxima'">
-                  {{ esVacunaVencida(vac) ? 'Vencida' : 'Próxima' }}
-                </mat-chip>
-              </mat-list-item>
-            }
-          </mat-list>
-        }
-        <button mat-button color="primary" routerLink="/vacunas" class="ver-mas">
-          Ver recordatorios <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Pagos pendientes (solo roles con acceso a Pagos) -->
-    @if (puede('pagos')) {
-    <mat-card class="panel-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar class="danger-avatar">schedule</mat-icon>
-        <mat-card-title>Pagos Pendientes</mat-card-title>
-        @if (stats.pagosPendientesCount > 0) {
-          <mat-card-subtitle class="subtitle-alert">
-            {{ stats.pagosPendientesCount }} pago{{ stats.pagosPendientesCount === 1 ? '' : 's' }} · ${{ stats.montoPorCobrar | number:'1.2-2' }} por cobrar
-          </mat-card-subtitle>
-        }
-        @if (stats.pagosPendientesCount === 0) {
-          <mat-card-subtitle>Todo al día</mat-card-subtitle>
-        }
-      </mat-card-header>
-      <mat-card-content>
-        @if (pagosPendientes.length === 0) {
-          <div class="empty-state">
-            <mat-icon>check_circle</mat-icon>
-            <p>No hay pagos pendientes</p>
-          </div>
-        }
-        @if (pagosPendientes.length > 0) {
-          <mat-list>
-            @for (pago of pagosPendientes; track pago) {
-              <mat-list-item class="pago-item">
-                <mat-icon matListItemIcon class="warn-icon">payments</mat-icon>
-                <div matListItemTitle><strong>{{ getClienteNombre(pago.clienteId) }}</strong> — ${{ pago.total | number:'1.2-2' }}</div>
-                <div matListItemLine class="metodo-pago">{{ pago.fecha | date:'dd/MM/yyyy' }} · {{ pago.metodoPago | titlecase }}</div>
-              </mat-list-item>
-            }
-          </mat-list>
-        }
-        <button mat-button color="primary" routerLink="/pagos" class="ver-mas">
-          Ver todos los pagos <mat-icon>arrow_forward</mat-icon>
-        </button>
-      </mat-card-content>
-    </mat-card>
-    }
-  </div>
+  </mat-tab-group>
 </div>

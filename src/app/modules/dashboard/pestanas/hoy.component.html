@@ -1,0 +1,153 @@
+<div class="kpis">
+  <app-kpi etiqueta="Citas de hoy" [valor]="entero(resumen().total)" enlace="/citas"
+    [ayuda]="plural(resumen().atendidas, 'atendida') + ' · ' + resumen().porLlegar + ' por llegar'"></app-kpi>
+  <app-kpi etiqueta="Atenciones inmediatas" [valor]="entero(resumen().inmediatas)"
+    [ayuda]="resumen().inmediatas ? 'Esperando atención ahora' : 'Ninguna en espera'"></app-kpi>
+  @if (!esVet()) {
+    <app-kpi etiqueta="Por confirmar" [valor]="entero(porConfirmar().length)"
+      [ayuda]="'Citas del ' + (manana() | date: 'EEEE d')"></app-kpi>
+  }
+  <app-kpi etiqueta="Vacunas por avisar" [valor]="entero(avisos().length)" enlace="/vacunas"
+    ayuda="Vencidas o vencen en 7 días"></app-kpi>
+</div>
+
+<div class="columnas">
+  <section class="panel panel--ancho" aria-labelledby="titulo-agenda">
+    <header class="panel-cabecera">
+      <div>
+        <h2 id="titulo-agenda">Agenda de hoy</h2>
+        <p>{{ datos().hoy | date: "EEEE d 'de' MMMM" }} · {{ plural(agenda().length, 'cita') }}</p>
+      </div>
+      @if (esVet()) {
+        <div class="segmentado" role="group" aria-label="Qué citas mostrar">
+          <button type="button" [attr.aria-pressed]="soloMias()" (click)="soloMias.set(true)">Mis citas</button>
+          <button type="button" [attr.aria-pressed]="!soloMias()" (click)="soloMias.set(false)">Toda la clínica</button>
+        </div>
+      }
+    </header>
+
+    @if (agenda().length === 0) {
+      <div class="vs-empty"><mat-icon aria-hidden="true">event_available</mat-icon><p>No hay citas para hoy.</p></div>
+    } @else {
+      <ol class="agenda">
+        @for (c of agenda(); track c.id; let i = $index) {
+          @if (i === indiceAhora()) {
+            <li class="ahora"><span>Ahora · {{ ahora() }}</span></li>
+          }
+          <li class="cita" [class.cita--pasada]="c.estado === 'completada'">
+            <span class="cita-hora">{{ c.hora }}</span>
+            <div class="cita-cuerpo">
+              <a class="cita-titulo" [routerLink]="['/clientes', c.clienteId]">
+                <mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>{{ nombreMascota(c.mascotaId) }}
+                <span class="cita-dueno">· {{ nombreCliente(c.clienteId) }}</span>
+              </a>
+              <span class="cita-motivo">{{ c.motivo }}@if (!esVet() || !soloMias()) { · {{ nombreVet(c.veterinarioId) }} }</span>
+            </div>
+            <span [class]="'vs-status ' + ESTADO_CLASE[c.estado]">{{ ESTADO_TEXTO[c.estado] }}</span>
+            @if (puedeConsultar() && c.estado !== 'completada') {
+              <button mat-stroked-button type="button" class="cita-accion" (click)="iniciarConsulta(c)"
+                [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Atender</button>
+            }
+          </li>
+        }
+        @if (indiceAhora() === agenda().length) {
+          <li class="ahora"><span>Ahora · {{ ahora() }}</span></li>
+        }
+      </ol>
+    }
+  </section>
+
+  <div class="lateral">
+    @if (proximo(); as p) {
+      <section class="panel panel--destacado" aria-labelledby="titulo-proximo">
+        <header class="panel-cabecera">
+          <div>
+            <h2 id="titulo-proximo">Próximo paciente</h2>
+            <p>{{ p.cita.estado === 'inmediata' ? 'Atención inmediata' : 'A las ' + p.cita.hora }}</p>
+          </div>
+        </header>
+        <p class="paciente-nombre">
+          <mat-icon aria-hidden="true">{{ especie(p.cita.mascotaId) }}</mat-icon>{{ p.mascota?.nombre }}
+        </p>
+        <p class="paciente-datos">{{ p.mascota?.tipo }} · {{ p.mascota?.raza }} · {{ p.mascota?.edad | edad }} · {{ p.mascota?.peso }} kg</p>
+        <p class="paciente-datos">Dueño: {{ p.cliente?.nombre }}</p>
+        @if (p.mascota?.alergias) {
+          <p class="alerta-clinica"><mat-icon aria-hidden="true">warning</mat-icon>Alergias: {{ p.mascota?.alergias }}</p>
+        }
+        <p class="paciente-motivo"><strong>Motivo:</strong> {{ p.cita.motivo }}</p>
+        @if (p.ultima) {
+          <p class="paciente-ultima">Última consulta {{ p.ultima.fecha | date: 'd MMM' }}: {{ p.ultima.diagnostico }}</p>
+        } @else {
+          <p class="paciente-ultima">Primera consulta en la clínica.</p>
+        }
+        <button mat-flat-button type="button" class="ancho" (click)="iniciarConsulta(p.cita)">Iniciar consulta</button>
+      </section>
+    }
+
+    <section class="panel" aria-labelledby="titulo-avisos">
+      <header class="panel-cabecera">
+        <div>
+          <h2 id="titulo-avisos">Llamar hoy por vacunas</h2>
+          <p>Vencidas o que vencen en 7 días</p>
+        </div>
+      </header>
+      @if (avisos().length === 0) {
+        <div class="vs-empty"><mat-icon aria-hidden="true">verified</mat-icon><p>Todas las vacunas al día.</p></div>
+      } @else {
+        <ul class="lista">
+          @for (r of avisos().slice(0, 6); track r.vacuna.id) {
+            <li class="lista-fila">
+              <div class="lista-cuerpo">
+                <span class="lista-titulo">{{ r.mascota.nombre }} · {{ r.vacuna.nombre }}</span>
+                <span class="lista-detalle">{{ r.cliente.nombre }} · {{ r.cliente.telefono }}</span>
+                <span [class]="'vs-status lista-estado ' + (r.dias < 0 ? 'vs-status--danger' : 'vs-status--warning')">
+                  {{ r.dias < 0 ? 'Vencida ' + enDias(r.dias) : 'Vence ' + enDias(r.dias) }}
+                </span>
+              </div>
+              <span class="contacto">
+                <a mat-button [href]="tel(r.cliente.telefono)" [attr.aria-label]="'Llamar a ' + r.cliente.nombre"><mat-icon>call</mat-icon></a>
+                @if (whatsappVacuna(r); as wa) {
+                  <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + r.cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+        @if (avisos().length > 6) {
+          <a class="ver-mas" routerLink="/vacunas">Ver los {{ avisos().length }} avisos</a>
+        }
+      }
+    </section>
+
+    @if (!esVet()) {
+      <section class="panel" aria-labelledby="titulo-confirmar">
+        <header class="panel-cabecera">
+          <div>
+            <h2 id="titulo-confirmar">Confirmar citas</h2>
+            <p>{{ manana() | date: "EEEE d 'de' MMMM" }}</p>
+          </div>
+        </header>
+        @if (porConfirmar().length === 0) {
+          <div class="vs-empty"><mat-icon aria-hidden="true">task_alt</mat-icon><p>No quedan citas por confirmar.</p></div>
+        } @else {
+          <ul class="lista">
+            @for (c of porConfirmar(); track c.id) {
+              <li class="lista-fila">
+                <div class="lista-cuerpo">
+                  <span class="lista-titulo">{{ c.hora }} · {{ nombreMascota(c.mascotaId) }}</span>
+                  <span class="lista-detalle">{{ nombreCliente(c.clienteId) }} · {{ telefono(c.clienteId) }}</span>
+                </div>
+                <span class="contacto">
+                  @if (whatsappConfirmar(c); as wa) {
+                    <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + nombreCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                  }
+                  <button mat-stroked-button type="button" (click)="confirmar(c)" [attr.aria-label]="'Marcar como confirmada la cita de ' + nombreMascota(c.mascotaId)">Confirmar</button>
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </div>
+</div>

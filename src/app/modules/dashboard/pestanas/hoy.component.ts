@@ -1,0 +1,138 @@
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Cita, Consulta } from '../../../core/models';
+import { CitasService } from '../../../core/services/citas.service';
+import { puedeAcceder } from '../../../core/auth/permisos';
+import { citasDelDia, enlaceWhatsApp, recordatoriosVacuna, siguienteDiaHabil, Recordatorio } from '../../../core/utils/metricas';
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
+import { DatosDashboard, ICONO_ESPECIE, enDias, entero, plural } from '../dashboard-datos';
+
+const ESTADO_TEXTO: Record<Cita['estado'], string> = {
+  pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Atendida', cancelada: 'Cancelada', inmediata: 'Inmediata'
+};
+const ESTADO_CLASE: Record<Cita['estado'], string> = {
+  pendiente: 'vs-status--warning', confirmada: 'vs-status--success', completada: 'vs-status--info', cancelada: 'vs-status--danger', inmediata: 'vs-status--accent'
+};
+
+/** Pestaña "Hoy": la jornada en curso para quien atiende o recibe pacientes. */
+@Component({
+  selector: 'app-dashboard-hoy',
+  imports: [RouterLink, DatePipe, MatIcon, MatButton, EdadPipe, KpiComponent],
+  templateUrl: './hoy.component.html',
+  styleUrls: ['./pestanas.scss', './hoy.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class HoyComponent {
+  private router = inject(Router);
+  private citasService = inject(CitasService);
+  private snack = inject(MatSnackBar);
+
+  readonly datos = input.required<DatosDashboard>();
+  /** Citas confirmadas en esta sesión (actualiza la lista sin recargar). */
+  private readonly confirmadas = signal<Set<string>>(new Set());
+  /** El veterinario ve primero sus citas; puede cambiar a toda la clínica. */
+  readonly soloMias = signal(true);
+
+  readonly ESTADO_TEXTO = ESTADO_TEXTO;
+  readonly ESTADO_CLASE = ESTADO_CLASE;
+  readonly ICONO_ESPECIE = ICONO_ESPECIE;
+  readonly enDias = enDias;
+
+  readonly esVet = computed(() => this.datos().rol === 'veterinario');
+  readonly puedeConsultar = computed(() => puedeAcceder(this.datos().rol, 'consultas'));
+  readonly ahora = computed(() => {
+    const h = this.datos().hoy;
+    return `${String(h.getHours()).padStart(2, '0')}:${String(h.getMinutes()).padStart(2, '0')}`;
+  });
+
+  private readonly todasHoy = computed(() => citasDelDia(this.datos().citas, this.datos().hoy));
+  readonly agenda = computed(() => {
+    const d = this.datos();
+    const lista = this.esVet() && this.soloMias() ? this.todasHoy().filter(c => c.veterinarioId === d.usuarioId) : this.todasHoy();
+    return lista.filter(c => c.estado !== 'cancelada');
+  });
+  /** Posición de la línea "Ahora" en la agenda. */
+  readonly indiceAhora = computed(() => {
+    const i = this.agenda().findIndex(c => c.hora >= this.ahora() && c.estado !== 'completada');
+    return i === -1 ? this.agenda().length : i;
+  });
+
+  readonly resumen = computed(() => {
+    const a = this.agenda();
+    const atendidas = a.filter(c => c.estado === 'completada').length;
+    const porLlegar = a.filter(c => c.estado === 'pendiente' || c.estado === 'confirmada').length;
+    const inmediatas = a.filter(c => c.estado === 'inmediata').length;
+    return { total: a.length, atendidas, porLlegar, inmediatas };
+  });
+
+  readonly manana = computed(() => siguienteDiaHabil(this.datos().hoy));
+  readonly porConfirmar = computed(() =>
+    citasDelDia(this.datos().citas, this.manana()).filter(c => c.estado === 'pendiente' && !this.confirmadas().has(c.id)));
+
+  /** Vacunas vencidas (hasta 60 días) o que vencen en los próximos 7: a quién llamar hoy. */
+  readonly avisos = computed(() => {
+    const d = this.datos();
+    return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, 7, 60);
+  });
+
+  readonly proximo = computed(() => {
+    if (!this.esVet()) return null;
+    const d = this.datos();
+    const mias = this.todasHoy().filter(c => c.veterinarioId === d.usuarioId);
+    const cita = mias.find(c => c.estado === 'inmediata') ?? mias.find(c => (c.estado === 'confirmada' || c.estado === 'pendiente') && c.hora >= this.restar(this.ahora(), 30));
+    if (!cita) return null;
+    const mascota = d.mascota.get(cita.mascotaId);
+    const ultima = d.consultas
+      .filter((c: Consulta) => c.mascotaId === cita.mascotaId && new Date(c.fecha) < d.hoy)
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())[0];
+    return { cita, mascota, cliente: d.cliente.get(cita.clienteId), ultima };
+  });
+
+  readonly entero = entero;
+  readonly plural = plural;
+
+  nombreMascota(id: string): string { return this.datos().mascota.get(id)?.nombre ?? 'Mascota'; }
+  especie(id: string): string { return ICONO_ESPECIE[this.datos().mascota.get(id)?.tipo ?? 'Otro']; }
+  nombreCliente(id: string): string { return this.datos().cliente.get(id)?.nombre ?? 'Cliente'; }
+  telefono(id: string): string { return this.datos().cliente.get(id)?.telefono ?? ''; }
+  nombreVet(id: string): string {
+    const u = this.datos().usuario.get(id);
+    return u ? `${u.nombre} ${u.apellido.charAt(0)}.` : '';
+  }
+
+  iniciarConsulta(cita: Cita): void {
+    this.router.navigate(['/consultas/nueva'], { queryParams: { citaId: cita.id, mascotaId: cita.mascotaId, clienteId: cita.clienteId } });
+  }
+
+  confirmar(cita: Cita): void {
+    this.citasService.update(cita.id, { estado: 'confirmada' });
+    this.confirmadas.update(s => new Set(s).add(cita.id));
+    this.snack.open(`Cita de ${this.nombreMascota(cita.mascotaId)} confirmada`, 'Cerrar', { duration: 3000 });
+  }
+
+  whatsappConfirmar(cita: Cita): string | null {
+    return enlaceWhatsApp(this.telefono(cita.clienteId),
+      `Hola ${this.nombreCliente(cita.clienteId)}, le escribimos de la clínica veterinaria para confirmar la cita de ${this.nombreMascota(cita.mascotaId)} mañana a las ${cita.hora}. ¿Nos confirma su asistencia?`);
+  }
+
+  whatsappVacuna(r: Recordatorio): string | null {
+    const fecha = new Date(r.vacuna.proximaFecha).toLocaleDateString('es-PA', { day: 'numeric', month: 'long' });
+    const texto = r.dias < 0
+      ? `a ${r.mascota.nombre} le correspondía la vacuna ${r.vacuna.nombre} el ${fecha}`
+      : `a ${r.mascota.nombre} le corresponde la vacuna ${r.vacuna.nombre} el ${fecha}`;
+    return enlaceWhatsApp(r.cliente.telefono, `Hola ${r.cliente.nombre}, le escribimos de la clínica veterinaria: ${texto}. ¿Le agendamos una cita?`);
+  }
+
+  tel(telefono: string): string { return `tel:+507${telefono.replace(/\D/g, '')}`; }
+
+  private restar(hora: string, minutos: number): string {
+    const [h, m] = hora.split(':').map(Number);
+    const t = Math.max(0, h * 60 + m - minutos);
+    return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+  }
+}

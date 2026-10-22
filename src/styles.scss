@@ -239,6 +239,16 @@ mat-card.mat-mdc-card {
 .vs-status, [class*='chip-'].mat-mdc-chip {
   font-weight: 600 !important;
 }
+// Estado como etiqueta suelta (fuera de mat-chip): misma forma compacta que el chip
+span.vs-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--vs-radius-full);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
 
 @mixin _status($bg, $fg) {
   --mat-chip-elevated-container-color: #{$bg};

@@ -21,9 +21,9 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
 
   test('las métricas del dashboard se activan con teclado', async ({ page }) => {
     await login(page, 'admin');
-    await page.locator('a.stat-link').first().focus();
+    await page.locator('a.kpi--enlace').first().focus();
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/pagos$/);
   });
 
   test('las tarjetas de mascota del expediente se abren con teclado', async ({ page }) => {
@@ -37,15 +37,29 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
     await expect(page).toHaveURL(/\/mascotas\/[^/]+$/);
   });
 
-  test('recepción no ve métricas ni paneles de secciones sin permiso', async ({ page }) => {
-    await login(page, 'recepcion');
-    await expect(page.locator('a.stat-link[href="/consultas"]')).toHaveCount(0);
-    await expect(page.locator('a.stat-link[href="/pagos"]')).toHaveCount(1);
+  test('el dashboard del admin abre en Negocio y respeta la vista pedida en la URL', async ({ page }) => {
+    await login(page, 'admin');
+    await expect(page.getByRole('tab', { name: 'Negocio' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('heading', { name: 'Ingresos de los últimos 6 meses' })).toBeVisible();
+    await page.goto('/dashboard?vista=clientes');
+    await expect(page.getByRole('tab', { name: 'Clientes' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('heading', { name: 'Para recuperar' })).toBeVisible();
   });
 
-  test('veterinario no ve ingresos ni pagos pendientes en el dashboard', async ({ page }) => {
+  test('recepción ve su jornada y no ve el negocio ni secciones sin permiso', async ({ page }) => {
+    await login(page, 'recepcion');
+    await expect(page.getByRole('tab')).toHaveText(['Hoy', 'Clientes']);
+    await expect(page.getByRole('heading', { name: 'Agenda de hoy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirmar citas' })).toBeVisible();
+    await expect(page.locator('main a[href="/consultas"]')).toHaveCount(0);
+    await expect(page.getByText('Ingresos del mes')).toHaveCount(0);
+  });
+
+  test('veterinario no ve ingresos ni pagos en el dashboard', async ({ page }) => {
     await login(page, 'veterinario');
-    await expect(page.locator('a.stat-link[href="/pagos"]')).toHaveCount(0);
-    await expect(page.getByText('Pagos Pendientes')).toHaveCount(0);
+    await expect(page.getByRole('tab')).toHaveText(['Hoy', 'Clientes']);
+    await expect(page.getByRole('heading', { name: 'Agenda de hoy' })).toBeVisible();
+    await expect(page.locator('main a[href="/pagos"]')).toHaveCount(0);
+    await expect(page.getByText('Ingresos del mes')).toHaveCount(0);
   });
 });
