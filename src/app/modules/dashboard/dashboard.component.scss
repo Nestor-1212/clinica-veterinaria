@@ -1,4 +1,6 @@
 /* Encabezado y pestañas; el contenido de cada vista vive en pestanas/ */
+// El dashboard usa el ancho disponible (1440–1920) en lugar del contenedor de 1400px
+.dashboard { max-width: var(--vs-dashboard-max); }
 .page-header { margin-bottom: var(--vs-space-2); }
 
 // "jueves, 22 de octubre de 2026" -> solo la inicial en mayúscula
