@@ -31,9 +31,8 @@
 .bar-label { font-size: 12px; color: var(--vs-text-secondary); }
 .progress-item { margin-bottom: var(--vs-space-4); }
 .progress-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
-.alert-card { border-left: 4px solid var(--vs-accent) !important; }
 .warn-avatar { display: flex !important; align-items: center; justify-content: center; border-radius: 50%; background: var(--vs-accent-container) !important; color: var(--vs-on-accent-container); }
-.warn-icon { color: var(--vs-accent-text) !important; }
-.danger-icon { color: var(--vs-danger) !important; }
-.prox-fecha { font-size: 12px; color: var(--vs-accent-text); }
-.fecha-vencida { font-size: 12px; color: var(--vs-danger); font-weight: 600; }
+.warn-icon { color: var(--vs-text-muted) !important; }
+.danger-icon { color: var(--vs-attention-text) !important; }
+.prox-fecha { font-size: 12px; color: var(--vs-text-muted); }
+.fecha-vencida { font-size: 12px; color: var(--vs-attention-text); font-weight: 600; }
