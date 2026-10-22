@@ -12,7 +12,7 @@ export interface DeltaKpi {
   subirEsBueno: boolean;
 }
 
-/** Tono de una cifra que pide acción: 'atencion' (naranja) o 'alerta' (rojo). */
+/** Tono de una cifra que pide acción: 'atencion' (ámbar) o 'alerta' (rojo). */
 export type TonoKpi = 'atencion' | 'alerta' | null;
 
 /**
@@ -65,7 +65,7 @@ export type TonoKpi = 'atencion' | 'alerta' | null;
     .delta { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 2px; font-size: 13px; font-weight: 600; color: var(--vs-text-secondary);
       mat-icon { font-size: 16px; width: 16px; height: 16px; } }
     .delta--bien { color: var(--vs-on-success-container); }
-    .delta--mal { color: var(--vs-on-danger-container); }
+    .delta--mal { color: var(--vs-attention-text); }
     .contra { margin-left: 4px; font-weight: 400; color: var(--vs-text-muted); }
     .ayuda { font-size: 13px; line-height: 18px; color: var(--vs-text-muted); }
 

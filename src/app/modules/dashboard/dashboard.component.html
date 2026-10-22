@@ -6,7 +6,7 @@
     </div>
     <div class="header-actions">
       @if (puedeClientes()) {
-        <button mat-flat-button class="vs-btn-urgent" type="button" (click)="nuevaAtencionInmediata()">
+        <button mat-stroked-button class="vs-btn-urgent" type="button" (click)="nuevaAtencionInmediata()">
           <mat-icon>bolt</mat-icon> Atención inmediata
         </button>
       }
@@ -14,7 +14,7 @@
         <button mat-flat-button type="button" (click)="nuevaCita()"><mat-icon>event_available</mat-icon> Nueva cita</button>
       }
       @if (puedeClientes()) {
-        <button mat-stroked-button type="button" (click)="nuevoCliente()"><mat-icon>person_add</mat-icon> Nuevo cliente</button>
+        <button mat-button type="button" (click)="nuevoCliente()"><mat-icon>person_add</mat-icon> Nuevo cliente</button>
       }
     </div>
   </header>

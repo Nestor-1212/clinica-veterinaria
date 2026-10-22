@@ -16,7 +16,7 @@ const ESTADO_TEXTO: Record<Cita['estado'], string> = {
   pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Atendida', cancelada: 'Cancelada', inmediata: 'Inmediata'
 };
 const ESTADO_CLASE: Record<Cita['estado'], string> = {
-  pendiente: 'vs-status--warning', confirmada: 'vs-status--success', completada: 'vs-status--info', cancelada: 'vs-status--danger', inmediata: 'vs-status--accent'
+  pendiente: 'vs-status--warning', confirmada: 'vs-status--success', completada: 'vs-status--neutral', cancelada: 'vs-status--neutral', inmediata: 'vs-status--accent vs-status--pill'
 };
 
 /** Pestaña "Hoy": la jornada en curso para quien atiende o recibe pacientes. */

@@ -23,16 +23,16 @@
 .confirmar .lista-fila { grid-template-columns: 56px minmax(0, 1fr) auto; }
 .confirmar-hora { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-/* ----- Bloque urgente: por cobrar hoy ----- */
-.urgente { padding: var(--vs-space-5); border-radius: var(--vs-radius-lg); background: var(--vs-surface-urgent); color: var(--vs-on-accent-container);
+/* ----- Bloque urgente: por cobrar hoy -----
+   Tinte ámbar muy claro; el texto sigue en los neutros de la app y solo la cifra
+   y el enlace llevan el ámbar (antes durazno con texto café: sucio). */
+.urgente { padding: var(--vs-space-5); border-radius: var(--vs-radius-lg); background: var(--vs-attention-surface); color: var(--vs-text);
   h2 { margin: 0; font: var(--vs-text-h3); }
   .lista { margin-top: var(--vs-space-4); }
-  .lista-fila { border-color: rgba(80, 36, 0, .14); }
-  .lista-titulo { color: inherit; }
-  .lista-meta { color: var(--vs-on-accent-container); }
-  .ver-mas { color: var(--vs-on-accent-container); } }
-.urgente-cifra { margin: var(--vs-space-2) 0 0; font: var(--vs-text-figure); letter-spacing: -0.02em; }
-.urgente-ayuda { margin: 2px 0 0; font-size: 13px; }
+  .lista-fila { border-color: var(--vs-attention-container); }
+  .ver-mas { color: var(--vs-attention-text); } }
+.urgente-cifra { margin: var(--vs-space-2) 0 0; font: var(--vs-text-figure); letter-spacing: -0.02em; color: var(--vs-attention-text); }
+.urgente-ayuda { margin: 2px 0 0; font-size: 13px; color: var(--vs-text-secondary); }
 .urgente-monto { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 1100px) {

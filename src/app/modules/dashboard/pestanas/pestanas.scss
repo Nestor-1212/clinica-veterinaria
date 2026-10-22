@@ -46,16 +46,17 @@ a.lista-titulo:hover { text-decoration: underline; text-underline-offset: 3px; }
 .lista-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--vs-space-2); font-size: 13px; line-height: 18px; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
 .lista-pie { margin: var(--vs-space-3) 0 0; font-size: 13px; color: var(--vs-text-muted); }
 
-/* Contacto: el teléfono se lee en el propio botón de llamar */
+/* Contacto: el teléfono se lee en el propio botón de llamar; número en neutro, icono teal */
 .contacto { display: inline-flex; align-items: center; gap: 2px; justify-self: end;
-  a[mat-button] { min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; }
+  a[mat-button] { min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; --mat-button-text-label-text-color: var(--vs-text-secondary); }
+  a[mat-button] mat-icon { color: var(--vs-primary); }
   a[mat-button] mat-icon:only-child { margin: 0; } }
 .ver-mas { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--vs-space-3); font-size: 14px; font-weight: 600; color: var(--vs-primary); text-underline-offset: 3px;
   mat-icon { font-size: 18px; width: 18px; height: 18px; } }
 
 /* Vacío compacto: una línea, no un hueco */
 .vacio { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; font-size: 14px; color: var(--vs-text-muted);
-  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-success); } }
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); } }
 
 /* ----- Cifras y tablas ----- */
 .cifras { display: grid; margin: 0;
