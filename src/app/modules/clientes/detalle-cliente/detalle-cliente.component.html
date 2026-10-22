@@ -68,7 +68,7 @@
                   </div>
                   <div class="mascota-details">
                     <span><mat-icon>straighten</mat-icon> {{ m.peso }} kg</span>
-                    <span><mat-icon>cake</mat-icon> {{ m.edad }} años</span>
+                    <span><mat-icon>cake</mat-icon> {{ m.edad | edad }}</span>
                     <span><mat-icon>{{ m.sexo === 'macho' ? 'male' : 'female' }}</mat-icon> {{ m.sexo }}</span>
                   </div>
                 </mat-card-content>

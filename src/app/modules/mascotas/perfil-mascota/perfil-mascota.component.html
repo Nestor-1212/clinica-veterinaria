@@ -32,7 +32,7 @@
             <div class="datos-grid">
               <div><span>Raza</span><strong>{{ mascota.raza }}</strong></div>
               <div><span>Sexo</span><strong>{{ mascota.sexo | titlecase }}</strong></div>
-              <div><span>Edad</span><strong>{{ mascota.edad }} años</strong></div>
+              <div><span>Edad</span><strong>{{ mascota.edad | edad }}</strong></div>
               <div><span>Peso</span><strong>{{ mascota.peso }} kg</strong></div>
               <div><span>Color</span><strong>{{ mascota.color }}</strong></div>
               @if (mascota.fechaNacimiento) {

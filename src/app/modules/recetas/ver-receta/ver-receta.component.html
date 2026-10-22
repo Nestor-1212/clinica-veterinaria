@@ -19,22 +19,16 @@
         <div class="clinic-sub">Tel: (507) 000-0000 | Ciudad de Panamá</div>
       </div>
       <h2 class="receta-title">RECETA MÉDICA VETERINARIA</h2>
-      <div class="receta-datos">
-        <div class="dato-row">
-          <span>Paciente:</span><strong>{{ mascota?.nombre }}</strong>
-          <span>Especie:</span><strong>{{ mascota?.tipo }}</strong>
-          <span>Raza:</span><strong>{{ mascota?.raza }}</strong>
-        </div>
-        <div class="dato-row">
-          <span>Edad:</span><strong>{{ mascota?.edad }} años</strong>
-          <span>Peso:</span><strong>{{ mascota?.peso }} kg</strong>
-          <span>Propietario:</span><strong>{{ cliente?.nombre }}</strong>
-        </div>
-        <div class="dato-row">
-          <span>Fecha:</span><strong>{{ receta.fecha | date:'dd/MM/yyyy' }}</strong>
-          <span>No. Receta:</span><strong>{{ receta.id }}</strong>
-        </div>
-      </div>
+      <dl class="receta-datos">
+        <div class="dato"><dt>Paciente</dt><dd>{{ mascota?.nombre }}</dd></div>
+        <div class="dato"><dt>Especie</dt><dd>{{ mascota?.tipo }}</dd></div>
+        <div class="dato"><dt>Raza</dt><dd>{{ mascota?.raza }}</dd></div>
+        <div class="dato"><dt>Edad</dt><dd>{{ mascota?.edad | edad }}</dd></div>
+        <div class="dato"><dt>Peso</dt><dd>{{ mascota?.peso }} kg</dd></div>
+        <div class="dato"><dt>Propietario</dt><dd>{{ cliente?.nombre }}</dd></div>
+        <div class="dato"><dt>Fecha</dt><dd>{{ receta.fecha | date:'dd/MM/yyyy' }}</dd></div>
+        <div class="dato"><dt>No. Receta</dt><dd>{{ receta.id }}</dd></div>
+      </dl>
       <div class="receta-rx">
         <div class="rx-symbol">Rp/</div>
         <table mat-table [dataSource]="dataSource" class="rx-table">

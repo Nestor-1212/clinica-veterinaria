@@ -12,24 +12,24 @@
 .clinic-name { font-size: 22px; font-weight: 700; }
 .clinic-sub { font-size: 12px; opacity: 0.9; }
 .receta-title { text-align: center; font-size: 18px; border-bottom: 2px solid var(--vs-border); padding-bottom: 8px; }
+// Pares etiqueta/valor alineados en grilla: 2 columnas en escritorio, 1 en móvil.
 .receta-datos {
-  margin-bottom: 16px;
-  // En móvil todas las etiquetas comparten columna y cada valor queda a su lado
-  @media screen and (max-width: 600px) {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 4px 12px;
-  }
-}
-.dato-row {
-  display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 6px;
-  span { color: var(--vs-text-secondary); font-size: 13px; }
-  strong { font-size: 13px; }
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 24px;
+  margin: 0 0 16px;
 
-  @media screen and (max-width: 600px) {
-    display: contents;
-    strong { overflow-wrap: anywhere; }
-  }
+  @media screen and (max-width: 600px) { grid-template-columns: minmax(0, 1fr); }
+}
+.dato {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+
+  dt { color: var(--vs-text-secondary); }
+  dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 }
 .receta-rx { margin: 16px 0; }
 .rx-symbol { font-size: 24px; font-style: italic; color: var(--vs-text); margin-bottom: 8px; }

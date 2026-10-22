@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Receta, Mascota, Cliente, Usuario, Pago, ItemPago } from '../models';
+import { formatearEdad } from '../utils/edad';
 
 @Injectable({ providedIn: 'root' })
 export class PdfService {
@@ -40,7 +41,7 @@ export class PdfService {
     doc.text(`Especie: ${mascota.tipo}`, 80, y);
     doc.text(`Raza: ${mascota.raza}`, 140, y);
     y += 5;
-    doc.text(`Edad: ${mascota.edad} años`, 10, y);
+    doc.text(`Edad: ${formatearEdad(mascota.edad)}`, 10, y);
     doc.text(`Peso: ${mascota.peso} kg`, 80, y);
     doc.text(`Sexo: ${mascota.sexo}`, 140, y);
     y += 5;

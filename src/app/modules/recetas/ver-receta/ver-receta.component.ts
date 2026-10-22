@@ -11,11 +11,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
 @Component({
     selector: 'app-ver-receta',
     templateUrl: './ver-receta.component.html',
     styleUrls: ['./ver-receta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe]
+    imports: [MatIcon, MatButton, RouterLink, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, EdadPipe]
 })
 export class VerRecetaComponent implements OnInit {
   private route = inject(ActivatedRoute);

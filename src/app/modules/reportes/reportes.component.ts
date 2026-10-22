@@ -17,7 +17,6 @@ import { EstadoRecordatorio, estadoRecordatorio, porProximaFecha } from '../../c
 interface ConsultasPorTipo {
   tipo: string;
   cantidad: number;
-  color: string;
 }
 
 interface PagosPorMetodo {
@@ -71,8 +70,8 @@ export class ReportesComponent implements OnInit {
     const citas = consultas.filter(c => c.tipo === 'cita').length;
     const inmediatas = consultas.filter(c => c.tipo === 'inmediata').length;
     this.consultasPorTipo = [
-      { tipo: 'Cita programada', cantidad: citas, color: '#1976d2' },
-      { tipo: 'Atención inmediata', cantidad: inmediatas, color: '#f44336' }
+      { tipo: 'Cita programada', cantidad: citas },
+      { tipo: 'Atención inmediata', cantidad: inmediatas }
     ];
 
     const pagos = this.pagosService.getAll();

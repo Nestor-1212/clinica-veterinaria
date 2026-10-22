@@ -16,11 +16,13 @@ import { MatChip } from '@angular/material/chips';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
 import { SlicePipe, TitleCasePipe, DatePipe } from '@angular/common';
 
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
 @Component({
     selector: 'app-perfil-mascota',
     templateUrl: './perfil-mascota.component.html',
     styleUrls: ['./perfil-mascota.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatTabGroup, MatTab, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatChip, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, SlicePipe, TitleCasePipe, DatePipe]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatTabGroup, MatTab, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatChip, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, SlicePipe, TitleCasePipe, DatePipe, EdadPipe]
 })
 export class PerfilMascotaComponent implements OnInit {
   private route = inject(ActivatedRoute);

@@ -270,6 +270,11 @@ mat-card.mat-mdc-card {
   @include _status(var(--vs-accent-container), var(--vs-on-accent-container));
 }
 
+/* Conteos y datos de marca (no son estados): p. ej. número de mascotas */
+.vs-status--brand {
+  @include _status(var(--vs-primary-soft), var(--vs-on-primary-soft));
+}
+
 /* Iconos de estado sueltos (listas del dashboard / expediente) */
 .estado-pendiente, .estado-proxima { color: var(--vs-warning); }
 .estado-confirmada, .estado-pagado { color: var(--vs-success); }

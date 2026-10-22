@@ -15,7 +15,7 @@
           <div class="p-avatar"><mat-icon>pets</mat-icon></div>
           <div>
             <h3>{{ mascota.nombre }} <span class="tipo">{{ mascota.tipo }}</span></h3>
-            <p>{{ mascota.raza }} — {{ mascota.sexo | titlecase }} — {{ mascota.edad }} años</p>
+            <p>{{ mascota.raza }} — {{ mascota.sexo | titlecase }} — {{ mascota.edad | edad }}</p>
             @if (mascota.alergias) {
               <p class="alergia"><mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}</p>
             }

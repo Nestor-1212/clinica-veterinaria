@@ -14,11 +14,13 @@ import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLin
 import { MatChip } from '@angular/material/chips';
 import { DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
 
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
 @Component({
     selector: 'app-detalle-cliente',
     templateUrl: './detalle-cliente.component.html',
     styleUrls: ['./detalle-cliente.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe, TitleCasePipe]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe, TitleCasePipe, EdadPipe]
 })
 export class DetalleClienteComponent implements OnInit {
   private route = inject(ActivatedRoute);

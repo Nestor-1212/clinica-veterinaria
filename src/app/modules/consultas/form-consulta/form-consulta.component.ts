@@ -19,11 +19,13 @@ import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular
 import { MatDivider } from '@angular/material/list';
 import { TitleCasePipe } from '@angular/common';
 
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
 @Component({
     selector: 'app-form-consulta',
     templateUrl: './form-consulta.component.html',
     styleUrls: ['./form-consulta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatDivider, TitleCasePipe]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatDivider, TitleCasePipe, EdadPipe]
 })
 export class FormConsultaComponent implements OnInit {
   private fb = inject(FormBuilder);

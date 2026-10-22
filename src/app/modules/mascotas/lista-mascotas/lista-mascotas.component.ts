@@ -19,11 +19,13 @@ import { MatSelect, MatOption } from '@angular/material/select';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatChip } from '@angular/material/chips';
 
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
 @Component({
     selector: 'app-lista-mascotas',
     templateUrl: './lista-mascotas.component.html',
     styleUrls: ['./lista-mascotas.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, ReactiveFormsModule, FormsModule, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, ReactiveFormsModule, FormsModule, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatChip, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, EdadPipe]
 })
 export class ListaMascotasComponent implements OnInit, AfterViewInit {
   private mascotasService = inject(MascotasService);
