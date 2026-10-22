@@ -52,3 +52,8 @@ Thumbs.db
 /test-results
 /playwright-report
 /playwright/.cache
+
+# Impeccable: material de trabajo (maquetas de decisión y capturas de revisión)
+/.impeccable/mocks/
+/.impeccable/review/
+/.impeccable/questions/

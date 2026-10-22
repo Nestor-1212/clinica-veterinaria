@@ -14,8 +14,9 @@ export async function login(page: Page, rol: RolDemo): Promise<void> {
   await page.goto('/login');
   await page.locator('input[formControlName="correo"]').fill(cred.correo);
   await page.locator('input[formControlName="password"]').fill(cred.password);
-  await page.getByRole('button', { name: /Iniciar Sesión/ }).click();
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.getByRole('button', { name: /^Entrar$/ }).click();
+  // Tras entrar se descarga el módulo del dashboard: margen holgado para equipos o CI con carga
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
   await expect(page.getByRole('heading', { level: 1 })).toContainText(`Bienvenido, ${cred.nombre}`);
 }
 

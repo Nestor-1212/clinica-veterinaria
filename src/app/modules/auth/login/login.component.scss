@@ -1,128 +1,215 @@
-.login-container {
-  min-height: 100vh;
+// Hoja inferior: la franja de marca arriba y el formulario como una hoja que la solapa.
+// Móvil: la hoja ocupa el ancho y sube desde abajo. Escritorio: hoja centrada.
+:host { display: block; }
+
+.login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--vs-bg);
+}
+
+/* ===== Franja de marca ===== */
+.banda {
+  background: var(--vs-primary);
+  color: var(--vs-on-primary);
+  text-align: center;
+  padding: var(--vs-space-8) var(--vs-space-4) 0;
+  height: 440px;
+  flex-shrink: 0;
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vs-space-3);
+}
+
+.marca-icono {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  background: var(--vs-primary-soft);
+  color: var(--vs-primary);
+  mat-icon { font-size: 28px; width: 28px; height: 28px; }
+}
+
+.marca-nombre { font-size: 28px; line-height: 36px; font-weight: 700; letter-spacing: -0.01em; }
+
+// Texto secundario teñido del primario (6.1:1 sobre la franja), nunca gris
+.marca-linea { margin: var(--vs-space-2) 0 0; font-size: 16px; color: var(--vs-primary-soft); }
+
+/* ===== Hoja ===== */
+.hoja {
+  position: relative;
+  width: min(440px, calc(100% - 2 * var(--vs-space-4)));
+  margin: -300px auto 0;
+  background: var(--vs-surface);
+  border-radius: 24px;
+  padding: var(--vs-space-7) var(--vs-space-7) var(--vs-space-6);
+  box-shadow: var(--vs-shadow-3);
+  animation: hoja-sube 240ms var(--vs-ease) both;
+
+  h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em; color: var(--vs-text); }
+}
+
+.hoja-sub { margin: var(--vs-space-1) 0 var(--vs-space-6); font-size: 14px; color: var(--vs-text-secondary); }
+
+.campo { width: 100%; }
+
+.aviso-mayus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vs-space-1);
+  color: var(--vs-on-warning-container);
+  font-weight: 600;
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.fila-ayudas {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--vs-primary) 0%, #003730 60%, #00201b 100%);
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--vs-space-2);
+  margin: calc(-1 * var(--vs-space-1)) 0 var(--vs-space-2);
+  font-size: 14px;
+
+  // El state-layer de mat-checkbox desplaza la caja: se compensa para alinearla con los campos
+  mat-checkbox { margin-left: calc((18px - var(--mat-checkbox-state-layer-size, 40px)) / 2); }
 }
 
-.login-bg {
-  position: absolute;
-  inset: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="15" fill="rgba(255,255,255,0.03)"/><circle cx="80" cy="80" r="25" fill="rgba(255,255,255,0.03)"/><circle cx="60" cy="20" r="10" fill="rgba(255,255,255,0.03)"/></svg>');
-  background-size: cover;
+// Botón con apariencia de enlace: abre una ayuda, no navega
+.enlace {
+  min-height: 44px;
+  padding: 0 var(--vs-space-1);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--vs-primary);
+  cursor: pointer;
+  border-radius: var(--vs-radius-sm);
+  text-underline-offset: 3px;
+  &:hover { text-decoration: underline; }
 }
 
-.login-card-wrapper {
-  z-index: 1;
-  width: 100%;
-  max-width: 420px;
-  padding: 16px;
+.ayuda {
+  display: flex;
+  gap: var(--vs-space-3);
+  margin: 0 0 var(--vs-space-2);
+  padding: var(--vs-space-3) var(--vs-space-4);
+  border-radius: var(--vs-radius-md);
+  background: var(--vs-surface-muted);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--vs-text-secondary);
+  mat-icon { flex-shrink: 0; color: var(--vs-primary); font-size: 20px; width: 20px; height: 20px; }
+  strong { color: var(--vs-text); }
 }
 
-.login-card {
-  border-radius: 16px !important;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.3) !important;
-  overflow: hidden;
-}
-
-.login-logo {
-  text-align: center;
-  padding: 32px 24px 16px;
-  background: var(--vs-primary);
-  color: white;
-  margin: -16px -16px 16px;
-
-  .logo-icon {
-    width: 72px;
-    height: 72px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-    mat-icon { font-size: 40px; width: 40px; height: 40px; }
-  }
-
-  h1 { margin: 0 0 4px; font-size: 28px; font-weight: 700; }
-  p { margin: 0; opacity: 0.85; font-size: 14px; }
-}
-
-.full-width { width: 100%; margin-bottom: 8px; }
-
-.login-btn {
+.entrar {
   width: 100%;
   height: 48px;
-  font-size: 16px;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  margin-top: var(--vs-space-4);
+  border-radius: var(--vs-radius-full);
+  font-size: 15px;
+  font-weight: 600;
+  mat-spinner { display: inline-block; margin-right: var(--vs-space-2); vertical-align: middle; }
 }
 
-.demo-credentials {
-  margin-top: 20px;
-  padding: 12px 12px 8px;
+/* ===== Cuentas de demostración: presentes, pero secundarias ===== */
+.demo {
+  margin-top: var(--vs-space-6);
+  padding: var(--vs-space-4);
+  border-radius: var(--vs-radius-md);
   background: var(--vs-surface-muted);
-  border-radius: 8px;
 
-  .demo-title {
-    margin: 0 0 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--vs-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .demo-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  h2 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--vs-text); }
+  p { margin: 2px 0 var(--vs-space-3); font-size: 13px; color: var(--vs-text-secondary); }
 }
 
-.demo-btn {
+.demo-cuentas { display: grid; gap: 6px; }
+
+.demo-cuenta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--vs-space-2);
   width: 100%;
-  padding: 8px 12px;
-  // Sin opacidad ni colores por rol: texto 17:1 / 9.3:1 sobre blanco, icono de marca
+  min-height: 36px;
+  padding: 0 var(--vs-space-3);
   border: 1px solid var(--vs-border);
   border-radius: var(--vs-radius-sm);
-  cursor: pointer;
   text-align: left;
-  font: inherit;
-  color: var(--vs-text);
   background: var(--vs-surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vs-text);
+  cursor: pointer;
   transition: background-color var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  &:hover, &:focus-visible { background: var(--vs-primary-soft); border-color: var(--vs-primary); }
+}
 
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: var(--vs-primary);
-  }
+.demo-correo { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--vs-text-secondary); font-variant-numeric: tabular-nums; }
 
-  .demo-btn-info {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.3;
+// Edge dibuja su propio botón de revelar contraseña: ya hay uno del formulario
+.campo input::-ms-reveal, .campo input::-ms-clear { display: none; }
 
-    strong { font-size: 13px; }
-    small  { font-size: 12px; color: var(--vs-text-secondary); }
-  }
+.pie {
+  margin: var(--vs-space-5) 0 0;
+  text-wrap: balance;
+  text-align: center;
+  font-size: 12px;
+  color: var(--vs-text-muted);
+}
 
-  &:hover {
-    background: var(--vs-primary-soft);
-    border-color: var(--vs-primary);
+/* ===== Escritorio: cuentas demo como chips de una sola línea, solo con el rol =====
+   El correo sigue en el aria-label y en el title; en móvil se muestra la lista completa. */
+@media (min-width: 601px) {
+  .demo-cuentas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .demo-cuenta {
+    width: auto;
+    padding: 0 var(--vs-space-3);
+    border-radius: var(--vs-radius-full);
+    mat-icon, .demo-correo { display: none; }
   }
 }
 
-mat-card-content { padding: 8px 16px 24px !important; }
+/* ===== Móvil: la hoja sube desde abajo y ocupa el ancho ===== */
+@media (max-width: 600px) {
+  .banda {
+    height: auto;
+    min-height: 32dvh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: var(--vs-space-6) var(--vs-space-4) calc(var(--vs-space-6) + var(--vs-space-5));
+  }
+  // La ayuda baja a su propia línea alineada con el borde del formulario
+  .fila-ayudas { flex-direction: column; align-items: flex-start; gap: 0; }
+  .enlace { margin-left: calc(-1 * var(--vs-space-1)); }
+  .marca-nombre { font-size: 24px; line-height: 32px; }
+  .marca-linea { font-size: 15px; }
+
+  .hoja {
+    flex: 1;
+    width: 100%;
+    margin: calc(-1 * var(--vs-space-6)) 0 0;
+    border-radius: 24px 24px 0 0;
+    padding: var(--vs-space-6) var(--vs-space-5) var(--vs-space-6);
+    box-shadow: 0 -4px 16px rgba(16, 24, 40, 0.08);
+  }
+
+  .demo-cuenta { min-height: 44px; }
+
+}
+
+@keyframes hoja-sube {
+  from { transform: translateY(16px); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hoja { animation: none; }
+  .demo-cuenta { transition: none; }
+}
