@@ -27,7 +27,7 @@ function techoLimpio(max: number): number {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!tabla()) {
-      <div class="grafico" role="group" [attr.aria-label]="titulo()">
+      <div class="grafico" role="group" [attr.aria-label]="titulo()" [style.height.px]="alto()">
         <div class="eje">
           @for (t of ticks(); track t) {
             <span class="tick" [style.bottom.%]="(t / techo()) * 100">{{ formato()(t) }}</span>
@@ -78,7 +78,7 @@ function techoLimpio(max: number): number {
   `,
   styles: [`
     :host { display: block; }
-    .grafico { display: grid; grid-template-columns: auto 1fr; gap: var(--vs-space-2); height: 200px; padding-top: 22px; }
+    .grafico { display: grid; grid-template-columns: auto 1fr; gap: var(--vs-space-2); padding-top: 22px; }
     .eje { position: relative; width: 44px; margin-bottom: 24px; }
     .tick { position: absolute; right: 0; transform: translateY(50%); font-size: 12px; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .plot { position: relative; display: flex; align-items: stretch; padding-bottom: 24px; }
@@ -119,6 +119,8 @@ export class GraficoColumnasComponent {
   readonly titulo = input.required<string>();
   readonly formato = input<(v: number) => string>(v => String(v));
   readonly notaParcial = input('Mes en curso: aún no está completo.');
+  /** Alto total del gráfico en px (incluye la banda del eje X). */
+  readonly alto = input(200);
 
   readonly activa = signal<number | null>(null);
   readonly tabla = signal(false);

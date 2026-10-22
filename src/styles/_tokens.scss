@@ -29,6 +29,14 @@
   --vs-surface: #ffffff;
   --vs-surface-muted: #f6faf8;                          // neutral 98 (bloques internos)
   --vs-surface-elevated: #ffffff;
+  // Superficie "escenario": la única superficie elevada de una vista (el protagonista).
+  // Sin borde; la separa del fondo una sombra con desplazamiento y desenfoque suave.
+  --vs-stage-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 10px 28px -12px rgba(16, 24, 40, 0.16);
+  // Bloque urgente (por cobrar hoy, atención inmediata): naranja de acento tono 95.
+  // Texto --vs-on-accent-container #502400 sobre él: 11.3:1; --vs-accent-text #964900: 5.9:1.
+  --vs-surface-urgent: #ffede3;
+  // Fila "siguiente" de la agenda: primario tono 98 (= --vs-primary-soft)
+  --vs-surface-next: var(--vs-primary-soft);
 
   // ---- Texto --------------------------------------------------------
   --vs-text: var(--mat-sys-on-surface);                 // #181d1b · 17.07 / 15.38 (bg)
@@ -75,6 +83,12 @@
   --vs-text-body: 400 14px/20px var(--vs-font);
   --vs-text-small: 400 13px/18px var(--vs-font);
   --vs-text-label: 500 12px/16px var(--vs-font);
+  // Cifras del dashboard: una cifra héroe por vista (>= 48px, misma Inter, cifras
+  // proporcionales) y cifras secundarias en la banda de resumen.
+  --vs-text-hero: 700 56px/60px var(--vs-font);
+  --vs-text-hero-sm: 700 44px/48px var(--vs-font);    // móvil
+  --vs-text-figure: 600 28px/34px var(--vs-font);
+  --vs-tracking-hero: -0.035em;
 
   // ---- Espaciado (base 4) -------------------------------------------
   --vs-space-1: 4px;
@@ -86,6 +100,8 @@
   --vs-space-7: 32px;
   --vs-space-8: 48px;
   --vs-form-max: 880px;
+  // Ancho máximo del dashboard: llena 1440–1920 (contenido ~1630px a 1920) sin márgenes muertos
+  --vs-dashboard-max: 1840px;
 
   // ---- Radios -------------------------------------------------------
   --vs-radius-sm: 8px;
@@ -102,6 +118,9 @@
   // validado con dataviz/validate_palette: luminosidad, croma y contraste >= 3:1)
   --vs-chart-1: #00876f;
   --vs-chart-1-soft: #8fd0c3;                           // mismo tono, periodo en curso (rotulado)
+  // Línea de tiempo de la agenda: tramo pasado (recesivo) y tramo por venir (serie)
+  --vs-timeline-past: #c9d1ce;                          // neutral 80 · decorativo, el estado va en texto
+  --vs-timeline-next: var(--vs-chart-1-soft);
 
   // ---- Movimiento ---------------------------------------------------
   --vs-dur-fast: 120ms;
