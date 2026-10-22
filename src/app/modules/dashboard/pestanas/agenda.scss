@@ -1,0 +1,66 @@
+// Agenda de hoy como línea de tiempo: riel vertical, nodos por estado y la línea "Ahora"
+// (signature move). Separado de hoy.component.scss por el presupuesto de 6 kB por hoja.
+/* ----- Línea de tiempo ----- */
+.tiempo { --hora: 56px; --nodo: 20px; --gap: 12px; list-style: none; margin: 0; padding: 0; }
+.cita, .ahora {
+  --pad: 0px;
+  position: relative; display: grid; grid-template-columns: var(--hora) var(--nodo) minmax(0, 1fr) auto; align-items: center; column-gap: var(--gap);
+}
+// El riel: tramo pasado recesivo, tramo por venir (después de "Ahora") en la serie
+.cita::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(var(--pad) + var(--hora) + var(--gap) + var(--nodo) / 2 - 1px); width: 2px; background: var(--vs-timeline-past); }
+.ahora ~ .cita::before { background: var(--vs-timeline-next); }
+.tiempo > :first-child::before { top: 50%; }
+.tiempo > :last-child::before { bottom: 50%; }
+
+.cita { padding: var(--vs-space-4) var(--pad); }
+.cita + .cita::after { content: ''; position: absolute; top: 0; right: var(--pad); left: calc(var(--pad) + var(--hora) + var(--nodo) + var(--gap) * 2); height: 1px; background: var(--vs-border); }
+.cita-hora { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--vs-text); }
+.nodo { position: relative; z-index: 1; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: var(--vs-surface); border: 2px solid var(--vs-chart-1); }
+.cita-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.cita-titulo {
+  display: inline-flex; flex-wrap: wrap; align-items: center; column-gap: 6px; min-width: 0; font-size: 15px; font-weight: 600; color: var(--vs-text); text-decoration: none;
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  &:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
+.cita-dueno { font-weight: 400; color: var(--vs-text-secondary); }
+.cita-motivo { font-size: 13px; color: var(--vs-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cita-fin { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--vs-space-3); }
+.cita-accion { min-width: 0; }
+
+// Lo atendido se retira: fila compacta y gris
+.cita--hecha { padding-block: var(--vs-space-2);
+  .cita-hora, .cita-titulo, .cita-titulo mat-icon { color: var(--vs-text-muted); font-weight: 500; }
+  .nodo { width: 10px; height: 10px; border: 0; background: var(--vs-timeline-past); } }
+.cita--falta .nodo { border-color: var(--vs-danger); }
+.cita--inmediata .nodo { border: 0; background: var(--vs-accent); }
+
+// La siguiente cita: la fila protagonista de la agenda
+.cita--siguiente {
+  --pad: 12px; margin-inline: -12px; border-radius: var(--vs-radius-md); background: var(--vs-surface-next);
+  + .cita::after { display: none; }
+  .cita-hora { font-size: 18px; font-weight: 700; color: var(--vs-on-primary-soft); }
+  .cita-titulo { font-size: 17px; }
+  .nodo { width: 16px; height: 16px; border: 0; background: var(--vs-chart-1); box-shadow: 0 0 0 3px var(--vs-surface-next); }
+}
+.cita-cuenta { font-size: 13px; font-weight: 700; color: var(--vs-on-primary-soft); font-variant-numeric: tabular-nums; }
+
+// Signature: "Ahora" cruza la agenda en el punto exacto de la jornada
+.ahora { min-height: 28px; font-size: 13px; font-weight: 700; color: var(--vs-accent-text);
+  + .cita::after { display: none; }
+  .ahora-hora { font-variant-numeric: tabular-nums; }
+  .nodo { width: 12px; height: 12px; border: 0; background: var(--vs-accent); box-shadow: 0 0 0 3px var(--vs-surface); }
+  &::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(var(--hora) + var(--gap) + var(--nodo) / 2 - 1px); width: 2px; background: linear-gradient(var(--vs-timeline-past) 50%, var(--vs-timeline-next) 50%); }
+}
+.ahora-linea { grid-column: 3 / -1; display: flex; align-items: center; gap: var(--vs-space-2); text-transform: uppercase; letter-spacing: .06em; font-size: 12px;
+  &::after { content: ''; flex: 1; height: 2px; border-radius: 1px; background: var(--vs-accent); } }
+.fin-jornada { margin: 0; padding: var(--vs-space-5) 0 0 calc(56px + 20px + 24px); font-size: 13px; color: var(--vs-text-muted); }
+
+.cita-hecha { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--vs-text-muted);
+  mat-icon { font-size: 16px; width: 16px; height: 16px; } }
+
+@media (max-width: 600px) {
+  .tiempo { --hora: 44px; --nodo: 16px; --gap: 8px; }
+  .cita-fin { grid-column: 3 / -1; justify-content: flex-start; margin-top: var(--vs-space-2); }
+  .fin-jornada { padding-left: 68px; }
+  .cita--siguiente .cita-hora { font-size: 15px; }
+}

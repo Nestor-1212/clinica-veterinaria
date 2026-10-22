@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -22,9 +22,9 @@ const ESTADO_CLASE: Record<Cita['estado'], string> = {
 /** Pestaña "Hoy": la jornada en curso para quien atiende o recibe pacientes. */
 @Component({
   selector: 'app-dashboard-hoy',
-  imports: [RouterLink, DatePipe, MatIcon, MatButton, EdadPipe, KpiComponent],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, MatIcon, MatButton, EdadPipe, KpiComponent],
   templateUrl: './hoy.component.html',
-  styleUrls: ['./pestanas.scss', './hoy.component.scss'],
+  styleUrls: ['./pestanas.scss', './agenda.scss', './hoy.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HoyComponent {
@@ -65,9 +65,20 @@ export class HoyComponent {
   readonly resumen = computed(() => {
     const a = this.agenda();
     const atendidas = a.filter(c => c.estado === 'completada').length;
-    const porLlegar = a.filter(c => c.estado === 'pendiente' || c.estado === 'confirmada').length;
+    const porLlegar = a.filter(c => (c.estado === 'pendiente' || c.estado === 'confirmada') && !this.noLlego(c)).length;
+    const noLlegaron = a.filter(c => this.noLlego(c)).length;
     const inmediatas = a.filter(c => c.estado === 'inmediata').length;
-    return { total: a.length, atendidas, porLlegar, inmediatas };
+    return { total: a.length, atendidas, porLlegar, noLlegaron, inmediatas };
+  });
+  /** "3 atendidas · 2 por llegar · 1 no llegó" (inasistencias solo si las hay). */
+  readonly ayudaCitas = computed(() => {
+    const r = this.resumen();
+    return `${plural(r.atendidas, 'atendida')} · ${r.porLlegar} por llegar` + (r.noLlegaron ? ` · ${r.noLlegaron} ${r.noLlegaron === 1 ? 'no llegó' : 'no llegaron'}` : '');
+  });
+  /** La primera cita por atender después de la línea "Ahora": se destaca en la agenda. */
+  readonly siguiente = computed(() => {
+    const c = this.agenda()[this.indiceAhora()];
+    return c && c.estado !== 'completada' && !this.noLlego(c) ? c : null;
   });
 
   readonly manana = computed(() => siguienteDiaHabil(this.datos().hoy));
@@ -82,6 +93,10 @@ export class HoyComponent {
   readonly totalCobrarHoy = computed(() => this.cobrarHoy().reduce((s, p) => s + p.total, 0));
   readonly porConfirmar = computed(() =>
     citasDelDia(this.datos().citas, this.manana()).filter(c => c.estado === 'pendiente' && !this.confirmadas().has(c.id)));
+
+  /** Citas del veterinario el siguiente día hábil (para preparar la jornada). */
+  readonly mananaMias = computed(() =>
+    citasDelDia(this.datos().citas, this.manana()).filter(c => c.veterinarioId === this.datos().usuarioId && c.estado !== 'cancelada'));
 
   /** Vacunas vencidas (hasta 60 días) o que vencen en los próximos 7: a quién llamar hoy. */
   readonly avisos = computed(() => {
@@ -143,7 +158,20 @@ export class HoyComponent {
     return enlaceWhatsApp(r.cliente.telefono, `Hola ${r.cliente.nombre}, le escribimos de la clínica veterinaria: ${texto}. ¿Le agendamos una cita?`);
   }
 
+  /** "en 13 min", "en 1 h 20 min" o "ahora" desde la hora actual hasta `hora`. */
+  faltan(hora: string): string {
+    const min = this.minutos(hora) - this.minutos(this.ahora());
+    if (min <= 0) return 'ahora';
+    if (min < 60) return `en ${min} min`;
+    return `en ${Math.floor(min / 60)} h${min % 60 ? ` ${min % 60} min` : ''}`;
+  }
+
   tel(telefono: string): string { return `tel:+507${telefono.replace(/\D/g, '')}`; }
+
+  private minutos(hora: string): number {
+    const [h, m] = hora.split(':').map(Number);
+    return h * 60 + m;
+  }
 
   private restar(hora: string, minutos: number): string {
     const [h, m] = hora.split(':').map(Number);
