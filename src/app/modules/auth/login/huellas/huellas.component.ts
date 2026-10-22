@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, afterNextRender, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, NgZone, afterNextRender, inject, input, viewChild } from '@angular/core';
 
 /** Una huella impresa: aparece, se sostiene y se desvanece. */
 interface Huella {
@@ -19,9 +19,15 @@ interface Caminante {
   escala: number;
 }
 
-const COLOR = '229, 255, 248'; // --vs-primary-soft sobre el teal de la marca
-const ALFA_BASE = 0.13;
-const ALFA_CURSOR = 0.3;
+/** Tono de las huellas según el fondo sobre el que caminan. */
+export type TonoHuellas = 'claro' | 'marca';
+
+const TONOS: Record<TonoHuellas, { color: string; base: number; cursor: number }> = {
+  // --vs-primary-soft sobre la franja teal
+  claro: { color: '229, 255, 248', base: 0.13, cursor: 0.3 },
+  // --vs-primary (#006b5e) sobre el fondo claro de la app
+  marca: { color: '0, 107, 94', base: 0.09, cursor: 0.2 }
+};
 const RADIO_CURSOR = 150;
 const VIDA_MS = 4200;
 const APARECE_MS = 260;
@@ -46,6 +52,8 @@ export class HuellasComponent {
   private readonly lienzo = viewChild.required<ElementRef<HTMLCanvasElement>>('lienzo');
   private readonly zona = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
+  /** 'claro' sobre la franja teal; 'marca' (verde) sobre el fondo claro. */
+  readonly tono = input<TonoHuellas>('claro');
 
   private ctx: CanvasRenderingContext2D | null = null;
   private ancho = 0;
@@ -182,13 +190,14 @@ export class HuellasComponent {
       const edad = ahora - h.nace;
       const entrada = Math.min(1, edad / APARECE_MS);
       const salida = Math.min(1, (VIDA_MS - edad) / DESVANECE_MS);
-      let alfa = ALFA_BASE * Math.min(entrada, salida);
+      const { base, cursor } = TONOS[this.tono()];
+      let alfa = base * Math.min(entrada, salida);
       let escala = 1;
       if (this.cursor) {
         const d = Math.hypot(h.x - this.cursor.x, h.y - this.cursor.y);
         if (d < RADIO_CURSOR) {
           const cerca = 1 - d / RADIO_CURSOR;
-          alfa += (ALFA_CURSOR - ALFA_BASE) * cerca * Math.min(entrada, salida);
+          alfa += (cursor - base) * cerca * Math.min(entrada, salida);
           escala += 0.12 * cerca;
         }
       }
@@ -210,7 +219,7 @@ export class HuellasComponent {
         const normal = r.rumbo + Math.PI / 2;
         const x = r.x + Math.cos(r.rumbo) * LARGO_PASO * i + Math.cos(normal) * SEPARACION_PISADA * lado;
         const y = r.y + Math.sin(r.rumbo) * LARGO_PASO * i + Math.sin(normal) * SEPARACION_PISADA * lado;
-        this.dibujarHuella(ctx, x, y, r.rumbo, 1, ALFA_BASE * (0.4 + 0.6 * (i / 6)));
+        this.dibujarHuella(ctx, x, y, r.rumbo, 1, TONOS[this.tono()].base * (0.4 + 0.6 * (i / 6)));
       }
     }
   }
@@ -222,7 +231,7 @@ export class HuellasComponent {
     ctx.translate(x, y);
     ctx.rotate(rumbo + Math.PI / 2);
     ctx.scale(escala * 0.62, escala * 0.62);
-    ctx.fillStyle = `rgba(${COLOR}, ${alfa})`;
+    ctx.fillStyle = `rgba(${TONOS[this.tono()].color}, ${alfa})`;
     ctx.beginPath();
     ctx.ellipse(0, 5, 9.5, 8, 0, 0, Math.PI * 2);
     ctx.moveTo(-6.2, -9);

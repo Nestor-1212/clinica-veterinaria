@@ -3,10 +3,18 @@
 :host { display: block; }
 
 .login {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--vs-bg);
+}
+
+// Capa de huellas verdes en la zona clara, bajo la franja y detrás de la hoja
+.fondo-huellas {
+  position: absolute;
+  inset: 440px 0 0;
+  pointer-events: none;
 }
 
 /* ===== Franja de marca ===== */
@@ -62,6 +70,7 @@
   box-shadow: var(--vs-shadow-3);
   animation: hoja-sube 240ms var(--vs-ease) both;
   view-transition-name: vs-hoja;
+  z-index: 1;
 
   h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.01em; color: var(--vs-text); }
 }
@@ -216,6 +225,8 @@
   .enlace { margin-left: calc(-1 * var(--vs-space-1)); }
   .marca-nombre { font-size: 24px; line-height: 32px; }
   .marca-linea { font-size: 15px; }
+  // En móvil la hoja ocupa todo el ancho y taparía la capa: no se dibuja
+  .fondo-huellas { display: none; }
   .banda app-huellas { mask-image: radial-gradient(ellipse 230px 70px at 50% 50%, transparent 35%, #000 100%); }
 
   .hoja {
