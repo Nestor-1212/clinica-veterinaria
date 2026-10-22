@@ -1,4 +1,6 @@
 .app-header {
+  // Destino de la franja del login en la View Transition de entrada
+  view-transition-name: vs-banda;
   // Zona sobre el primario: foco en blanco (6.43:1 contra #006b5e)
   --vs-focus: #ffffff;
 
@@ -13,6 +15,7 @@
 .menu-btn { color: var(--vs-on-primary); }
 
 .brand {
+  view-transition-name: vs-marca;
   display: flex;
   align-items: center;
   gap: var(--vs-space-2);

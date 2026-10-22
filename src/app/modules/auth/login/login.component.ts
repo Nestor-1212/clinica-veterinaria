@@ -11,6 +11,11 @@ import { MatFormField, MatLabel, MatInput, MatSuffix, MatError, MatHint } from '
 import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { HuellasComponent } from './huellas/huellas.component';
+import { TransicionEntradaService, prefiereMenosMovimiento } from '../../../core/ui/transicion-entrada.service';
+
+/** Tiempo que se muestra el check de éxito antes de pasar al sistema. */
+const PAUSA_EXITO_MS = 420;
 
 /** Solo se recuerda el correo, nunca la contraseña. */
 export const CLAVE_CORREO_RECORDADO = 'vet_correo_recordado';
@@ -26,13 +31,14 @@ export interface CuentaDemo {
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss'],
-    imports: [MatIcon, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSuffix, MatError, MatHint, MatIconButton, MatButton, MatCheckbox, MatProgressSpinner]
+    imports: [MatIcon, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSuffix, MatError, MatHint, MatIconButton, MatButton, MatCheckbox, MatProgressSpinner, HuellasComponent]
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
   private snack = inject(MatSnackBar);
+  private transicion = inject(TransicionEntradaService);
   private host = inject(ElementRef, { optional: true });
   /** Las cuentas de demostración solo se muestran en modo demo. */
   readonly demo = inject(DEMO_MODE);
@@ -48,6 +54,8 @@ export class LoginComponent {
   hidePassword = true;
   bloqMayus = false;
   mostrarAyudaPassword = false;
+  /** Credenciales correctas: el botón muestra el check mientras arranca la transición. */
+  exito = false;
 
   constructor() {
     const recordado = this.leerCorreoRecordado();
@@ -84,7 +92,14 @@ export class LoginComponent {
     if (ok) {
       this.guardarCorreoRecordado(recordar ? correo : null);
       // loading sigue en true hasta salir del login: evita un segundo envío
-      this.router.navigate(['/dashboard']);
+      this.exito = true;
+      if (prefiereMenosMovimiento()) {
+        this.router.navigate(['/dashboard']);
+      } else {
+        // La franja de marca se convierte en la barra superior del sistema (View Transition)
+        this.transicion.marcar();
+        setTimeout(() => this.router.navigate(['/dashboard']), PAUSA_EXITO_MS);
+      }
     } else {
       this.loading = false;
       this.snack.open('El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.', 'Cerrar', { duration: 6000, panelClass: 'snack-error' });

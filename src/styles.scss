@@ -326,6 +326,56 @@ input:focus-visible,
 ::selection { background: var(--vs-primary-container); color: var(--vs-on-primary-container); }
 input, textarea { caret-color: var(--vs-primary); }
 
+/* ===== ENTRADA AL SISTEMA (View Transition desde el login) =====
+   La franja de marca se encoge hasta ser la barra superior, el logo viaja a su
+   sitio, la hoja se hunde y el contenido del sistema aparece. Solo se usa en la
+   navegación login -> dashboard (ver app.config.ts). */
+::view-transition-group(vs-banda),
+::view-transition-group(vs-marca) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(.2, 0, 0, 1);
+}
+// La franja se encoge recortada (sin desbordar la caja que anima); su contenido
+// viejo (lema y huellas) se apaga enseguida y queda el color sólido de la barra
+::view-transition-group(vs-banda) {
+  overflow: clip;
+  background: var(--vs-primary);
+}
+::view-transition-old(vs-banda),
+::view-transition-new(vs-banda) {
+  height: 100%;
+  object-fit: none;
+  object-position: center top;
+}
+::view-transition-old(vs-banda) { animation: vs-desvanece 160ms ease-out both; }
+::view-transition-new(vs-banda) { animation: vs-aparece-suave 200ms 360ms ease-out both; }
+@keyframes vs-aparece-suave {
+  from { opacity: 0; }
+}
+::view-transition-old(vs-hoja) {
+  animation: vs-hoja-sale 260ms cubic-bezier(.4, 0, 1, 1) both;
+}
+::view-transition-old(root) {
+  animation: vs-desvanece 200ms ease-out both;
+}
+::view-transition-new(root) {
+  animation: vs-aparece 420ms 220ms cubic-bezier(.2, 0, 0, 1) both;
+}
+@keyframes vs-hoja-sale {
+  to { opacity: 0; transform: translateY(32px) scale(.97); }
+}
+@keyframes vs-desvanece {
+  to { opacity: 0; }
+}
+@keyframes vs-aparece {
+  from { opacity: 0; transform: translateY(10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
 /* Texto solo para lectores de pantalla */
 .sr-only {
   position: absolute !important;

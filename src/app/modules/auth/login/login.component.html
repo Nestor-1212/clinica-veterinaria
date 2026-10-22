@@ -1,5 +1,6 @@
 <div class="login">
   <header class="banda">
+    <app-huellas></app-huellas>
     <div class="marca">
       <span class="marca-icono" aria-hidden="true"><mat-icon>pets</mat-icon></span>
       <span class="marca-nombre">VetSystem</span>
@@ -51,8 +52,10 @@
         </p>
       }
 
-      <button mat-flat-button type="submit" class="entrar" [disabled]="loading">
-        @if (loading) {
+      <button mat-flat-button type="submit" class="entrar" [class.entrar--exito]="exito" [disabled]="loading">
+        @if (exito) {
+          <span class="entrar-exito"><mat-icon aria-hidden="true">check</mat-icon>Listo</span>
+        } @else if (loading) {
           <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
           Entrando…
         } @else {
@@ -60,6 +63,7 @@
         }
       </button>
     </form>
+    <span class="sr-only" aria-live="polite">{{ exito ? 'Sesión iniciada. Abriendo el sistema.' : '' }}</span>
 
     @if (demo) {
       <section class="demo" aria-labelledby="titulo-demo">
