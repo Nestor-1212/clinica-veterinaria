@@ -1,3 +1,63 @@
-// Atención inmediata: el ámbar de "requiere atención" (no el rojo de lo crítico)
+// Atención inmediata: el ámbar de "requiere atención" (nunca el rojo de lo crítico)
 .icon-warn { color: var(--vs-attention); }
-.inmediata-banner { background: var(--vs-attention-container); color: var(--vs-on-attention-container); padding: 12px 16px; display: flex; align-items: center; gap: 8px; font-size: 14px; margin: -16px -16px 16px; }
+
+// Aviso dentro de la tarjeta (antes era una franja que se salía del borde)
+.aviso-inmediata {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vs-space-2);
+  margin: 0 0 var(--vs-space-5);
+  padding: var(--vs-space-3) var(--vs-space-4);
+  border-radius: var(--vs-radius-md);
+  background: var(--vs-attention-container);
+  color: var(--vs-on-attention-container);
+  font-size: 14px;
+  line-height: 20px;
+  mat-icon { flex-shrink: 0; color: var(--vs-attention-text); font-size: 20px; width: 20px; height: 20px; }
+}
+
+// La llegada no se pide: es ahora. Ocupa la celda de fecha/hora con la misma altura que un campo.
+.llegada {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  min-height: 56px;
+  // Mismo hueco inferior que reservan los campos para su mensaje de error
+  margin-bottom: 22px;
+  padding: 0 var(--vs-space-4);
+  border-radius: var(--vs-radius-sm);
+  background: var(--vs-surface-muted);
+}
+.llegada-etiqueta { font-size: 12px; color: var(--vs-text-secondary); }
+.llegada-valor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--vs-text);
+  &::first-letter { text-transform: uppercase; }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-attention-text); }
+}
+
+// Alergias: dato clínico crítico, en rojo, en cuanto se elige la mascota
+.alerta-alergia {
+  display: flex;
+  align-items: center;
+  gap: var(--vs-space-2);
+  margin: calc(-1 * var(--vs-space-2)) 0 var(--vs-space-2);
+  padding: var(--vs-space-2) var(--vs-space-3);
+  border-radius: var(--vs-radius-sm);
+  background: var(--vs-danger-container);
+  color: var(--vs-on-danger-container);
+  font-size: 14px;
+  mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
+}
+
+// Acción principal urgente: ámbar oscuro (blanco encima 6.36:1; hover 8.85:1)
+.btn-urgente {
+  --mat-button-filled-container-color: var(--vs-attention-text);
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-filled-icon-color: #fff;
+  &:hover { --mat-button-filled-container-color: #7a3700; }
+}

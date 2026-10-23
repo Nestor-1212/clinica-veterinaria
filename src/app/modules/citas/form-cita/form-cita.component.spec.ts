@@ -32,6 +32,27 @@ describe('FormCitaComponent: atención inmediata (B1)', () => {
     });
   });
 
+  it('guarda la hora real de llegada (no un tramo de media hora) y la fija al enviar', () => {
+    sesionComo('u-rec');
+    const antes = new Date();
+    registrarInmediata();
+    const [creada] = leer<Cita>('vet_citas');
+    expect(creada.hora).toMatch(/^\d{2}:\d{2}$/);
+    const [h, m] = creada.hora.split(':').map(Number);
+    const minutos = h * 60 + m;
+    expect(Math.abs(minutos - (antes.getHours() * 60 + antes.getMinutes()))).toBeLessThanOrEqual(1);
+  });
+
+  it('desde un cliente, Volver lleva a su expediente; sin cliente, a Citas', () => {
+    const conCliente = crearComponente(FormCitaComponent, { queryParams: { tipo: 'inmediata', clienteId: 'c1' } });
+    conCliente.componente.ngOnInit();
+    expect(conCliente.componente.volverA).toEqual(['/clientes', 'c1']);
+    TestBed.resetTestingModule();
+    const sinCliente = crearComponente(FormCitaComponent, { queryParams: { tipo: 'inmediata' } });
+    sinCliente.componente.ngOnInit();
+    expect(sinCliente.componente.volverA).toEqual(['/citas']);
+  });
+
   it('recepción (sin acceso a Consultas) vuelve a Citas', () => {
     sesionComo('u-rec');
     const { navigate } = registrarInmediata();

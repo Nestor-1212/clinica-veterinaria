@@ -13,7 +13,8 @@ import { Cliente, Mascota, Usuario } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatSuffix, MatError, MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel, MatSuffix, MatError, MatHint, MatInput } from '@angular/material/input';
+import { DatePipe } from '@angular/common';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 
@@ -21,7 +22,7 @@ import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular
     selector: 'app-form-cita',
     templateUrl: './form-cita.component.html',
     styleUrls: ['./form-cita.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker]
+    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, DatePipe]
 })
 export class FormCitaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -42,6 +43,10 @@ export class FormCitaComponent implements OnInit {
   mascotas: Mascota[] = [];
   veterinarios: Usuario[] = [];
   isInmediata = false;
+  /** Momento de llegada de la atención inmediata (se fija de nuevo al enviar). */
+  llegada = new Date();
+  /** Volver al expediente si se llegó desde un cliente; si no, a Citas. */
+  volverA: string[] = ['/citas'];
   horas = this.generarHoras();
 
   constructor() {
@@ -65,12 +70,20 @@ export class FormCitaComponent implements OnInit {
     const params = this.route.snapshot.queryParams;
     if (params.tipo === 'inmediata') {
       this.isInmediata = true;
-      this.form.patchValue({ estado: 'inmediata', fecha: new Date(), hora: new Date().toTimeString().substr(0, 5) });
+      this.llegada = new Date();
+      this.form.patchValue({ estado: 'inmediata', fecha: this.llegada, hora: horaDe(this.llegada) });
     }
     if (params.clienteId) {
       this.form.patchValue({ clienteId: params.clienteId });
       this.onClienteChange(params.clienteId);
+      this.volverA = ['/clientes', params.clienteId];
     }
+  }
+
+  /** Mascota elegida: para avisar de sus alergias antes de atenderla. */
+  get mascotaSeleccionada(): Mascota | undefined {
+    const id = this.form.get('mascotaId')?.value;
+    return id ? this.mascotas.find(m => m.id === id) : undefined;
   }
 
   onClienteChange(clienteId: string): void {
@@ -83,6 +96,11 @@ export class FormCitaComponent implements OnInit {
     if (this.enviando) return;
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.enviando = true;
+    if (this.isInmediata) {
+      // La llegada real es el momento de registrar, no el de abrir el formulario
+      this.llegada = new Date();
+      this.form.patchValue({ fecha: this.llegada, hora: horaDe(this.llegada) });
+    }
     const cita = this.citasService.create(this.form.value);
     if (!this.isInmediata) {
       this.snack.open('Cita programada', 'OK', { duration: 2000 });
@@ -110,4 +128,9 @@ export class FormCitaComponent implements OnInit {
     }
     return h;
   }
+}
+
+/** "HH:mm" de una fecha (la hora real de llegada, no un tramo de media hora). */
+function horaDe(fecha: Date): string {
+  return `${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}`;
 }

@@ -3,28 +3,28 @@
     <div>
       <h1>
         <mat-icon [class]="isInmediata ? 'icon-warn' : ''">{{ isInmediata ? 'bolt' : 'event_available' }}</mat-icon>
-        {{ isInmediata ? 'Atención Inmediata' : 'Nueva Cita' }}
+        {{ isInmediata ? 'Atención inmediata' : 'Nueva cita' }}
       </h1>
-      <p>{{ isInmediata ? 'Registre la atención sin cita programada' : 'Programe una cita para el paciente' }}</p>
+      <p>{{ isInmediata ? 'El paciente llegó sin cita: se registra para ahora mismo' : 'Programe una cita para el paciente' }}</p>
     </div>
-    <button mat-stroked-button routerLink="/citas"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <button mat-button type="button" [routerLink]="volverA"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <mat-card class="form-card" [class.card-inmediata]="isInmediata">
-    @if (isInmediata) {
-      <div class="inmediata-banner">
-        <mat-icon>bolt</mat-icon>
-        <strong>ATENCIÓN INMEDIATA</strong> — El cliente llegó sin cita previa
-      </div>
-    }
-
+  <mat-card class="form-card">
     <mat-card-content>
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        @if (isInmediata) {
+          <p class="aviso-inmediata">
+            <mat-icon aria-hidden="true">bolt</mat-icon>
+            <span>Se registra con la fecha y hora de llegada. Al iniciarla, el veterinario pasa directo a la consulta.</span>
+          </p>
+        }
+
         <div class="form-grid">
           <mat-form-field appearance="outline">
             <mat-label>Propietario</mat-label>
             <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-              @for (c of clientes; track c) {
+              @for (c of clientes; track c.id) {
                 <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
               }
             </mat-select>
@@ -35,46 +35,66 @@
           <mat-form-field appearance="outline">
             <mat-label>Mascota</mat-label>
             <mat-select formControlName="mascotaId">
-              @for (m of mascotas; track m) {
+              @for (m of mascotas; track m.id) {
                 <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
               }
             </mat-select>
             <mat-icon matSuffix>pets</mat-icon>
+            @if (!form.get('clienteId')?.value) {
+              <mat-hint>Elija primero el propietario</mat-hint>
+            }
             <mat-error>Seleccione la mascota</mat-error>
           </mat-form-field>
+
+          @if (mascotaSeleccionada?.alergias) {
+            <p class="alerta-alergia col-full" role="note">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              <span><strong>Alergias de {{ mascotaSeleccionada?.nombre }}:</strong> {{ mascotaSeleccionada?.alergias }}</span>
+            </p>
+          }
 
           <mat-form-field appearance="outline">
             <mat-label>Veterinario</mat-label>
             <mat-select formControlName="veterinarioId">
-              @for (v of veterinarios; track v) {
-                <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+              @for (v of veterinarios; track v.id) {
+                <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}@if (v.especialidad) { · {{ v.especialidad }} }</mat-option>
               }
             </mat-select>
             <mat-icon matSuffix>medical_services</mat-icon>
             <mat-error>Seleccione el veterinario</mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="dp" formControlName="fecha" [readonly]="isInmediata">
-            <mat-datepicker-toggle matSuffix [for]="dp" [disabled]="isInmediata"></mat-datepicker-toggle>
-            <mat-datepicker #dp></mat-datepicker>
-          </mat-form-field>
+          @if (isInmediata) {
+            <div class="llegada" aria-live="polite">
+              <span class="llegada-etiqueta">Llegada</span>
+              <span class="llegada-valor"><mat-icon aria-hidden="true">schedule</mat-icon>Ahora · {{ llegada | date: "EEEE d 'de' MMMM, HH:mm" }}</span>
+            </div>
+          } @else {
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha</mat-label>
+              <input matInput [matDatepicker]="dp" formControlName="fecha">
+              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+              <mat-datepicker #dp></mat-datepicker>
+              <mat-error>Seleccione la fecha</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Hora</mat-label>
-            <mat-select formControlName="hora">
-              @for (h of horas; track h) {
-                <mat-option [value]="h">{{ h }}</mat-option>
-              }
-            </mat-select>
-            <mat-icon matSuffix>schedule</mat-icon>
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Hora</mat-label>
+              <mat-select formControlName="hora">
+                @for (h of horas; track h) {
+                  <mat-option [value]="h">{{ h }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matSuffix>schedule</mat-icon>
+              <mat-error>Seleccione la hora</mat-error>
+            </mat-form-field>
+          }
 
           <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Motivo de la consulta</mat-label>
-            <textarea matInput formControlName="motivo" rows="2" placeholder="Describe el motivo de la consulta..."></textarea>
-            <mat-error>El motivo es requerido</mat-error>
+            <mat-label>{{ isInmediata ? 'Qué le pasa' : 'Motivo de la consulta' }}</mat-label>
+            <textarea matInput formControlName="motivo" rows="2"
+              [placeholder]="isInmediata ? 'Ej.: vómitos desde anoche, cojera tras una caída…' : 'Describa el motivo de la consulta'"></textarea>
+            <mat-error>Describa el motivo</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="col-full">
@@ -84,10 +104,10 @@
         </div>
 
         <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/citas">Cancelar</button>
-          <button mat-flat-button [color]="isInmediata ? 'warn' : 'primary'" type="submit" [disabled]="enviando">
+          <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
+          <button mat-flat-button type="submit" [class.btn-urgente]="isInmediata" [disabled]="enviando">
             <mat-icon>{{ isInmediata ? 'bolt' : 'event_available' }}</mat-icon>
-            {{ isInmediata ? 'Iniciar Atención' : 'Programar Cita' }}
+            {{ isInmediata ? 'Iniciar atención' : 'Programar cita' }}
           </button>
         </div>
       </form>
