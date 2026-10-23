@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Cita, Usuario } from '../models';
-import { agregarMotivo, disponibilidadVeterinarios } from './atencion';
+import { agregarMotivo, citasDelDia, disponibilidadVeterinarios, horariosDelDia } from './atencion';
 
 const AHORA = new Date(2026, 9, 23, 11, 0);
 const vet = (id: string): Usuario => ({ id, nombre: id, apellido: 'X', correo: '', password: '', rol: 'veterinario', activo: true, createdAt: AHORA });
@@ -35,5 +35,22 @@ describe('atención inmediata', () => {
     const [d] = disponibilidadVeterinarios([vet('v')], [cita('v', '10:45', 'confirmada'), cita('v', '10:50', 'inmediata')], AHORA);
     expect(d.libre).toBe(false);
     expect(d.enEspera).toBe(1);
+  });
+});
+
+describe('horarios de una cita programada', () => {
+  const horas = ['09:00', '10:30', '11:00', '14:00'];
+
+  it('marca las horas ocupadas del veterinario y las ya pasadas de hoy', () => {
+    const citas = [cita('v', '14:00', 'confirmada'), cita('v', '11:00', 'cancelada'), cita('otro', '11:00', 'pendiente')];
+    expect(horariosDelDia(horas, citas, 'v', AHORA, AHORA).map(h => h.estado)).toEqual(['pasada', 'pasada', 'pasada', 'ocupada']);
+    const manana = new Date(2026, 9, 24);
+    expect(horariosDelDia(horas, [cita('v', '10:30', 'pendiente', 24)], 'v', manana, AHORA).map(h => h.estado))
+      .toEqual(['libre', 'ocupada', 'libre', 'libre']);
+  });
+
+  it('sin veterinario elegido solo descarta las pasadas; cuenta las citas vigentes del día', () => {
+    expect(horariosDelDia(horas, [cita('v', '14:00', 'confirmada')], '', AHORA, AHORA).map(h => h.estado)).toEqual(['pasada', 'pasada', 'pasada', 'libre']);
+    expect(citasDelDia([cita('v', '14:00', 'confirmada'), cita('v', '09:00', 'completada'), cita('v', '15:00', 'pendiente', 24)], 'v', AHORA)).toHaveLength(1);
   });
 });

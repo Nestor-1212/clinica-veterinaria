@@ -13,17 +13,16 @@ import { VacunasService } from '../../../core/services/vacunas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { puedeAcceder } from '../../../core/auth/permisos';
 import { Cliente, Consulta, Mascota, Usuario } from '../../../core/models';
-import { DisponibilidadVet, MOTIVOS_FRECUENTES, agregarMotivo, disponibilidadVeterinarios } from '../../../core/utils/atencion';
+import { DisponibilidadVet, Horario, MOTIVOS_FRECUENTES, MOTIVOS_PROGRAMADOS, agregarMotivo, citasDelDia, disponibilidadVeterinarios, horariosDelDia } from '../../../core/utils/atencion';
 import { EstadoVacunas, ICONO_ESPECIE, estadoVacunas, tiempoRelativo } from '../../../core/utils/clientes';
 import { enlaceWhatsApp } from '../../../core/utils/metricas';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatSuffix, MatError, MatHint, MatInput } from '@angular/material/input';
-import { DatePipe } from '@angular/common';
+import { MatFormField, MatLabel, MatSuffix, MatError, MatInput } from '@angular/material/input';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatCalendar } from '@angular/material/datepicker';
 
 /** Lo que el veterinario necesita saber del paciente antes de atenderlo. */
 interface FichaPaciente {
@@ -39,7 +38,7 @@ interface FichaPaciente {
     selector: 'app-form-cita',
     templateUrl: './form-cita.component.html',
     styleUrls: ['./form-cita.component.scss', './atencion-inmediata.scss', './ficha-paciente.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, DatePipe, EdadPipe]
+    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe]
 })
 export class FormCitaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -69,8 +68,13 @@ export class FormCitaComponent implements OnInit {
   /** Volver al expediente si se llegó desde un cliente; si no, a Citas. */
   volverA: string[] = ['/citas'];
 
-  readonly motivos = MOTIVOS_FRECUENTES;
   readonly iconoEspecie = ICONO_ESPECIE;
+  /** Primer día que se puede agendar. */
+  readonly hoy = inicioDelDia(new Date());
+  /** Tramos del día elegido para el veterinario elegido (solo cita programada). */
+  horarios: Horario[] = [];
+  /** Citas vigentes de cada veterinario el día elegido. */
+  citasPorVet: Record<string, number> = {};
   /** Veterinarios ordenados por disponibilidad ahora (solo atención inmediata). */
   disponibilidad: DisponibilidadVet[] = [];
   ficha: FichaPaciente | null = null;
@@ -81,8 +85,8 @@ export class FormCitaComponent implements OnInit {
       // Se habilita al elegir propietario (onClienteChange); antes era [disabled] en la plantilla
       mascotaId: [{ value: '', disabled: true }, Validators.required],
       veterinarioId: ['', Validators.required],
-      fecha: [new Date(), Validators.required],
-      hora: ['08:00', Validators.required],
+      fecha: [inicioDelDia(new Date()), Validators.required],
+      hora: ['', Validators.required],
       motivo: ['', Validators.required],
       estado: ['pendiente'],
       notas: ['']
@@ -90,6 +94,41 @@ export class FormCitaComponent implements OnInit {
     this.form.get('mascotaId')!.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(id => this.actualizarFicha(id));
+    for (const campo of ['fecha', 'veterinarioId']) {
+      this.form.get(campo)!.valueChanges
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => { if (!this.isInmediata) this.actualizarAgenda(); });
+    }
+  }
+
+  get motivos(): readonly string[] {
+    return this.isInmediata ? MOTIVOS_FRECUENTES : MOTIVOS_PROGRAMADOS;
+  }
+
+  // Las horas que ya pasaron hoy no se muestran; las ocupadas sí (tachadas), para ver la agenda
+  get horariosManana(): Horario[] { return this.horarios.filter(h => h.estado !== 'pasada' && h.hora < '12:00'); }
+  get horariosTarde(): Horario[] { return this.horarios.filter(h => h.estado !== 'pasada' && h.hora >= '12:00'); }
+  get libresDelDia(): number { return this.horarios.filter(h => h.estado === 'libre').length; }
+
+  elegirFecha(fecha: Date | null): void {
+    if (fecha) this.form.patchValue({ fecha: inicioDelDia(fecha) });
+  }
+
+  elegirHora(h: Horario): void {
+    if (h.estado !== 'libre') return;
+    this.form.patchValue({ hora: h.hora });
+    this.form.get('hora')!.markAsTouched();
+  }
+
+  /** Recalcula horas libres y carga de cada veterinario al cambiar el día o el veterinario. */
+  private actualizarAgenda(): void {
+    const { fecha, veterinarioId, hora } = this.form.getRawValue();
+    const dia = new Date(fecha);
+    const citas = this.citasService.getAll();
+    this.horarios = horariosDelDia(this.horas, citas, veterinarioId, dia, new Date());
+    this.citasPorVet = Object.fromEntries(this.veterinarios.map(v => [v.id, citasDelDia(citas, v.id, dia).length]));
+    // La hora elegida ya no sirve (ocupada o pasada): se pide otra
+    if (hora && this.horarios.find(h => h.hora === hora)?.estado !== 'libre') this.form.patchValue({ hora: '' }, { emitEvent: false });
   }
 
   ngOnInit(): void {
@@ -105,6 +144,8 @@ export class FormCitaComponent implements OnInit {
       // Si quien registra es veterinario, lo atiende él por defecto
       const yo = this.auth.currentUser;
       if (yo?.rol === 'veterinario' && this.veterinarios.some(v => v.id === yo.id)) this.form.patchValue({ veterinarioId: yo.id });
+    } else {
+      this.actualizarAgenda();
     }
     if (params.clienteId) {
       this.form.patchValue({ clienteId: params.clienteId });
@@ -192,6 +233,10 @@ export class FormCitaComponent implements OnInit {
       whatsapp: cliente ? enlaceWhatsApp(cliente.telefono, `Hola ${cliente.nombre}, le escribimos de la clínica veterinaria sobre ${mascota.nombre}.`) : null
     };
   }
+}
+
+function inicioDelDia(fecha: Date): Date {
+  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
 }
 
 /** "HH:mm" de una fecha (la hora real de llegada, no un tramo de media hora). */

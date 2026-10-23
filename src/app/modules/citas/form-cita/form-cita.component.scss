@@ -1,58 +1,8 @@
+// Nueva cita y atención inmediata comparten pasos y ficha (atencion-inmediata.scss, ficha-paciente.scss).
+// Aquí: lo propio de cada modo — urgencia en ámbar y la elección de día y hora.
+
 // Atención inmediata: el ámbar de "requiere atención" (nunca el rojo de lo crítico)
 .icon-warn { color: var(--vs-attention); }
-
-// Aviso dentro de la tarjeta (antes era una franja que se salía del borde)
-.aviso-inmediata {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--vs-space-2);
-  margin: 0 0 var(--vs-space-5);
-  padding: var(--vs-space-3) var(--vs-space-4);
-  border-radius: var(--vs-radius-md);
-  background: var(--vs-attention-container);
-  color: var(--vs-on-attention-container);
-  font-size: 14px;
-  line-height: 20px;
-  mat-icon { flex-shrink: 0; color: var(--vs-attention-text); font-size: 20px; width: 20px; height: 20px; }
-}
-
-// La llegada no se pide: es ahora. Ocupa la celda de fecha/hora con la misma altura que un campo.
-.llegada {
-  display: grid;
-  align-content: center;
-  gap: 2px;
-  min-height: 56px;
-  // Mismo hueco inferior que reservan los campos para su mensaje de error
-  margin-bottom: 22px;
-  padding: 0 var(--vs-space-4);
-  border-radius: var(--vs-radius-sm);
-  background: var(--vs-surface-muted);
-}
-.llegada-etiqueta { font-size: 12px; color: var(--vs-text-secondary); }
-.llegada-valor {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--vs-text);
-  &::first-letter { text-transform: uppercase; }
-  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-attention-text); }
-}
-
-// Alergias: dato clínico crítico, en rojo, en cuanto se elige la mascota
-.alerta-alergia {
-  display: flex;
-  align-items: center;
-  gap: var(--vs-space-2);
-  margin: calc(-1 * var(--vs-space-2)) 0 var(--vs-space-2);
-  padding: var(--vs-space-2) var(--vs-space-3);
-  border-radius: var(--vs-radius-sm);
-  background: var(--vs-danger-container);
-  color: var(--vs-on-danger-container);
-  font-size: 14px;
-  mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
-}
 
 // Acción principal urgente: ámbar oscuro (blanco encima 6.36:1; hover 8.85:1)
 .btn-urgente {
@@ -61,3 +11,80 @@
   --mat-button-filled-icon-color: #fff;
   &:hover { --mat-button-filled-container-color: #7a3700; }
 }
+
+// Carga del veterinario el día elegido
+.carga { margin-top: 2px; color: var(--vs-text-muted); }
+
+// Cuándo: calendario siempre visible + horas del día en botones
+.cuando {
+  display: grid;
+  grid-template-columns: 296px minmax(0, 1fr);
+  gap: var(--vs-space-6);
+  align-items: start;
+  margin-bottom: var(--vs-space-4);
+}
+.calendario {
+  border: 1px solid var(--vs-border);
+  border-radius: var(--vs-radius-lg);
+}
+.horas-titulo {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 var(--vs-space-3);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--vs-text);
+  &::first-letter { text-transform: uppercase; }
+  span { font-size: 13px; font-weight: 400; color: var(--vs-text-secondary); }
+}
+.horas-grupo { margin: var(--vs-space-3) 0 var(--vs-space-2); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--vs-text-muted); }
+.horas-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: var(--vs-space-2); }
+
+.hora {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  border: 1px solid var(--vs-border);
+  border-radius: var(--vs-radius-full);
+  background: var(--vs-surface);
+  color: var(--vs-text);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
+  input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  &:hover { border-color: var(--vs-border-strong); background: var(--vs-row-hover); }
+  &:has(input:focus-visible) { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+}
+.hora--elegida, .hora--elegida:hover { border-color: var(--vs-primary); background: var(--vs-primary); color: var(--vs-on-primary); font-weight: 600; }
+// Ocupada o pasada: tachada y sin interacción (no solo por color)
+.hora--no, .hora--no:hover {
+  border-style: dashed;
+  background: var(--vs-surface-muted);
+  color: var(--vs-text-muted);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+.resumen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--vs-text);
+  &::first-letter { text-transform: uppercase; }
+  mat-icon { color: var(--vs-primary); }
+}
+
+@media (max-width: 1279px) {
+  .cuando { grid-template-columns: 1fr; }
+  .calendario { max-width: 340px; }
+}
+@media (max-width: 599px) {
+  .resumen { margin: 0; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .hora { transition: none; } }

@@ -8,80 +8,198 @@
       @if (isInmediata) {
         <p class="llegada-linea"><mat-icon aria-hidden="true">schedule</mat-icon>Llegó ahora · {{ llegada | date: "EEEE d 'de' MMMM, HH:mm" }} · sin cita previa</p>
       } @else {
-        <p>Programe una cita para el paciente</p>
+        <p>Elija paciente, veterinario y un horario libre</p>
       }
     </div>
     <button mat-button type="button" [routerLink]="volverA"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  @if (isInmediata) {
-    <form class="triage" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="triage-pasos">
-        <!-- 1. Paciente -->
-        <section class="paso" aria-labelledby="paso-paciente">
-          <h2 id="paso-paciente"><span class="paso-num" aria-hidden="true">1</span>Paciente</h2>
-          <mat-form-field appearance="outline" class="ancho">
-            <mat-label>Propietario</mat-label>
-            <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-              @for (c of clientes; track c.id) {
-                <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
-              }
-            </mat-select>
-            <mat-icon matSuffix>person</mat-icon>
-            <mat-error>Seleccione el propietario</mat-error>
-          </mat-form-field>
-
-          @if (form.get('clienteId')?.value) {
-            <fieldset class="opciones">
-              <legend>Mascota</legend>
-              @if (mascotas.length === 0) {
-                <p class="opciones-vacio">Este cliente no tiene mascotas activas. <a [routerLink]="['/mascotas/nueva']" [queryParams]="{ clienteId: form.get('clienteId')?.value }">Registrar mascota</a></p>
-              }
-              <div class="opciones-rejilla">
-                @for (m of mascotas; track m.id) {
-                  <label class="opcion" [class.opcion--elegida]="form.get('mascotaId')?.value === m.id">
-                    <input type="radio" formControlName="mascotaId" [value]="m.id">
-                    <span class="opcion-icono" aria-hidden="true"><mat-icon>{{ iconoEspecie[m.tipo] }}</mat-icon></span>
-                    <span class="opcion-texto">
-                      <strong>{{ m.nombre }}</strong>
-                      <span>{{ m.tipo }} · {{ m.edad | edad }}</span>
-                    </span>
-                    @if (m.alergias) { <mat-icon class="opcion-alerta" aria-label="Tiene alergias">warning</mat-icon> }
-                  </label>
-                }
-              </div>
-              @if (form.get('mascotaId')?.touched && form.get('mascotaId')?.invalid) {
-                <p class="error" role="alert">Seleccione la mascota</p>
-              }
-            </fieldset>
-          }
-        </section>
-
-        <!-- 2. Qué le pasa -->
-        <section class="paso" aria-labelledby="paso-motivo">
-          <h2 id="paso-motivo"><span class="paso-num" aria-hidden="true">2</span>Qué le pasa</h2>
-          <div class="motivos" role="group" aria-label="Motivos frecuentes">
-            @for (m of motivos; track m) {
-              <button type="button" class="motivo" [class.motivo--usado]="motivoIncluido(m)" [attr.aria-pressed]="motivoIncluido(m)" (click)="usarMotivo(m)">{{ m }}</button>
+  <form class="triage" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="triage-pasos">
+      <!-- Paciente -->
+      <section class="paso" aria-labelledby="paso-paciente">
+        <h2 id="paso-paciente"><span class="paso-num" aria-hidden="true">1</span>Paciente</h2>
+        <mat-form-field appearance="outline" class="ancho">
+          <mat-label>Propietario</mat-label>
+          <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
+            @for (c of clientes; track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
             }
+          </mat-select>
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error>Seleccione el propietario</mat-error>
+        </mat-form-field>
+
+        @if (form.get('clienteId')?.value) {
+          <fieldset class="opciones">
+            <legend>Mascota</legend>
+            @if (mascotas.length === 0) {
+              <p class="opciones-vacio">Este cliente no tiene mascotas activas. <a [routerLink]="['/mascotas/nueva']" [queryParams]="{ clienteId: form.get('clienteId')?.value }">Registrar mascota</a></p>
+            }
+            <div class="opciones-rejilla">
+              @for (m of mascotas; track m.id) {
+                <label class="opcion" [class.opcion--elegida]="form.get('mascotaId')?.value === m.id">
+                  <input type="radio" formControlName="mascotaId" [value]="m.id">
+                  <span class="opcion-icono" aria-hidden="true"><mat-icon>{{ iconoEspecie[m.tipo] }}</mat-icon></span>
+                  <span class="opcion-texto">
+                    <strong>{{ m.nombre }}</strong>
+                    <span>{{ m.tipo }} · {{ m.edad | edad }}</span>
+                  </span>
+                  @if (m.alergias) { <mat-icon class="opcion-alerta" aria-label="Tiene alergias">warning</mat-icon> }
+                </label>
+              }
+            </div>
+            @if (form.get('mascotaId')?.touched && form.get('mascotaId')?.invalid) {
+              <p class="error" role="alert">Seleccione la mascota</p>
+            }
+          </fieldset>
+        }
+      </section>
+
+      @if (isInmediata) {
+        <ng-container *ngTemplateOutlet="pasoMotivo; context: { $implicit: 2 }"></ng-container>
+        <ng-container *ngTemplateOutlet="pasoVet; context: { $implicit: 3 }"></ng-container>
+      } @else {
+        <ng-container *ngTemplateOutlet="pasoVet; context: { $implicit: 2 }"></ng-container>
+
+        <!-- Cuándo -->
+        <section class="paso" aria-labelledby="paso-cuando">
+          <h2 id="paso-cuando"><span class="paso-num" aria-hidden="true">3</span>Cuándo</h2>
+          <div class="cuando">
+            <mat-calendar class="calendario" [selected]="form.get('fecha')?.value" [minDate]="hoy" (selectedChange)="elegirFecha($event)"></mat-calendar>
+            <div class="horas" role="radiogroup" aria-labelledby="horas-titulo">
+              <p id="horas-titulo" class="horas-titulo">
+                {{ form.get('fecha')?.value | date: "EEEE d 'de' MMMM" }}
+                <span>{{ form.get('veterinarioId')?.value ? libresDelDia + ' horas libres' : 'Elija veterinario para ver su agenda' }}</span>
+              </p>
+              @for (grupo of [{ t: 'Mañana', h: horariosManana }, { t: 'Tarde', h: horariosTarde }]; track grupo.t) {
+                @if (grupo.h.length) {
+                  <p class="horas-grupo">{{ grupo.t }}</p>
+                  <div class="horas-rejilla">
+                    @for (h of grupo.h; track h.hora) {
+                      <label class="hora" [class.hora--elegida]="form.get('hora')?.value === h.hora" [class.hora--no]="h.estado !== 'libre'">
+                        <input type="radio" name="hora" [value]="h.hora" [checked]="form.get('hora')?.value === h.hora"
+                          [disabled]="h.estado !== 'libre'" (change)="elegirHora(h)"
+                          [attr.aria-label]="h.hora + (h.estado === 'ocupada' ? ', ocupada' : '')">
+                        {{ h.hora }}
+                      </label>
+                    }
+                  </div>
+                }
+              }
+              @if (!horariosManana.length && !horariosTarde.length) {
+                <p class="opciones-vacio">Ya no quedan horas hoy. Elija otro día en el calendario.</p>
+              }
+              @if (form.get('hora')?.touched && form.get('hora')?.invalid) {
+                <p class="error" role="alert">Elija una hora libre</p>
+              }
+            </div>
           </div>
-          <mat-form-field appearance="outline" class="ancho">
-            <mat-label>Descripción</mat-label>
-            <textarea matInput formControlName="motivo" rows="3" placeholder="Toque un motivo o escriba: desde cuándo, qué notó el dueño…"></textarea>
-            <mat-error>Describa qué le pasa</mat-error>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="ancho">
-            <mat-label>Notas para el veterinario (opcional)</mat-label>
-            <textarea matInput formControlName="notas" rows="2"></textarea>
-          </mat-form-field>
         </section>
 
-        <!-- 3. Quién lo atiende -->
-        <section class="paso" aria-labelledby="paso-vet">
-          <h2 id="paso-vet"><span class="paso-num" aria-hidden="true">3</span>Quién lo atiende</h2>
-          <fieldset class="opciones">
-            <legend class="sr-only">Veterinario</legend>
-            <div class="opciones-rejilla">
+        <ng-container *ngTemplateOutlet="pasoMotivo; context: { $implicit: 4 }"></ng-container>
+      }
+
+      <div class="triage-acciones">
+        @if (!isInmediata && form.get('hora')?.value) {
+          <p class="resumen">
+            <mat-icon aria-hidden="true">event</mat-icon>
+            {{ form.get('fecha')?.value | date: "EEE d 'de' MMM" }} · {{ form.get('hora')?.value }}
+          </p>
+        }
+        <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
+        @if (isInmediata) {
+          <button mat-flat-button type="submit" class="btn-urgente" [disabled]="enviando"><mat-icon>bolt</mat-icon> Iniciar atención</button>
+        } @else {
+          <button mat-flat-button type="submit" [disabled]="enviando"><mat-icon>event_available</mat-icon> Programar cita</button>
+        }
+      </div>
+    </div>
+
+    <!-- Ficha del paciente -->
+    <aside class="ficha" aria-labelledby="ficha-titulo">
+      @if (ficha; as f) {
+        <div class="ficha-cabecera">
+          <span class="ficha-icono" aria-hidden="true"><mat-icon>{{ iconoEspecie[f.mascota.tipo] }}</mat-icon></span>
+          <div>
+            <h2 id="ficha-titulo">{{ f.mascota.nombre }}</h2>
+            <p>{{ f.mascota.tipo }} · {{ f.mascota.raza }} · {{ f.mascota.sexo === 'macho' ? 'Macho' : 'Hembra' }}</p>
+          </div>
+        </div>
+        <dl class="ficha-datos">
+          <div><dt>Edad</dt><dd>{{ f.mascota.edad | edad }}</dd></div>
+          <div><dt>Peso</dt><dd>{{ f.mascota.peso }} kg</dd></div>
+        </dl>
+        @if (f.mascota.alergias) {
+          <p class="ficha-alergia" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ f.mascota.alergias }}</span></p>
+        } @else {
+          <p class="ficha-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias registradas</p>
+        }
+        <p class="ficha-linea" [class.ficha-linea--atencion]="f.vacunas.estado === 'vencidas'">
+          <mat-icon aria-hidden="true">vaccines</mat-icon>
+          @switch (f.vacunas.estado) {
+            @case ('al-dia') { Vacunas al día }
+            @case ('vencidas') { Vacuna vencida: {{ f.vacunas.vencidas.join(', ') }} }
+            @default { Sin vacunas registradas }
+          }
+        </p>
+        <div class="ficha-bloque">
+          <h3>Última consulta</h3>
+          @if (f.ultima) {
+            <p class="ficha-ultima"><strong>{{ f.ultima.diagnostico }}</strong><span>{{ f.ultimaHace }} · {{ f.ultima.tratamiento }}</span></p>
+          } @else {
+            <p class="ficha-ultima"><span>Es su primera consulta en la clínica.</span></p>
+          }
+        </div>
+        @if (f.cliente; as c) {
+          <div class="ficha-bloque">
+            <h3>Dueño</h3>
+            <p class="ficha-dueno"><strong>{{ c.nombre }}</strong></p>
+            <div class="ficha-contacto">
+              <a mat-button [href]="'tel:+507' + c.telefono.replace('-', '')"><mat-icon>call</mat-icon>{{ c.telefono }}</a>
+              @if (f.whatsapp) {
+                <a mat-button [href]="f.whatsapp" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + c.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>WhatsApp</a>
+              }
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="ficha-vacia">
+          <mat-icon aria-hidden="true">pets</mat-icon>
+          <h2 id="ficha-titulo">Ficha del paciente</h2>
+          <p>Elija el propietario y la mascota para ver sus alergias, vacunas y la última consulta.</p>
+        </div>
+      }
+    </aside>
+
+    <!-- Pasos que cambian de orden según el modo (declarados dentro del form: sus campos son del mismo formulario) -->
+    <ng-template #pasoMotivo let-n>
+      <section class="paso" aria-labelledby="paso-motivo">
+        <h2 id="paso-motivo"><span class="paso-num" aria-hidden="true">{{ n }}</span>{{ isInmediata ? 'Qué le pasa' : 'Motivo' }}</h2>
+        <div class="motivos" role="group" aria-label="Motivos frecuentes">
+          @for (m of motivos; track m) {
+            <button type="button" class="motivo" [class.motivo--usado]="motivoIncluido(m)" [attr.aria-pressed]="motivoIncluido(m)" (click)="usarMotivo(m)">{{ m }}</button>
+          }
+        </div>
+        <mat-form-field appearance="outline" class="ancho">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="motivo" rows="3" [placeholder]="isInmediata ? 'Toque un motivo o escriba: desde cuándo, qué notó el dueño…' : 'Toque un motivo o escriba el detalle'"></textarea>
+          <mat-error>{{ isInmediata ? 'Describa qué le pasa' : 'Indique el motivo de la cita' }}</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="ancho">
+          <mat-label>Notas para el veterinario (opcional)</mat-label>
+          <textarea matInput formControlName="notas" rows="2"></textarea>
+        </mat-form-field>
+      </section>
+    </ng-template>
+
+    <ng-template #pasoVet let-n>
+      <section class="paso" aria-labelledby="paso-vet">
+        <h2 id="paso-vet"><span class="paso-num" aria-hidden="true">{{ n }}</span>Quién lo atiende</h2>
+        <fieldset class="opciones">
+          <legend class="sr-only">Veterinario</legend>
+          <div class="opciones-rejilla">
+            @if (isInmediata) {
               @for (d of disponibilidad; track d.vet.id) {
                 <label class="opcion" [class.opcion--elegida]="form.get('veterinarioId')?.value === d.vet.id">
                   <input type="radio" formControlName="veterinarioId" [value]="d.vet.id">
@@ -96,164 +214,25 @@
                   </span>
                 </label>
               }
-            </div>
-            @if (form.get('veterinarioId')?.touched && form.get('veterinarioId')?.invalid) {
-              <p class="error" role="alert">Seleccione quién lo atiende</p>
-            }
-          </fieldset>
-        </section>
-
-        <div class="triage-acciones">
-          <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
-          <button mat-flat-button type="submit" class="btn-urgente" [disabled]="enviando">
-            <mat-icon>bolt</mat-icon> Iniciar atención
-          </button>
-        </div>
-      </div>
-
-      <!-- Ficha del paciente -->
-      <aside class="ficha" aria-labelledby="ficha-titulo">
-        @if (ficha; as f) {
-          <div class="ficha-cabecera">
-            <span class="ficha-icono" aria-hidden="true"><mat-icon>{{ iconoEspecie[f.mascota.tipo] }}</mat-icon></span>
-            <div>
-              <h2 id="ficha-titulo">{{ f.mascota.nombre }}</h2>
-              <p>{{ f.mascota.tipo }} · {{ f.mascota.raza }} · {{ f.mascota.sexo === 'macho' ? 'Macho' : 'Hembra' }}</p>
-            </div>
-          </div>
-          <dl class="ficha-datos">
-            <div><dt>Edad</dt><dd>{{ f.mascota.edad | edad }}</dd></div>
-            <div><dt>Peso</dt><dd>{{ f.mascota.peso }} kg</dd></div>
-          </dl>
-          @if (f.mascota.alergias) {
-            <p class="ficha-alergia" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ f.mascota.alergias }}</span></p>
-          } @else {
-            <p class="ficha-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias registradas</p>
-          }
-          <p class="ficha-linea" [class.ficha-linea--atencion]="f.vacunas.estado === 'vencidas'">
-            <mat-icon aria-hidden="true">vaccines</mat-icon>
-            @switch (f.vacunas.estado) {
-              @case ('al-dia') { Vacunas al día }
-              @case ('vencidas') { Vacuna vencida: {{ f.vacunas.vencidas.join(', ') }} }
-              @default { Sin vacunas registradas }
-            }
-          </p>
-          <div class="ficha-bloque">
-            <h3>Última consulta</h3>
-            @if (f.ultima) {
-              <p class="ficha-ultima"><strong>{{ f.ultima.diagnostico }}</strong><span>{{ f.ultimaHace }} · {{ f.ultima.tratamiento }}</span></p>
             } @else {
-              <p class="ficha-ultima"><span>Es su primera consulta en la clínica.</span></p>
-            }
-          </div>
-          @if (f.cliente; as c) {
-            <div class="ficha-bloque">
-              <h3>Dueño</h3>
-              <p class="ficha-dueno"><strong>{{ c.nombre }}</strong></p>
-              <div class="ficha-contacto">
-                <a mat-button [href]="'tel:+507' + c.telefono.replace('-', '')"><mat-icon>call</mat-icon>{{ c.telefono }}</a>
-                @if (f.whatsapp) {
-                  <a mat-button [href]="f.whatsapp" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + c.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>WhatsApp</a>
-                }
-              </div>
-            </div>
-          }
-        } @else {
-          <div class="ficha-vacia">
-            <mat-icon aria-hidden="true">pets</mat-icon>
-            <h2 id="ficha-titulo">Ficha del paciente</h2>
-            <p>Elija el propietario y la mascota para ver sus alergias, vacunas y la última consulta antes de atenderla.</p>
-          </div>
-        }
-      </aside>
-    </form>
-  } @else {
-    <mat-card class="form-card">
-      <mat-card-content>
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>Propietario</mat-label>
-              <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-                @for (c of clientes; track c.id) {
-                  <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
-                }
-              </mat-select>
-              <mat-icon matSuffix>person</mat-icon>
-              <mat-error>Seleccione el propietario</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Mascota</mat-label>
-              <mat-select formControlName="mascotaId">
-                @for (m of mascotas; track m.id) {
-                  <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
-                }
-              </mat-select>
-              <mat-icon matSuffix>pets</mat-icon>
-              @if (!form.get('clienteId')?.value) {
-                <mat-hint>Elija primero el propietario</mat-hint>
+              @for (v of veterinarios; track v.id) {
+                <label class="opcion" [class.opcion--elegida]="form.get('veterinarioId')?.value === v.id">
+                  <input type="radio" formControlName="veterinarioId" [value]="v.id">
+                  <span class="opcion-icono opcion-icono--vet" aria-hidden="true">{{ v.nombre.charAt(0) }}</span>
+                  <span class="opcion-texto">
+                    <strong>{{ v.nombre }} {{ v.apellido }}</strong>
+                    <span>{{ v.especialidad || 'Medicina general' }}</span>
+                    <span class="carga">{{ citasPorVet[v.id] || 0 }} {{ citasPorVet[v.id] === 1 ? 'cita' : 'citas' }} ese día</span>
+                  </span>
+                </label>
               }
-              <mat-error>Seleccione la mascota</mat-error>
-            </mat-form-field>
-
-            @if (mascotaSeleccionada?.alergias) {
-              <p class="alerta-alergia col-full" role="note">
-                <mat-icon aria-hidden="true">warning</mat-icon>
-                <span><strong>Alergias de {{ mascotaSeleccionada?.nombre }}:</strong> {{ mascotaSeleccionada?.alergias }}</span>
-              </p>
             }
-
-            <mat-form-field appearance="outline">
-              <mat-label>Veterinario</mat-label>
-              <mat-select formControlName="veterinarioId">
-                @for (v of veterinarios; track v.id) {
-                  <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}@if (v.especialidad) { · {{ v.especialidad }} }</mat-option>
-                }
-              </mat-select>
-              <mat-icon matSuffix>medical_services</mat-icon>
-              <mat-error>Seleccione el veterinario</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Fecha</mat-label>
-              <input matInput [matDatepicker]="dp" formControlName="fecha">
-              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-              <mat-datepicker #dp></mat-datepicker>
-              <mat-error>Seleccione la fecha</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Hora</mat-label>
-              <mat-select formControlName="hora">
-                @for (h of horas; track h) {
-                  <mat-option [value]="h">{{ h }}</mat-option>
-                }
-              </mat-select>
-              <mat-icon matSuffix>schedule</mat-icon>
-              <mat-error>Seleccione la hora</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="col-full">
-              <mat-label>Motivo de la consulta</mat-label>
-              <textarea matInput formControlName="motivo" rows="2" placeholder="Describa el motivo de la consulta"></textarea>
-              <mat-error>Describa el motivo</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="col-full">
-              <mat-label>Notas adicionales</mat-label>
-              <textarea matInput formControlName="notas" rows="2"></textarea>
-            </mat-form-field>
           </div>
-
-          <div class="form-actions">
-            <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
-            <button mat-flat-button type="submit" [disabled]="enviando">
-              <mat-icon>event_available</mat-icon> Programar cita
-            </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-  }
+          @if (form.get('veterinarioId')?.touched && form.get('veterinarioId')?.invalid) {
+            <p class="error" role="alert">Seleccione quién lo atiende</p>
+          }
+        </fieldset>
+      </section>
+    </ng-template>
+  </form>
 </div>

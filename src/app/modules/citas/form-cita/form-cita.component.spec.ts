@@ -93,9 +93,29 @@ describe('FormCitaComponent: atención inmediata (B1)', () => {
     sesionComo('u-rec');
     const h = crearComponente(FormCitaComponent, { queryParams: { clienteId: 'c1' } });
     h.componente.ngOnInit();
+    const manana = new Date(); manana.setDate(manana.getDate() + 1);
+    h.componente.elegirFecha(manana);
     h.componente.form.patchValue({ veterinarioId: 'u-vet', motivo: 'Control' });
     h.componente.onSubmit();
-    expect(leer<Cita>('vet_citas')[0].estado).toBe('pendiente');
+    expect(h.navigate).not.toHaveBeenCalled(); // falta la hora
+    h.componente.elegirHora({ hora: '10:00', estado: 'libre' });
+    h.componente.onSubmit();
+    const [cita] = leer<Cita>('vet_citas');
+    expect([cita.estado, cita.hora]).toEqual(['pendiente', '10:00']);
     expect(h.navigate).toHaveBeenCalledWith(['/citas']);
+  });
+
+  it('las horas ocupadas del veterinario no se pueden elegir y al cambiar de veterinario se libera la hora', () => {
+    sesionComo('u-rec');
+    const manana = new Date(); manana.setDate(manana.getDate() + 1);
+    sembrar({ vet_citas: [{ id: 'x', clienteId: 'c1', mascotaId: 'm1', veterinarioId: 'u-vet', fecha: manana, hora: '10:00', motivo: 'Control', estado: 'confirmada', createdAt: new Date() }] });
+    const h = crearComponente(FormCitaComponent);
+    h.componente.ngOnInit();
+    h.componente.elegirFecha(manana);
+    h.componente.form.patchValue({ veterinarioId: 'u-vet' });
+    expect(h.componente.horarios.find(x => x.hora === '10:00')?.estado).toBe('ocupada');
+    h.componente.elegirHora({ hora: '10:00', estado: 'ocupada' });
+    expect(h.componente.form.get('hora')?.value).toBe('');
+    expect(h.componente.citasPorVet['u-vet']).toBe(1);
   });
 });

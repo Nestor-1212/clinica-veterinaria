@@ -54,3 +54,32 @@ export function disponibilidadVeterinarios(vets: Usuario[], citas: Cita[], ahora
     })
     .sort((a, b) => Number(b.libre) - Number(a.libre) || a.enEspera - b.enEspera);
 }
+
+/** Motivos frecuentes de una cita programada. */
+export const MOTIVOS_PROGRAMADOS = [
+  'Control general', 'Vacunación', 'Desparasitación', 'Revisión de resultados', 'Control post-operatorio',
+  'Limpieza dental', 'Esterilización', 'Problema de piel', 'Revisión de oídos'
+] as const;
+
+export interface Horario {
+  hora: string;
+  /** libre, ocupada (el veterinario ya tiene una cita) o pasada (hoy, hora ya transcurrida). */
+  estado: 'libre' | 'ocupada' | 'pasada';
+}
+
+/** Citas pendientes o confirmadas de un veterinario en un día. */
+export function citasDelDia(citas: Cita[], vetId: string, dia: Date): Cita[] {
+  return citas.filter(c => c.veterinarioId === vetId && mismoDia(c.fecha, dia) && (c.estado === 'pendiente' || c.estado === 'confirmada'));
+}
+
+/** Estado de cada tramo horario de un día para un veterinario (sin veterinario, solo se descartan las horas pasadas). */
+export function horariosDelDia(horas: string[], citas: Cita[], vetId: string, dia: Date, ahora: Date): Horario[] {
+  const ocupadas = new Set(vetId ? citasDelDia(citas, vetId, dia).map(c => c.hora) : []);
+  const esHoy = mismoDia(dia, ahora);
+  const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
+  return horas.map(hora => {
+    const [h, m] = hora.split(':').map(Number);
+    const estado = esHoy && h * 60 + m <= minutosAhora ? 'pasada' : ocupadas.has(hora) ? 'ocupada' : 'libre';
+    return { hora, estado };
+  });
+}

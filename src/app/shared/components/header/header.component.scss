@@ -1,10 +1,10 @@
 .app-header {
   // Destino de la franja del login en la View Transition de entrada
   view-transition-name: vs-banda;
-  // Zona sobre el primario: foco en blanco (6.43:1 contra #006b5e)
+  // Mismo teal profundo que el menú lateral: foco y texto en blanco (12.89:1 contra #0c3833)
   --vs-focus: #ffffff;
 
-  background: var(--vs-primary) !important;
+  background: var(--vs-sidebar-bg) !important;
   color: var(--vs-on-primary);
   // Sin sombra: la barra fluye hacia el contenido por la franja teñida
   z-index: 1000;
