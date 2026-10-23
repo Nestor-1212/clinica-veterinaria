@@ -109,7 +109,9 @@ export class FormCitaComponent implements OnInit {
     if (params.clienteId) {
       this.form.patchValue({ clienteId: params.clienteId });
       this.onClienteChange(params.clienteId);
-      this.volverA = ['/clientes', params.clienteId];
+      // Desde la lista de Mascotas llega también la mascota
+      if (this.mascotas.some(m => m.id === params.mascotaId)) this.form.patchValue({ mascotaId: params.mascotaId });
+      this.volverA = params.mascotaId ? ['/mascotas'] : ['/clientes', params.clienteId];
     }
   }
 

@@ -53,6 +53,13 @@ describe('FormCitaComponent: atención inmediata (B1)', () => {
     expect(sinCliente.componente.volverA).toEqual(['/citas']);
   });
 
+  it('desde la lista de Mascotas llega con la mascota elegida y Volver lleva a Mascotas', () => {
+    const h = crearComponente(FormCitaComponent, { queryParams: { tipo: 'inmediata', clienteId: 'c1', mascotaId: 'm1' } });
+    h.componente.ngOnInit();
+    expect(h.componente.form.get('mascotaId')?.value).toBe('m1');
+    expect(h.componente.volverA).toEqual(['/mascotas']);
+  });
+
   it('recepción (sin acceso a Consultas) vuelve a Citas', () => {
     sesionComo('u-rec');
     const { navigate } = registrarInmediata();

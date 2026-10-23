@@ -1,5 +1,74 @@
-.mascota-cell { display: flex; align-items: center; gap: 10px; }
-.mascota-avatar-sm { width: 32px; height: 32px; border-radius: var(--vs-radius-sm); background: var(--vs-primary-soft); color: var(--vs-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; mat-icon { font-size: 18px; width: 18px; height: 18px; } }
-.mascota-cell small { display: block; font-size: 12px; color: var(--vs-text-muted); }
-/* Especie: dato, no estado -> chip neutro (sin color por especie) */
-[class*='chip-tipo-'].mat-mdc-chip { background: var(--vs-surface-muted) !important; color: var(--vs-text-secondary) !important; --mat-chip-label-text-color: var(--vs-text-secondary); }
+// Lista de mascotas: cada fila responde "¿quién es este paciente y qué necesita?".
+// Mismo lenguaje que la lista de Clientes. Móvil (<= 768px): tarjeta en rejilla.
+
+.table-toolbar { justify-content: space-between; gap: var(--vs-space-3); flex-wrap: wrap; }
+.filtros { display: flex; gap: var(--vs-space-3); flex-wrap: wrap; align-items: center;
+  .filter-field { width: 160px; }
+  .search-field { width: 300px; } }
+
+.mascotas-tabla td.mat-mdc-cell { vertical-align: middle; }
+
+/* Paciente: icono de especie, nombre al historial y datos clave debajo */
+.paciente { display: flex; align-items: center; gap: var(--vs-space-3); }
+.especie {
+  display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--vs-primary-soft); color: var(--vs-primary);
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+.nombre { display: inline-grid; justify-items: start; gap: 2px; min-width: 0;
+  a { font-size: 15px; font-weight: 600; color: var(--vs-text); text-decoration: none; text-underline-offset: 3px; border-radius: 4px; }
+  a:hover { color: var(--vs-primary); text-decoration: underline; }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+
+/* Alergia: dato clínico crítico, el único rojo de la lista */
+.alergia {
+  display: inline-flex; align-items: center; gap: 4px; max-width: 280px; margin-top: 2px; padding: 1px 8px 1px 6px;
+  border-radius: var(--vs-radius-full); background: var(--vs-danger-container); color: var(--vs-on-danger-container);
+  font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  mat-icon { flex-shrink: 0; font-size: 14px; width: 14px; height: 14px; }
+}
+
+/* Datos con subtítulo: valor arriba, contexto debajo */
+.dato { display: inline-grid; justify-items: start; gap: 2px;
+  time, .cifra { font-size: 13px; color: var(--vs-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.corta { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.enlace { white-space: nowrap; font-size: 14px; font-weight: 500; color: var(--vs-text); text-decoration: none; text-underline-offset: 3px;
+  &:hover { color: var(--vs-primary); text-decoration: underline; } }
+.tel { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--vs-text-secondary); text-decoration: none; font-variant-numeric: tabular-nums;
+  mat-icon { font-size: 15px; width: 15px; height: 15px; color: var(--vs-primary); }
+  &:hover { color: var(--vs-primary); text-decoration: underline; } }
+.c-vacunas .vs-status { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.tenue { font-size: 13px; color: var(--vs-text-muted); }
+
+.menu-peligro { color: var(--vs-danger); mat-icon { color: var(--vs-danger); } }
+.no-data button, .no-data a { margin-top: var(--vs-space-2); }
+
+/* ----- Móvil: tarjeta en rejilla ----- */
+@media (max-width: 768px) {
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .vs-segmentado { align-self: flex-start; }
+  .filtros { .filter-field { width: 100%; } .search-field { flex: 1 1 100%; width: 100%; } }
+
+  .mat-mdc-table.mascotas-tabla {
+    tr.mat-mdc-row {
+      display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; column-gap: var(--vs-space-3);
+      grid-template-areas: 'pac pac acc' 'vac vac vac' 'ult pro pro' 'due due due';
+      padding: var(--vs-space-3) var(--vs-space-4) !important;
+    }
+    td.mat-mdc-cell { border-bottom: 0 !important; padding: 6px 0 !important; justify-content: flex-start; text-align: left; }
+    td[data-label].mat-mdc-cell { flex-direction: column; align-items: flex-start; gap: 2px;
+      &::before { font-size: 12px; text-transform: none; letter-spacing: 0; } }
+    .c-paciente { grid-area: pac; padding-top: 0 !important; }
+    .c-acciones { grid-area: acc; align-self: start; padding: 0 !important; }
+    .c-vacunas { grid-area: vac; }
+    .c-ultima { grid-area: ult; }
+    .c-proxima { grid-area: pro; }
+    .c-dueno { grid-area: due; margin-top: 4px; border-top: 1px solid var(--vs-border) !important; padding-bottom: 0 !important; }
+    .enlace { white-space: normal; }
+    .corta { max-width: 100%; white-space: normal; }
+    .dato { min-width: 0; }
+    .alergia { max-width: 100%; white-space: normal; }
+    .c-vacunas .vs-status { max-width: 100%; white-space: normal; }
+  }
+}
