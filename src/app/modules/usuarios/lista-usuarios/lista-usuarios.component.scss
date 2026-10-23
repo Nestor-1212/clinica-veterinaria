@@ -1,4 +1,62 @@
-.user-cell { display: flex; align-items: center; gap: 10px; }
-.user-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; background: var(--vs-primary-container); color: var(--vs-on-primary-container); }
-/* Rol: dato, no estado -> chip neutro; el icono distingue cada rol */
-[class*='chip-rol-'].mat-mdc-chip { background: var(--vs-surface-muted) !important; color: var(--vs-text-secondary) !important; --mat-chip-label-text-color: var(--vs-text-secondary); }
+// Usuarios: el equipo como tarjetas de persona (rol, contacto y actividad), no como tabla.
+
+.barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--vs-space-3); margin-bottom: var(--vs-space-4);
+  .mat-mdc-form-field { width: 300px; } }
+
+.equipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--vs-space-4); margin: 0; padding: 0; list-style: none; }
+
+.persona {
+  --rol: var(--vs-primary);
+  --rol-texto: var(--vs-on-primary);
+  display: grid; align-content: start; gap: var(--vs-space-4);
+  padding: var(--vs-space-5); border-radius: var(--vs-radius-xl); background: var(--vs-surface); box-shadow: var(--vs-shadow-soft);
+  border-top: 0;
+}
+// El rol se distingue por icono y texto; el avatar lleva un tono del teal por rol
+.persona--admin { --rol: var(--vs-sidebar-bg); }
+.persona--recepcion { --rol: var(--vs-primary-soft); --rol-texto: var(--vs-on-primary-soft); }
+.persona--inactiva { background: var(--vs-surface-muted); box-shadow: none;
+  .avatar { background: var(--vs-border); color: var(--vs-text-secondary); }
+  h2 { color: var(--vs-text-secondary); } }
+
+.p-cabecera { display: flex; align-items: center; gap: var(--vs-space-3); }
+.avatar {
+  flex-shrink: 0; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--rol); color: var(--rol-texto); font-size: 18px; font-weight: 700; letter-spacing: .02em;
+}
+.p-nombre { display: grid; gap: 2px; flex: 1; min-width: 0;
+  h2 { margin: 0; font-size: 17px; font-weight: 700; color: var(--vs-text); overflow-wrap: anywhere; } }
+.tu { margin-left: 6px; padding: 0 8px; border-radius: var(--vs-radius-full); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft);
+  font-size: 11px; font-weight: 600; vertical-align: 2px; }
+.rol { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--vs-text-secondary);
+  mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--vs-primary); } }
+
+.actividad { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vs-space-2); margin: 0;
+  div { padding: var(--vs-space-2) var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-surface-muted); }
+  dt { font-size: 12px; color: var(--vs-text-secondary); }
+  dd { margin: 0; font-size: 20px; font-weight: 700; color: var(--vs-text); font-variant-numeric: tabular-nums; } }
+
+.contacto { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none;
+  li { display: flex; align-items: center; gap: var(--vs-space-2); min-width: 0; font-size: 14px; }
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  a { color: var(--vs-text); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  a:hover { color: var(--vs-primary); text-decoration: underline; } }
+
+.p-pie { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vs-space-2) var(--vs-space-3);
+  padding-top: var(--vs-space-3); border-top: 1px solid var(--vs-border);
+  small { font-size: 12px; color: var(--vs-text-muted); }
+  .reactivar { margin-left: auto; } }
+
+.menu-peligro { color: var(--vs-danger); mat-icon { color: var(--vs-danger); } }
+
+.vacio { grid-column: 1 / -1; display: grid; justify-items: center; gap: var(--vs-space-2); padding: var(--vs-space-8);
+  border-radius: var(--vs-radius-xl); background: var(--vs-surface); color: var(--vs-text-secondary); text-align: center;
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--vs-primary); }
+  p { margin: 0; } }
+
+@media (max-width: 767px) {
+  .barra { flex-direction: column; align-items: stretch;
+    .vs-segmentado { align-self: flex-start; }
+    .mat-mdc-form-field { width: 100%; } }
+  .equipo { grid-template-columns: 1fr; }
+}

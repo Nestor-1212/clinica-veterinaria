@@ -1,65 +1,86 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>manage_accounts</mat-icon> Usuarios del Sistema</h1><p>Gestión de cuentas y roles</p></div>
-    <button mat-flat-button color="primary" routerLink="/usuarios/nuevo"><mat-icon>person_add</mat-icon> Nuevo Usuario</button>
+    <div>
+      <h1><mat-icon>manage_accounts</mat-icon> Usuarios</h1>
+      <p>El equipo de la clínica: {{ conteos.veterinario }} {{ conteos.veterinario === 1 ? 'veterinario' : 'veterinarios' }}, {{ conteos.recepcion }} en recepción y {{ conteos.admin }} {{ conteos.admin === 1 ? 'administrador' : 'administradores' }}</p>
+    </div>
+    <button mat-flat-button routerLink="/usuarios/nuevo"><mat-icon>person_add</mat-icon> Nuevo usuario</button>
   </div>
-  <mat-card class="table-card">
-    <mat-card-content>
-      <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label><input matInput #searchInput (keyup)="applyFilter($event)">
-          @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''"><mat-icon>close</mat-icon></button>
+
+  <div class="barra">
+    <div class="vs-segmentado" role="group" aria-label="Filtrar usuarios">
+      @for (f of filtros; track f.valor) {
+        <button type="button" [attr.aria-pressed]="filtro === f.valor" (click)="elegirFiltro(f.valor)">{{ f.texto }} <span class="vs-cuenta">{{ conteos[f.valor] }}</span></button>
+      }
+    </div>
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-label>Buscar nombre, correo o rol</mat-label>
+      <input matInput #searchInput (keyup)="applyFilter($event)">
+      @if (searchInput.value) {
+        <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+      } @else {
+        <mat-icon matSuffix>search</mat-icon>
+      }
+    </mat-form-field>
+  </div>
+
+  <ul class="equipo" aria-label="Usuarios">
+    @for (u of visibles; track u.id) {
+      <li class="persona" [class.persona--inactiva]="!u.activo" [class]="'persona persona--' + u.rol">
+        <div class="p-cabecera">
+          <span class="avatar" aria-hidden="true">{{ iniciales(u) }}</span>
+          <div class="p-nombre">
+            <h2>{{ u.nombre }} {{ u.apellido }}@if (u.id === yo) { <span class="tu">Tú</span> }</h2>
+            <span class="rol"><mat-icon aria-hidden="true">{{ iconoRol(u.rol) }}</mat-icon>{{ getRolLabel(u.rol) }}@if (u.especialidad) { · {{ u.especialidad }} }</span>
+          </div>
+          <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para ' + u.nombre + ' ' + u.apellido"><mat-icon>more_vert</mat-icon></button>
+          <mat-menu #menu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="editar(u)"><mat-icon>edit</mat-icon>Editar datos y rol</button>
+            @if (u.activo) {
+              <button mat-menu-item class="menu-peligro" (click)="eliminar(u)"><mat-icon>person_off</mat-icon>Desactivar</button>
+            } @else {
+              <button mat-menu-item (click)="reactivar(u)"><mat-icon>how_to_reg</mat-icon>Reactivar</button>
+            }
+          </mat-menu>
+        </div>
+
+        @if (u.rol === 'veterinario' && u.activo && actividad[u.id]; as a) {
+          <dl class="actividad">
+            <div><dt>Consultas este mes</dt><dd>{{ a.consultasMes }}</dd></div>
+            <div><dt>Citas hoy</dt><dd>{{ a.citasHoy }}</dd></div>
+          </dl>
+        }
+
+        <ul class="contacto">
+          <li><mat-icon aria-hidden="true">mail</mat-icon><a [href]="'mailto:' + u.correo">{{ u.correo }}</a></li>
+          @if (u.telefono) {
+            <li><mat-icon aria-hidden="true">call</mat-icon><a [href]="tel(u)">{{ u.telefono }}</a></li>
           }
-          @if (!searchInput.value) {
-            <mat-icon matSuffix>search</mat-icon>
+        </ul>
+
+        <div class="p-pie">
+          @if (u.activo) {
+            <span class="vs-status vs-status--success">Activo</span>
+          } @else {
+            <span class="vs-status vs-status--neutral">Inactivo · no puede entrar</span>
           }
-        </mat-form-field>
-      </div>
-      <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let u" class="cell-primary">
-              <div class="user-cell">
-                <div class="user-avatar" [class]="'rol-' + u.rol">{{ u.nombre.charAt(0) }}</div>
-                <div><strong>{{ u.nombre }} {{ u.apellido }}</strong></div>
-              </div>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="correo"><th mat-header-cell *matHeaderCellDef>Correo</th><td mat-cell *matCellDef="let u" data-label="Correo">{{ u.correo }}</td></ng-container>
-          <ng-container matColumnDef="rol">
-            <th mat-header-cell *matHeaderCellDef>Rol</th>
-            <td mat-cell *matCellDef="let u" data-label="Rol">
-              <mat-chip [class]="'chip-rol-' + u.rol">
-                <mat-icon class="chip-icon">{{ iconoRol(u.rol) }}</mat-icon>{{ getRolLabel(u.rol) }}
-              </mat-chip>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="especialidad"><th mat-header-cell *matHeaderCellDef class="hide-md">Especialidad</th><td mat-cell *matCellDef="let u" class="hide-md" data-label="Especialidad">{{ u.especialidad || '-' }}</td></ng-container>
-          <ng-container matColumnDef="activo">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let u" data-label="Estado">
-              <mat-chip [class]="u.activo ? 'chip-activo' : 'chip-inactivo'">
-                <mat-icon class="chip-icon">{{ u.activo ? 'check_circle' : 'block' }}</mat-icon>{{ u.activo ? 'Activo' : 'Inactivo' }}
-              </mat-chip>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let u" class="cell-actions">
-              <button mat-icon-button (click)="editar(u)" matTooltip="Editar" [attr.aria-label]="'Editar ' + u.nombre"><mat-icon>edit</mat-icon></button>
-              <button mat-icon-button color="warn" (click)="eliminar(u)" matTooltip="Desactivar" [attr.aria-label]="'Desactivar ' + u.nombre"><mat-icon>person_off</mat-icon></button>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length"><mat-icon>search_off</mat-icon><p>No se encontraron usuarios</p></td>
-          </tr>
-        </table>
-      </div>
-      <mat-paginator [pageSizeOptions]="[10, 25]" showFirstLastButtons></mat-paginator>
-    </mat-card-content>
-  </mat-card>
+          <small>Desde {{ u.createdAt | date: "MMM y" }}</small>
+          @if (!u.activo) {
+            <button mat-stroked-button type="button" class="reactivar" (click)="reactivar(u)"><mat-icon>how_to_reg</mat-icon>Reactivar</button>
+          }
+        </div>
+      </li>
+    } @empty {
+      <li class="vacio">
+        @if (dataSource.filter) {
+          <mat-icon aria-hidden="true">search_off</mat-icon><p>Nadie coincide con «{{ searchInput.value }}».</p>
+        } @else if (filtro === 'inactivos') {
+          <mat-icon aria-hidden="true">task_alt</mat-icon><p>No hay usuarios desactivados.</p>
+        } @else {
+          <mat-icon aria-hidden="true">group</mat-icon><p>No hay usuarios en este grupo.</p>
+          <a mat-stroked-button routerLink="/usuarios/nuevo">Crear usuario</a>
+        }
+      </li>
+    }
+  </ul>
 </div>

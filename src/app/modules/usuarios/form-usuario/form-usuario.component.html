@@ -1,35 +1,102 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>manage_accounts</mat-icon> {{ isEdit ? 'Editar Usuario' : 'Nuevo Usuario' }}</h1></div>
-    <button mat-stroked-button routerLink="/usuarios"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <div>
+      <h1><mat-icon>{{ isEdit ? 'manage_accounts' : 'person_add' }}</mat-icon> {{ isEdit ? 'Editar a ' + (nombreOriginal || 'usuario') : 'Nuevo usuario' }}</h1>
+      <p>{{ isEdit ? 'Datos, acceso y rol de la cuenta' : 'Cree la cuenta con la que esta persona entrará al sistema' }}</p>
+    </div>
+    <button mat-button type="button" routerLink="/usuarios"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput formControlName="nombre"><mat-error>Requerido</mat-error></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Apellido</mat-label><input matInput formControlName="apellido"><mat-error>Requerido</mat-error></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput type="email" formControlName="correo"><mat-error>Correo inválido</mat-error></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>{{ isEdit ? 'Nueva contraseña (opcional)' : 'Contraseña' }}</mat-label><input matInput type="password" formControlName="password"><mat-error>Mínimo 6 caracteres</mat-error></mat-form-field>
+
+  <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="vs-registro-secciones">
+      <section class="vs-seccion" aria-labelledby="s-persona">
+        <h2 id="s-persona"><mat-icon aria-hidden="true">badge</mat-icon>Persona</h2>
+        <div class="dos">
           <mat-form-field appearance="outline">
-            <mat-label>Rol</mat-label>
-            <mat-select formControlName="rol">
-              @for (r of roles; track r) {
-                <mat-option [value]="r.value">{{ r.label }}</mat-option>
-              }
-            </mat-select>
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" autocomplete="given-name">
+            <mat-error>Escriba el nombre (mínimo 2 letras)</mat-error>
           </mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Teléfono</mat-label><input matInput formControlName="telefono"></mat-form-field>
-          <mat-form-field appearance="outline" class="col-full"><mat-label>Especialidad (veterinarios)</mat-label><input matInput formControlName="especialidad" placeholder="Ej: Medicina General, Cirugía"></mat-form-field>
-          <mat-checkbox formControlName="activo" color="primary">Usuario activo</mat-checkbox>
+          <mat-form-field appearance="outline">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" autocomplete="family-name">
+            <mat-error>Escriba el apellido</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono (opcional)</mat-label>
+            <input matInput type="tel" inputmode="tel" formControlName="telefono" placeholder="Ej: 6000-0000" autocomplete="tel-national">
+          </mat-form-field>
         </div>
-        <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/usuarios">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
-            <mat-icon>save</mat-icon> {{ isEdit ? 'Actualizar' : 'Crear Usuario' }}
-          </button>
+      </section>
+
+      <section class="vs-seccion" aria-labelledby="s-rol">
+        <h2 id="s-rol"><mat-icon aria-hidden="true">admin_panel_settings</mat-icon>Rol</h2>
+        <div class="roles" role="radiogroup" aria-labelledby="s-rol">
+          @for (r of roles; track r.value) {
+            <label class="rol" [class.rol--elegido]="form.value.rol === r.value">
+              <input type="radio" formControlName="rol" [value]="r.value">
+              <mat-icon aria-hidden="true">{{ ICONO_ROL[r.value] }}</mat-icon>
+              <strong>{{ r.label }}</strong>
+              <small>{{ r.descripcion }}</small>
+            </label>
+          }
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        @if (form.value.rol === 'veterinario') {
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Especialidad</mat-label>
+            <input matInput formControlName="especialidad" placeholder="Ej: Medicina general, Cirugía, Dermatología">
+            <mat-hint>Se muestra al elegir veterinario en citas y consultas</mat-hint>
+          </mat-form-field>
+        }
+      </section>
+
+      <section class="vs-seccion" aria-labelledby="s-acceso">
+        <h2 id="s-acceso"><mat-icon aria-hidden="true">key</mat-icon>Acceso</h2>
+        <div class="dos">
+          <mat-form-field appearance="outline">
+            <mat-label>Correo (usuario para entrar)</mat-label>
+            <input matInput type="email" formControlName="correo" autocomplete="off">
+            <mat-error>Escriba un correo válido</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ isEdit ? 'Nueva contraseña (opcional)' : 'Contraseña' }}</mat-label>
+            <input matInput [type]="verPassword ? 'text' : 'password'" formControlName="password" autocomplete="new-password">
+            <button mat-icon-button matSuffix type="button" (click)="verPassword = !verPassword" [attr.aria-label]="verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="verPassword">
+              <mat-icon>{{ verPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-hint>{{ isEdit ? 'Déjela vacía para conservar la actual' : 'Mínimo 6 caracteres' }}</mat-hint>
+            <mat-error>Mínimo 6 caracteres</mat-error>
+          </mat-form-field>
+        </div>
+        <mat-slide-toggle formControlName="activo" class="activo" color="primary">
+          {{ form.value.activo ? 'Cuenta activa: puede iniciar sesión' : 'Cuenta desactivada: no puede iniciar sesión' }}
+        </mat-slide-toggle>
+      </section>
+
+      <div class="vs-acciones">
+        <button mat-stroked-button type="button" routerLink="/usuarios">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          <mat-icon>{{ isEdit ? 'save' : 'person_add' }}</mat-icon> {{ isEdit ? 'Guardar cambios' : 'Crear usuario' }}
+        </button>
+      </div>
+    </div>
+
+    <aside class="vs-previa" aria-label="Vista previa de la cuenta">
+      <p class="vs-previa-titulo">Así quedará la cuenta</p>
+      <span class="avatar" [class]="'avatar avatar--' + form.value.rol" aria-hidden="true">
+        @if (iniciales) { {{ iniciales }} } @else { <mat-icon>person</mat-icon> }
+      </span>
+      <h2 class="vs-previa-nombre" [class.vacio]="!form.value.nombre">{{ (form.value.nombre || 'Nombre') + ' ' + (form.value.apellido || '') }}</h2>
+      <p class="vs-previa-sub"><mat-icon aria-hidden="true">{{ iconoRol }}</mat-icon>{{ rolElegido?.label }}@if (form.value.rol === 'veterinario' && form.value.especialidad) { · {{ form.value.especialidad }} }</p>
+      <div class="accesos">
+        <h3>Puede usar</h3>
+        <ul>
+          @for (a of accesos; track a) { <li>{{ a }}</li> }
+        </ul>
+      </div>
+      @if (!form.value.activo) {
+        <p class="inactiva"><mat-icon aria-hidden="true">block</mat-icon>No podrá iniciar sesión mientras esté desactivada</p>
+      }
+    </aside>
+  </form>
 </div>
