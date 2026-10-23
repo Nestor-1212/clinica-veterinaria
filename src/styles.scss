@@ -481,6 +481,15 @@ mat-chip {
   color: #ffcdd2;
 }
 
+/* Confirmación destacada (p. ej. un cobro): centrada en la pantalla y más grande */
+.cdk-global-overlay-wrapper:has(.snack-centro) { align-items: center !important; justify-content: center !important; }
+.mat-mdc-snack-bar-container.snack-centro {
+  --mat-snack-bar-container-color: var(--vs-sidebar-bg);
+  --mat-snack-bar-button-color: #9ff2df;
+  .mdc-snackbar__surface { min-width: min(420px, 90vw); min-height: 64px; padding-left: 8px; border-radius: var(--vs-radius-lg); box-shadow: 0 12px 40px rgba(12, 56, 51, 0.35); }
+  .mat-mdc-snack-bar-label { font-size: 16px; font-weight: 600; }
+}
+
 /* ===== MAT-LIST ===== */
 mat-list-item { height: auto !important; min-height: 48px !important; }
 

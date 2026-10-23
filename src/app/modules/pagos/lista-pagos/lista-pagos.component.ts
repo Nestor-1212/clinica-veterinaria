@@ -134,7 +134,7 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
       if (!ok) return;
       if (this.pagosService.marcarPagado(pago.id)) {
         this.cargar();
-        this.snack.open('Pago registrado como pagado', 'OK', { duration: 2000 });
+        this.avisar(`Cobro registrado: ${this.moneda(pago.total)} de ${this.getCliente(pago.clienteId)}`);
       }
     });
   }
@@ -152,9 +152,14 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
       if (typeof motivo !== 'string' || !motivo.trim()) return;
       if (this.pagosService.anular(pago.id, motivo, this.auth.currentUser?.id)) {
         this.cargar();
-        this.snack.open('Pago anulado', 'OK', { duration: 2000 });
+        this.avisar(`Pago anulado: ${this.moneda(pago.total)} de ${this.getCliente(pago.clienteId)}`);
       }
     });
+  }
+
+  /** Confirmación de cobro o anulación en el centro de la pantalla (no abajo, donde se pierde). */
+  private avisar(mensaje: string): void {
+    this.snack.open(mensaje, 'OK', { duration: 3500, panelClass: 'snack-centro', verticalPosition: 'top', horizontalPosition: 'center' });
   }
 
   applyFilter(ev: Event): void { this.dataSource.filter = (ev.target as HTMLInputElement).value.trim().toLowerCase(); }

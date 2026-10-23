@@ -1,151 +1,146 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>bar_chart</mat-icon> Reportes y Estadísticas</h1><p>Panel de análisis de la clínica</p></div>
+    <div>
+      <h1><mat-icon>bar_chart</mat-icon> Reportes</h1>
+      <p>{{ rango.etiqueta.charAt(0).toUpperCase() + rango.etiqueta.slice(1) }} · comparado con {{ rango.anterior.etiqueta }}</p>
+    </div>
+    <button mat-stroked-button type="button" class="no-imprimir" (click)="imprimir()"><mat-icon>print</mat-icon> Imprimir</button>
   </div>
 
-  <!-- Indicadores: una sola banda tonal con separadores que se desvanecen (no una tarjeta por cifra).
-       El ámbar solo aparece si hay vacunas pendientes (requiere atención). -->
-  <section class="kpi-banda" aria-label="Indicadores generales">
-    <div class="kpi-item">
-      <mat-icon class="kpi-icon" aria-hidden="true">people</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">{{ stats.clientes }}</span><small>Clientes activos</small></div>
-    </div>
-    <div class="kpi-item">
-      <mat-icon class="kpi-icon" aria-hidden="true">pets</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">{{ stats.mascotas }}</span><small>Mascotas</small></div>
-    </div>
-    <div class="kpi-item">
-      <mat-icon class="kpi-icon" aria-hidden="true">medical_services</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">{{ stats.consultasMes }}</span><small>Consultas del mes</small></div>
-    </div>
-    <div class="kpi-item">
-      <mat-icon class="kpi-icon" aria-hidden="true">history</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">{{ stats.consultasTotal }}</span><small>Consultas totales</small></div>
-    </div>
-    <div class="kpi-item">
-      <mat-icon class="kpi-icon" aria-hidden="true">payments</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del mes</small></div>
-    </div>
-    <div class="kpi-item" [class.kpi-item--atencion]="stats.vacunasPendientes > 0">
-      <mat-icon class="kpi-icon" aria-hidden="true">vaccines</mat-icon>
-      <div class="kpi-data"><span class="kpi-value">{{ stats.vacunasPendientes }}</span><small>Vacunas pendientes</small></div>
+  <div class="vs-segmentado periodos no-imprimir" role="group" aria-label="Período del reporte">
+    @for (p of periodos; track p.valor) {
+      <button type="button" [attr.aria-pressed]="periodo === p.valor" (click)="elegirPeriodo(p.valor)">{{ p.texto }}</button>
+    }
+  </div>
+
+  <!-- Indicadores del período -->
+  <section class="cifras" aria-label="Indicadores del período">
+    <app-kpi hero etiqueta="Ingresos cobrados" [valor]="moneda(cifras.ingresos.actual)" [delta]="delta(cifras.ingresos)"
+      [ayuda]="entero(cifras.cobros.actual) + ' cobros · período anterior: ' + moneda(cifras.ingresos.anterior)"></app-kpi>
+    <div class="cifras-secundarias">
+      <app-kpi etiqueta="Atenciones" [valor]="entero(cifras.atenciones.actual)" [delta]="delta(cifras.atenciones)"></app-kpi>
+      <app-kpi etiqueta="Ticket promedio" [valor]="moneda(cifras.ticket.actual)" [delta]="delta(cifras.ticket)"></app-kpi>
+      <app-kpi etiqueta="Clientes nuevos" [valor]="entero(cifras.clientesNuevos.actual)" [delta]="delta(cifras.clientesNuevos)"></app-kpi>
+      <app-kpi etiqueta="No asistieron" [valor]="cifras.inasistencia.actual + ' %'" [delta]="delta(cifras.inasistencia, false)"
+        [tono]="cifras.inasistencia.actual >= 15 ? 'atencion' : null" ayuda="De las citas que ya pasaron"></app-kpi>
+      <app-kpi etiqueta="Refuerzos vencidos" [valor]="entero(vacunasVencidas)" enlace="/vacunas" [tono]="vacunasVencidas ? 'atencion' : null"
+        [ayuda]="(vacunasPendientesList.length - vacunasVencidas) + ' vencen en 7 días'"></app-kpi>
     </div>
   </section>
 
-  <div class="charts-grid">
-    <!-- Gráfico de consultas mensual -->
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title>Consultas — Últimos 6 meses</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="bar-chart" role="img" [attr.aria-label]="resumenConsultas">
-          @for (r of reporteMensual; track r) {
-            <div class="bar-item" aria-hidden="true">
-              <div class="bar-value">{{ r.consultas }}</div>
-              <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100"></div>
-              <div class="bar-label">{{ r.mes }}</div>
-            </div>
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Tendencia (siempre 6 meses) -->
+  <section class="dos-col">
+    <div class="panel">
+      <h2>Ingresos cobrados por mes</h2>
+      <p class="panel-sub">Últimos 6 meses</p>
+      <app-grafico-columnas [datos]="columnasIngresos" titulo="Ingresos cobrados por mes, últimos 6 meses" [formato]="moneda" [alto]="240"
+        notaParcial="Mes en curso: suma hasta hoy."></app-grafico-columnas>
+      <p class="sr-only">{{ resumenIngresos }}</p>
+    </div>
+    <div class="panel">
+      <h2>Atenciones por mes</h2>
+      <p class="panel-sub">Últimos 6 meses</p>
+      <app-grafico-columnas [datos]="columnasConsultas" titulo="Atenciones por mes, últimos 6 meses" [formato]="entero" [alto]="240"
+        notaParcial="Mes en curso: hasta hoy."></app-grafico-columnas>
+      <p class="sr-only">{{ resumenConsultas }}</p>
+    </div>
+  </section>
 
-    <!-- Gráfico de ingresos -->
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title>Ingresos — Últimos 6 meses ($)</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="bar-chart" role="img" [attr.aria-label]="resumenIngresos">
-          @for (r of reporteMensual; track r) {
-            <div class="bar-item" aria-hidden="true">
-              <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
-              <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100"></div>
-              <div class="bar-label">{{ r.mes }}</div>
-            </div>
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Servicios y veterinarios -->
+  <section class="dos-col">
+    <div class="panel">
+      <div class="panel-cabecera">
+        <div><h2>Servicios más vendidos</h2><p class="panel-sub">Por ingreso cobrado en el período</p></div>
+        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('servicios')" matTooltip="Descargar CSV" aria-label="Descargar servicios en CSV"><mat-icon>download</mat-icon></button>
+      </div>
+      @if (servicios.length) {
+        <table class="tabla">
+          <thead><tr><th scope="col">Servicio</th><th scope="col" class="num">Cant.</th><th scope="col" class="num">Total</th></tr></thead>
+          <tbody>
+            @for (s of servicios; track s.servicio) {
+              <tr>
+                <th scope="row">
+                  <span class="nombre">{{ s.servicio }}</span>
+                  <span class="barra" aria-hidden="true"><span [style.width.%]="(s.total / maxServicio) * 100"></span></span>
+                </th>
+                <td class="num">{{ s.cantidad }}</td>
+                <td class="num"><strong>{{ moneda(s.total) }}</strong><small>{{ s.porcentaje }} %</small></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else { <p class="vacio">Sin cobros en este período.</p> }
+    </div>
 
-    <!-- Tipo de consultas -->
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title>Tipo de Consultas</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        @for (item of consultasPorTipo; track item) {
-          <div class="progress-item">
-            <div class="progress-header">
-              <span>{{ item.tipo }}</span>
-              <span>{{ item.cantidad }}</span>
-            </div>
-            <mat-progress-bar mode="determinate" color="primary"
-              [value]="stats.consultasTotal > 0 ? (item.cantidad / stats.consultasTotal) * 100 : 0"
-              [attr.aria-label]="item.tipo + ': ' + item.cantidad + ' de ' + stats.consultasTotal"></mat-progress-bar>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
+    <div class="panel">
+      <div class="panel-cabecera">
+        <div><h2>Rendimiento por veterinario</h2><p class="panel-sub">Atenciones e ingresos de sus consultas</p></div>
+        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('veterinarios')" matTooltip="Descargar CSV" aria-label="Descargar veterinarios en CSV"><mat-icon>download</mat-icon></button>
+      </div>
+      @if (veterinarios.length) {
+        <table class="tabla">
+          <thead><tr><th scope="col">Veterinario</th><th scope="col" class="num">Atenciones</th><th scope="col" class="num">Ingresos</th></tr></thead>
+          <tbody>
+            @for (v of veterinarios; track v.nombre) {
+              <tr>
+                <th scope="row">
+                  <span class="nombre">{{ v.nombre }}@if (v.especialidad) { <small>{{ v.especialidad }}</small> }</span>
+                  <span class="barra" aria-hidden="true"><span [style.width.%]="(v.ingresos / maxVet) * 100"></span></span>
+                </th>
+                <td class="num">{{ v.atenciones }}@if (v.inmediatas) { <small>{{ v.inmediatas }} sin cita</small> }</td>
+                <td class="num"><strong>{{ moneda(v.ingresos) }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else { <p class="vacio">Sin atenciones en este período.</p> }
+    </div>
+  </section>
 
-    <!-- Métodos de pago -->
-    <mat-card class="chart-card">
-      <mat-card-header>
-        <mat-card-title>Métodos de Pago</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        @for (item of pagosPorMetodo; track item) {
-          <div class="progress-item">
-            <div class="progress-header">
-              <span>{{ item.metodo | titlecase }}</span>
-              <span>{{ item.cantidad }}</span>
-            </div>
-            <mat-progress-bar mode="determinate" color="primary"
-              [value]="(item.cantidad / pagosTotal) * 100"
-              [attr.aria-label]="(item.metodo | titlecase) + ': ' + item.cantidad + ' pagos'"></mat-progress-bar>
-          </div>
-        }
-        @if (pagosPorMetodo.length === 0) {
-          <p class="vs-empty">No hay pagos registrados</p>
-        }
-      </mat-card-content>
-    </mat-card>
-  </div>
+  <!-- Clínico y cobros -->
+  <section class="tres-col">
+    <div class="panel">
+      <div class="panel-cabecera">
+        <div><h2>Diagnósticos frecuentes</h2><p class="panel-sub">Casos en el período</p></div>
+        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('diagnosticos')" matTooltip="Descargar CSV" aria-label="Descargar diagnósticos en CSV"><mat-icon>download</mat-icon></button>
+      </div>
+      <ol class="ranking">
+        @for (d of diagnosticos; track d.nombre) {
+          <li><span class="r-nombre">{{ d.nombre }}</span><span class="r-valor">{{ d.cantidad }}<small>{{ d.porcentaje }} %</small></span></li>
+        } @empty { <li class="vacio">Sin consultas en este período.</li> }
+      </ol>
+    </div>
 
-  <!-- Vacunas pendientes (vencidas y de los próximos 7 días) -->
-  @if (vacunasPendientesList.length > 0) {
-    <mat-card class="alert-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar class="warn-avatar" aria-hidden="true">vaccines</mat-icon>
-        <mat-card-title>Vacunas pendientes</mat-card-title>
-        <mat-card-subtitle>
-          @if (vacunasVencidas > 0) {
-            {{ vacunasVencidas }} vencida{{ vacunasVencidas === 1 ? '' : 's' }} ·
-          }
-          próximos 7 días
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <ul class="vacunas-lista">
-          @for (v of vacunasPendientesList; track v) {
-            <li class="vacuna-fila">
-              <mat-icon [class]="estadoVacuna(v) === 'vencida' ? 'danger-icon' : 'warn-icon'" aria-hidden="true">
-                {{ estadoVacuna(v) === 'vencida' ? 'error' : 'vaccines' }}
-              </mat-icon>
-              <div class="vacuna-cuerpo">
-                <span class="vacuna-nombre">{{ v.nombre }}</span>
-                <span [class]="estadoVacuna(v) === 'vencida' ? 'fecha-vencida' : 'prox-fecha'">
-                  {{ estadoVacuna(v) === 'vencida' ? 'Vencida desde' : 'Próxima:' }} {{ v.proximaFecha | date:'dd/MM/yyyy' }}
-                </span>
-              </div>
-              <span [class]="'vs-status ' + (estadoVacuna(v) === 'vencida' ? 'vs-status--warning' : 'vs-status--neutral')">
-                {{ estadoVacuna(v) === 'vencida' ? 'Vencida' : 'Próxima' }}
-              </span>
-            </li>
-          }
-        </ul>
-      </mat-card-content>
-    </mat-card>
-  }
+    <div class="panel">
+      <div class="panel-cabecera">
+        <div><h2>Especies atendidas</h2><p class="panel-sub">Atenciones por especie</p></div>
+        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('especies')" matTooltip="Descargar CSV" aria-label="Descargar especies en CSV"><mat-icon>download</mat-icon></button>
+      </div>
+      <ul class="barras">
+        @for (e of especies; track e.nombre) {
+          <li>
+            <span class="b-fila"><span>{{ e.nombre }}</span><span class="r-valor">{{ e.cantidad }}<small>{{ e.porcentaje }} %</small></span></span>
+            <span class="barra" aria-hidden="true"><span [style.width.%]="e.porcentaje"></span></span>
+          </li>
+        } @empty { <li class="vacio">Sin atenciones en este período.</li> }
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="panel-cabecera">
+        <div><h2>Métodos de pago</h2><p class="panel-sub">Cobrado en el período</p></div>
+        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('metodos')" matTooltip="Descargar CSV" aria-label="Descargar métodos de pago en CSV"><mat-icon>download</mat-icon></button>
+      </div>
+      <ul class="barras">
+        @for (m of metodos; track m.metodo) {
+          <li>
+            <span class="b-fila"><span>{{ m.metodo }} <small>· {{ m.cobros }} cobros</small></span><span class="r-valor">{{ moneda(m.total) }}<small>{{ m.porcentaje }} %</small></span></span>
+            <span class="barra" aria-hidden="true"><span [style.width.%]="m.porcentaje"></span></span>
+          </li>
+        } @empty { <li class="vacio">Sin cobros en este período.</li> }
+      </ul>
+    </div>
+  </section>
+
+  <p class="nota">Los ingresos cuentan en la fecha en que se cobraron (un pago pendiente cuenta el día que se pagó) y excluyen pagos anulados. Los servicios se suman antes de descuentos.</p>
 </div>
