@@ -1,7 +1,7 @@
 <div class="shell-layout">
   <a class="skip-link" href="#contenido" (click)="irAlContenido($event)">Saltar al contenido</a>
 
-  <app-header [class.con-riel]="!isMobile" (menuToggle)="toggleSidenav()"></app-header>
+  <app-header (menuToggle)="toggleSidenav()"></app-header>
 
   <mat-sidenav-container class="sidenav-container" [class.con-riel]="!isMobile">
     <mat-sidenav #sidenav

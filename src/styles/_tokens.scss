@@ -69,9 +69,6 @@
   --vs-ink: #0b3d36;                                    // 12.10 blanco · 9.91 franja · 10.58 fondo
   // Fila al pasar el puntero (listas y tablas): tinte sutil del teal
   --vs-row-hover: #eef5f3;                              // muted 5.56 · secundario 8.45 · primario 5.82
-  // Barra superior: el teal profundo del menú fluye hacia el primario.
-  // Texto blanco: 12.89 en el extremo profundo, 6.43 en el primario (peor punto).
-  --vs-header-gradient: linear-gradient(90deg, var(--vs-sidebar-bg) 0, var(--vs-sidebar-bg) 268px, var(--vs-primary) 62%);
   // Fila "siguiente" de la agenda
   --vs-surface-next: var(--vs-primary-soft);
 

@@ -12,9 +12,6 @@
   top: 0;
 }
 
-// Con menú fijo: el teal profundo del menú se prolonga y fluye hacia el primario
-:host(.con-riel) .app-header { background: var(--vs-header-gradient) !important; }
-
 .menu-btn { color: var(--vs-on-primary); }
 
 .brand {
