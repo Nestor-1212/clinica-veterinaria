@@ -62,9 +62,12 @@ html { scrollbar-color: #9fb3ad transparent; }
 ::-webkit-scrollbar-thumb:hover { background: var(--vs-border-strong); background-clip: padding-box; }
 
 /* ===== PAGE LAYOUT ===== */
+// Las páginas ocupan todo el ancho junto al menú (sin márgenes muertos en pantallas anchas);
+// los formularios conservan su ancho de lectura con .form-card
 .page-container {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   animation: fadeIn var(--vs-dur-slow) var(--vs-ease-out);
 }
 
