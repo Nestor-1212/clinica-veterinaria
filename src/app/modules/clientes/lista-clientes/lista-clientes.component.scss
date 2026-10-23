@@ -1,11 +1,74 @@
-.cliente-nombre {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  .avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: var(--vs-primary-container); color: var(--vs-on-primary-container);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 14px; flex-shrink: 0;
+// Lista de clientes: cada fila responde "¿quién es y qué necesita?".
+// Escritorio: tabla .full-table. Móvil (<= 768px): tarjeta en rejilla propia
+// (nombre + acciones, mascotas, tres datos con etiqueta, contacto).
+
+.table-toolbar { justify-content: space-between; }
+
+.clientes-tabla {
+  td.mat-mdc-cell { vertical-align: middle; }
+  .num { text-align: right; }
+}
+
+/* Cliente: avatar tonal, nombre como enlace al expediente y cédula debajo */
+.c-cliente > .avatar { display: inline-flex; vertical-align: middle; margin-right: var(--vs-space-3); }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; align-items: center; justify-content: center;
+  background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-weight: 700; font-size: 14px;
+}
+.nombre { display: inline-grid; vertical-align: middle; gap: 1px;
+  a { font-size: 14px; font-weight: 600; color: var(--vs-text); text-decoration: none; text-underline-offset: 3px; border-radius: 4px; }
+  a:hover { color: var(--vs-primary); text-decoration: underline; }
+  small { font-size: 12px; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; } }
+
+/* Contacto: el teléfono se lee en el botón de llamar (mismo patrón que el dashboard) */
+.contacto { display: inline-flex; align-items: center; gap: 2px; margin-left: -8px;
+  a[mat-button] { min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; white-space: nowrap; --mat-button-text-label-text-color: var(--vs-text-secondary); }
+  mat-icon { color: var(--vs-primary); }
+  mat-icon:only-child { margin: 0; } }
+
+/* Mascotas como fichas pequeñas: icono de especie + nombre */
+.fichas { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none;
+  li { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 6px; border-radius: var(--vs-radius-full);
+    background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--vs-primary); }
+  .mas { padding: 2px 8px; background: var(--vs-surface-muted); color: var(--vs-text-secondary); } }
+
+/* Datos con subtítulo: valor arriba, contexto debajo */
+.dato { display: inline-grid; justify-items: start; gap: 2px;
+  time, .cifra { font-size: 13px; color: var(--vs-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.dato .vs-status { font-size: 12px; }
+.tenue { font-size: 13px; color: var(--vs-text-muted); }
+.saldo { font-size: 14px; font-weight: 600; color: var(--vs-attention-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.menu-peligro { color: var(--vs-danger); mat-icon { color: var(--vs-danger); } }
+
+.no-data button, .no-data a { margin-top: var(--vs-space-2); }
+
+/* ----- Móvil: tarjeta en rejilla ----- */
+@media (max-width: 768px) {
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .vs-segmentado { align-self: flex-start; }
+
+  .mat-mdc-table.clientes-tabla {
+    tr.mat-mdc-row {
+      display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; column-gap: var(--vs-space-3);
+      grid-template-areas: 'cli cli acc' 'mas mas mas' 'ult pro sal' 'con con con';
+      padding: var(--vs-space-3) var(--vs-space-4) !important;
+    }
+    td.mat-mdc-cell { border-bottom: 0 !important; padding: 6px 0 !important; justify-content: flex-start; text-align: left; }
+    td[data-label].mat-mdc-cell { flex-direction: column; align-items: flex-start; gap: 2px;
+      &::before { font-size: 12px; text-transform: none; letter-spacing: 0; } }
+    .c-saldo.mat-mdc-cell { align-items: flex-end; }
+    .dato .vs-status { white-space: normal; }
+    .c-cliente { grid-area: cli; align-items: center; gap: var(--vs-space-3); padding-top: 0 !important; }
+    .c-cliente > .avatar { margin-right: 0; }
+    .c-acciones { grid-area: acc; align-self: start; padding: 0 !important; }
+    .c-mascotas { grid-area: mas; }
+    .c-ultima { grid-area: ult; }
+    .c-proxima { grid-area: pro; }
+    .c-saldo { grid-area: sal; }
+    .c-contacto { grid-area: con; margin-top: 4px; border-top: 1px solid var(--vs-border) !important; padding-bottom: 0 !important; }
+    .dato time, .dato .cifra { white-space: normal; }
   }
 }

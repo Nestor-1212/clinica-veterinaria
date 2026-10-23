@@ -2,105 +2,169 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>people</mat-icon> Clientes</h1>
-      <p>Gestión de propietarios de mascotas</p>
+      <p>{{ conteos.todos }} {{ conteos.todos === 1 ? 'cliente activo' : 'clientes activos' }} con sus mascotas, visitas y citas</p>
     </div>
     <button mat-flat-button color="primary" routerLink="/clientes/nuevo">
-      <mat-icon>person_add</mat-icon> Nuevo Cliente
+      <mat-icon>person_add</mat-icon> Nuevo cliente
     </button>
   </div>
 
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar por nombre, cédula, teléfono...</mat-label>
-          <input matInput #searchInput (keyup)="applyFilter($event)" placeholder="Ej: Juan Pérez">
-          @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-              <mat-icon>close</mat-icon>
+        <div class="vs-segmentado" role="group" aria-label="Filtrar clientes">
+          @for (s of segmentos; track s.valor) {
+            <button type="button" [attr.aria-pressed]="segmento === s.valor" (click)="elegirSegmento(s.valor)">
+              {{ s.texto }} <span class="vs-cuenta">{{ conteos[s.valor] }}</span>
             </button>
           }
-          @if (!searchInput.value) {
+        </div>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar cliente o mascota</mat-label>
+          <input matInput #searchInput (keyup)="applyFilter($event)" placeholder="Nombre, cédula, teléfono o mascota">
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="limpiarBusqueda(searchInput)">
+              <mat-icon>close</mat-icon>
+            </button>
+          } @else {
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
       </div>
 
       <div class="table-responsive">
-        @if (loading) {
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        }
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="nombre">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let c" class="cell-primary">
-              <div class="cliente-nombre">
-                <div class="avatar">{{ c.nombre.charAt(0) }}</div>
-                <span>{{ c.nombre }}</span>
-              </div>
+        <table mat-table [dataSource]="dataSource" matSort class="full-table clientes-tabla">
+          <ng-container matColumnDef="cliente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Cliente</th>
+            <td mat-cell *matCellDef="let f" class="cell-primary c-cliente">
+              <span class="avatar" aria-hidden="true">{{ f.cliente.nombre.charAt(0) }}</span>
+              <span class="nombre">
+                <a [routerLink]="['/clientes', f.cliente.id]" (click)="$event.stopPropagation()" [attr.aria-label]="'Ver expediente de ' + f.cliente.nombre">{{ f.cliente.nombre }}</a>
+                <small>{{ f.cliente.cedula }}</small>
+              </span>
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="cedula">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Cédula</th>
-            <td mat-cell class="cell-nowrap" *matCellDef="let c" data-label="Cédula">{{ c.cedula }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="telefono">
-            <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-            <td mat-cell class="cell-nowrap" *matCellDef="let c" data-label="Teléfono">{{ c.telefono }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="correo">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Correo</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Correo">{{ c.correo || '—' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="fechaRegistro">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="hide-md">Registro</th>
-            <td mat-cell *matCellDef="let c" class="cell-nowrap hide-md" data-label="Registro">{{ c.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+          <ng-container matColumnDef="contacto">
+            <th mat-header-cell *matHeaderCellDef>Contacto</th>
+            <td mat-cell *matCellDef="let f" class="c-contacto" (click)="$event.stopPropagation()">
+              <span class="contacto">
+                <a mat-button [href]="tel(f.cliente.telefono)" [attr.aria-label]="'Llamar a ' + f.cliente.nombre + ', ' + f.cliente.telefono"><mat-icon>call</mat-icon>{{ f.cliente.telefono }}</a>
+                @if (whatsapp(f.cliente); as wa) {
+                  <a mat-button [href]="wa" target="_blank" rel="noopener" matTooltip="WhatsApp" [attr.aria-label]="'Escribir por WhatsApp a ' + f.cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                }
+              </span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="mascotas">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Mascotas</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Mascotas">
-              <mat-chip-set>
-                <mat-chip class="vs-status--brand">{{ getMascotas(c.id) }}</mat-chip>
-              </mat-chip-set>
+            <th mat-header-cell *matHeaderCellDef>Mascotas</th>
+            <td mat-cell *matCellDef="let f" class="c-mascotas">
+              @if (f.mascotas.length) {
+                <ul class="fichas" [attr.aria-label]="'Mascotas de ' + f.cliente.nombre">
+                  @for (m of f.mascotas.slice(0, 3); track m.id) {
+                    <li><mat-icon aria-hidden="true">{{ especie(m.tipo) }}</mat-icon>{{ m.nombre }}<span class="sr-only">, {{ m.tipo }}</span></li>
+                  }
+                  @if (f.mascotas.length > 3) {
+                    <li class="mas">+{{ f.mascotas.length - 3 }}<span class="sr-only"> más</span></li>
+                  }
+                </ul>
+              } @else {
+                <span class="tenue">Sin mascotas</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ultimaVisita">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Última visita</th>
+            <td mat-cell *matCellDef="let f" class="c-ultima" data-label="Última visita">
+              <span class="dato">
+                @if (f.ultimaVisita) {
+                  <time [attr.datetime]="f.ultimaVisita.toISOString()" [title]="f.ultimaVisita | date: 'd MMM y'">{{ relativo(f.ultimaVisita, hoy) }}</time>
+                } @else {
+                  <span class="tenue">Sin visitas</span>
+                }
+                @if (f.paraRecuperar) {
+                  <span class="vs-status vs-status--warning">Para recuperar</span>
+                } @else if (f.nuevo) {
+                  <span class="vs-status vs-status--success">Nuevo</span>
+                }
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="proximaCita">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Próxima cita</th>
+            <td mat-cell *matCellDef="let f" class="c-proxima" data-label="Próxima cita">
+              <span class="dato">
+                @if (f.proximaCita; as c) {
+                  <span class="cifra">{{ momentoCita(c) | date: 'EEE d MMM' }} · {{ c.hora }}</span>
+                  <small>{{ relativo(momentoCita(c), hoy) }}</small>
+                } @else {
+                  <span class="tenue">Sin cita</span>
+                }
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Solo se muestra a quien puede cobrar (displayedColumns) -->
+          <ng-container matColumnDef="saldo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header arrowPosition="before" class="num">Saldo</th>
+            <td mat-cell *matCellDef="let f" class="num c-saldo" data-label="Saldo">
+              @if (f.saldo > 0) {
+                <span class="saldo">${{ f.saldo | number: '1.2-2' }}</span>
+              } @else {
+                <span class="tenue">Al día</span>
+              }
             </td>
           </ng-container>
 
           <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let c" class="cell-actions" (click)="$event.stopPropagation()">
-              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver expediente" [attr.aria-label]="'Ver expediente de ' + c.nombre">
-                <mat-icon>folder_open</mat-icon>
-              </button>
-              <button mat-icon-button color="accent" (click)="nuevaAtencion(c)" matTooltip="Atención inmediata" [attr.aria-label]="'Iniciar atención inmediata para ' + c.nombre">
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let f" class="cell-actions c-acciones" (click)="$event.stopPropagation()">
+              <button mat-icon-button color="accent" (click)="nuevaAtencion(f.cliente)" matTooltip="Atención inmediata" [attr.aria-label]="'Iniciar atención inmediata para ' + f.cliente.nombre">
                 <mat-icon>bolt</mat-icon>
               </button>
-              <button mat-icon-button (click)="editar(c)" matTooltip="Editar" [attr.aria-label]="'Editar ' + c.nombre">
-                <mat-icon>edit</mat-icon>
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para ' + f.cliente.nombre">
+                <mat-icon>more_vert</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="eliminar(c)" matTooltip="Eliminar" [attr.aria-label]="'Eliminar ' + c.nombre">
-                <mat-icon>delete</mat-icon>
-              </button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="nuevaCita(f.cliente)"><mat-icon>event</mat-icon>Nueva cita</button>
+                <button mat-menu-item (click)="editar(f.cliente)"><mat-icon>edit</mat-icon>Editar datos</button>
+                <button mat-menu-item class="menu-peligro" (click)="eliminar(f.cliente)"><mat-icon>delete</mat-icon>Eliminar cliente</button>
+              </mat-menu>
             </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row" (click)="verDetalle(row)"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row" (click)="verDetalle(row.cliente)"></tr>
 
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-              <mat-icon>search_off</mat-icon>
-              <p>No se encontraron clientes</p>
+              @if (dataSource.filter) {
+                <mat-icon>search_off</mat-icon>
+                <p>Ningún cliente coincide con «{{ searchInput.value }}».</p>
+                <button mat-button type="button" (click)="limpiarBusqueda(searchInput)">Limpiar búsqueda</button>
+              } @else if (segmento === 'saldo') {
+                <mat-icon>task_alt</mat-icon>
+                <p>Ningún cliente tiene saldo pendiente.</p>
+              } @else if (segmento === 'recuperar') {
+                <mat-icon>favorite</mat-icon>
+                <p>Todos los clientes han venido en los últimos 90 días o tienen cita.</p>
+              } @else if (segmento === 'nuevos') {
+                <mat-icon>person_add</mat-icon>
+                <p>Aún no hay clientes nuevos este mes.</p>
+              } @else {
+                <mat-icon>people</mat-icon>
+                <p>Todavía no hay clientes registrados.</p>
+                <a mat-button routerLink="/clientes/nuevo">Registrar el primer cliente</a>
+              }
             </td>
           </tr>
         </table>
       </div>
 
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de clientes"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

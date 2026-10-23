@@ -12,7 +12,9 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
   test('"Eliminar" abre la confirmación sin navegar al expediente', async ({ page }) => {
     await login(page, 'admin');
     await page.goto('/clientes');
-    await page.getByRole('button', { name: /^Eliminar / }).first().click();
+    // Eliminar vive en el menú "Más acciones" de la fila
+    await page.getByRole('button', { name: /^Más acciones para / }).first().click();
+    await page.getByRole('menuitem', { name: /Eliminar cliente/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page).toHaveURL(/\/clientes$/);
     await page.getByRole('button', { name: 'Cancelar' }).click();
@@ -29,7 +31,7 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
   test('las tarjetas de mascota del expediente se abren con teclado', async ({ page }) => {
     await login(page, 'admin');
     await page.goto('/clientes');
-    await page.getByRole('button', { name: /^Ver expediente de/ }).first().click();
+    await page.getByRole('link', { name: /^Ver expediente de/ }).first().click();
     await expect(page).toHaveURL(/\/clientes\/[^/]+$/);
     const tarjeta = page.getByRole('link', { name: /^Ver historial médico de/ }).first();
     await tarjeta.focus();
