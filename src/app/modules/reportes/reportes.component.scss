@@ -1,38 +1,56 @@
-// 6 indicadores: 3 x 2 en escritorio, 2 por fila en tablet y 1 en móvil
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: var(--vs-space-4); margin-bottom: var(--vs-space-6);
-  @media (min-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+// Indicadores: una banda tonal (superficie blanca) con seis cifras separadas por filetes que
+// se desvanecen; el icono teal es el único color, el ámbar solo si algo requiere atención.
+.kpi-banda {
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: var(--vs-space-6);
+  padding: var(--vs-space-5) 0; border-radius: var(--vs-radius-xl); background: var(--vs-surface); box-shadow: var(--vs-stage-shadow);
+  @media (max-width: 1599px) { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--vs-space-5); }
+  @media (max-width: 600px) { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: var(--vs-space-4) 0; }
 }
-
-/* KPI sobre superficie blanca: el texto siempre es oscuro; el color va en el icono */
-.kpi-card {
-  mat-card-content { display: flex; align-items: center; gap: var(--vs-space-4); padding: var(--vs-space-5) !important; }
+.kpi-item {
+  display: flex; align-items: center; gap: var(--vs-space-3); min-width: 0; padding: 0 var(--vs-space-5);
+  background: linear-gradient(transparent, var(--vs-border) 20% 80%, transparent) left / 1px 100% no-repeat;
+  &:first-child { background: none; }
   .kpi-icon {
-    width: 48px; height: 48px; flex-shrink: 0;
-    border-radius: var(--vs-radius-md);
-    display: flex; align-items: center; justify-content: center;
-    mat-icon { font-size: 26px; width: 26px; height: 26px; }
+    flex-shrink: 0; box-sizing: content-box; padding: 10px; border-radius: var(--vs-radius-md);
+    font-size: 22px; width: 22px; height: 22px; background: var(--vs-primary-soft); color: var(--vs-primary);
   }
-  .kpi-value { display: block; font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--vs-text); font-variant-numeric: tabular-nums; }
-  small { display: block; margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--vs-text-secondary); }
+  .kpi-value { display: block; font: var(--vs-text-figure); letter-spacing: -0.02em; color: var(--vs-ink); font-variant-numeric: tabular-nums; }
+  small { display: block; margin-top: 2px; font-size: 13px; line-height: 18px; color: var(--vs-text-secondary); }
+  @media (max-width: 1599px) { &:nth-child(3n + 1) { background: none; } }
+  @media (max-width: 600px) {
+    padding: 0 var(--vs-space-4);
+    &:nth-child(n) { background: none; }
+    &:nth-child(even) { background: linear-gradient(transparent, var(--vs-border) 20% 80%, transparent) left / 1px 100% no-repeat; }
+    .kpi-icon { display: none; }
+  }
 }
-.kpi--primary .kpi-icon { background: var(--vs-primary-soft); color: var(--vs-primary); }
-.kpi--accent  .kpi-icon { background: var(--vs-accent-container); color: var(--vs-on-accent-container); }
-.kpi--success .kpi-icon { background: var(--vs-success-container); color: var(--vs-on-success-container); }
-.kpi--warning .kpi-icon { background: var(--vs-warning-container); color: var(--vs-on-warning-container); }
+.kpi-item--atencion {
+  .kpi-icon { background: var(--vs-attention-container); color: var(--vs-attention-text); }
+  .kpi-value { color: var(--vs-attention-text); }
+}
 
 .charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: var(--vs-space-5); margin-bottom: var(--vs-space-5); }
-.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 8px 0; }
+// Columnas en la serie validada (--vs-chart-1), redondeadas arriba y con aire entre ellas
+.bar-chart { display: flex; align-items: flex-end; gap: var(--vs-space-3); height: 168px; padding: var(--vs-space-2) 0; }
 .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-.bar { width: 100%; min-height: 4px; border-radius: 4px 4px 0 0; transition: height var(--vs-dur) var(--vs-ease); }
-.bar--primary { background: var(--vs-primary); }
-.bar--success { background: var(--vs-success); }
+.bar { width: 100%; max-width: 44px; min-height: 4px; border-radius: 8px 8px 2px 2px; background: var(--vs-chart-1); transition: height var(--vs-dur-slow) var(--vs-ease-out); }
 .bar-value { font-size: 12px; font-weight: 600; color: var(--vs-text); font-variant-numeric: tabular-nums; }
 .bar-label { font-size: 12px; color: var(--vs-text-secondary); }
 .progress-item { margin-bottom: var(--vs-space-4); }
-.progress-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
-.warn-avatar { display: flex !important; align-items: center; justify-content: center; border-radius: 50%; background: var(--vs-accent-container) !important; color: var(--vs-on-accent-container); }
-.warn-icon { color: var(--vs-text-muted) !important; }
-.danger-icon { color: var(--vs-attention-text) !important; }
-.prox-fecha { font-size: 12px; color: var(--vs-text-muted); }
-.fecha-vencida { font-size: 12px; color: var(--vs-attention-text); font-weight: 600; }
+.progress-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; } }
+.warn-avatar { display: flex !important; align-items: center; justify-content: center; border-radius: var(--vs-radius-md); background: var(--vs-attention-container) !important; color: var(--vs-attention-text); }
+
+/* Vacunas pendientes: filas como las listas del dashboard (separador con sangría, tinte al pasar) */
+.vacunas-lista { list-style: none; margin: 0 calc(var(--vs-space-3) * -1); padding: 0; }
+.vacuna-fila {
+  position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-3); border-radius: var(--vs-radius-md); transition: background-color var(--vs-dur-fast) var(--vs-ease);
+  & + &::before { content: ''; position: absolute; top: 0; left: var(--vs-space-3); right: var(--vs-space-3); height: 1px; background: var(--vs-border); }
+  &:hover { background: var(--vs-row-hover); }
+}
+.vacuna-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.vacuna-nombre { font-size: 14px; font-weight: 600; }
+.warn-icon { color: var(--vs-text-muted); }
+.danger-icon { color: var(--vs-attention-text); }
+.prox-fecha { font-size: 13px; color: var(--vs-text-muted); }
+.fecha-vencida { font-size: 13px; color: var(--vs-attention-text); font-weight: 600; }

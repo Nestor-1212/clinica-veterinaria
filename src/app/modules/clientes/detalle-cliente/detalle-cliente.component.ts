@@ -67,12 +67,12 @@ export class DetalleClienteComponent implements OnInit {
 
   iconoEstadoCita(estado: string): string {
     const iconos: Record<string, string> = {
-      pendiente: 'schedule', confirmada: 'check_circle', completada: 'done_all', cancelada: 'cancel', inmediata: 'flash_on'
+      pendiente: 'schedule', confirmada: 'check_circle', completada: 'done_all', cancelada: 'cancel', inmediata: 'bolt'
     };
     return iconos[estado] || 'event';
   }
 
-  iconoTipoConsulta(tipo: string): string { return tipo === 'inmediata' ? 'flash_on' : 'event'; }
+  iconoTipoConsulta(tipo: string): string { return tipo === 'inmediata' ? 'bolt' : 'event'; }
 
   iconoEstadoPago(estado: string): string {
     const iconos: Record<string, string> = { pagado: 'check_circle', pendiente: 'schedule', anulado: 'cancel' };

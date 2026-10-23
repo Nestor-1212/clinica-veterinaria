@@ -153,7 +153,25 @@ html {
   @include mat.menu-overrides((
     container-shape: var(--vs-radius-md),
   ));
+  // Paneles de historial: misma forma redondeada, sombra teñida suave
+  @include mat.expansion-overrides((
+    container-shape: var(--vs-radius-md),
+    container-background-color: var(--vs-surface),
+  ));
+  // Barras de progreso en la serie de datos validada, con pista tonal y extremos redondeados
+  @include mat.progress-bar-overrides((
+    active-indicator-color: var(--vs-chart-1),
+    track-color: var(--vs-tonal),
+    active-indicator-height: 8px,
+    track-height: 8px,
+    track-shape: var(--vs-radius-full),
+  ));
 }
+mat-progress-bar.mat-mdc-progress-bar { border-radius: var(--vs-radius-full); }
+.mat-accordion .mat-expansion-panel:not([class*='mat-elevation-z']) { box-shadow: none; }
+.mat-accordion .mat-expansion-panel + .mat-expansion-panel { margin-top: 2px; }
+.mat-accordion .mat-expansion-panel { background: var(--vs-surface-soft); transition: background-color var(--vs-dur) var(--vs-ease); }
+.mat-accordion .mat-expansion-panel.mat-expanded { background: var(--vs-surface); box-shadow: var(--vs-shadow-soft); }
 
 .table-card, .form-card {
   mat-card-content { padding: var(--vs-space-5) !important; }
@@ -313,6 +331,14 @@ html .mat-mdc-tab-group.vs-tabs {
   .mat-mdc-tab .mat-mdc-tab-ripple, .mat-mdc-tab .mdc-tab__ripple { border-radius: var(--vs-radius-full); }
   .mat-mdc-tab:focus-visible { outline-offset: -2px; }
 }
+// Variante con panel: el contenido de la pestaña es una superficie blanca bajo la pista
+// (expediente del cliente, historial médico). Sustituye la caja con borde.
+html .mat-mdc-tab-group.vs-tabs--panel > .mat-mdc-tab-body-wrapper {
+  margin-top: var(--vs-space-4);
+  border-radius: var(--vs-radius-lg);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+}
 
 /* Diálogos sobre superficie blanca, como las tarjetas */
 html {
@@ -339,6 +365,7 @@ html {
    success 7.28 · atención 7.82 · danger 7.83 · neutro 9.34. */
 [class*='chip-'].mat-mdc-chip {
   font-weight: 600 !important;
+  text-transform: capitalize;   // los estados llegan en minúscula ("pendiente")
 }
 // Estado como etiqueta suelta (listas del dashboard): punto + texto coloreado, sin
 // pastilla. En filas repetidas una pastilla saturada por fila es ruido; la pastilla

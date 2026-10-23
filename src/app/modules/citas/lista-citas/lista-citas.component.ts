@@ -73,7 +73,7 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
       confirmada: 'check_circle',
       completada: 'done_all',
       cancelada: 'cancel',
-      inmediata: 'flash_on'
+      inmediata: 'bolt'
     };
     return iconos[estado] || 'event';
   }

@@ -3,45 +3,34 @@
     <div><h1><mat-icon>bar_chart</mat-icon> Reportes y Estadísticas</h1><p>Panel de análisis de la clínica</p></div>
   </div>
 
-  <!-- KPIs: superficie blanca; el color de marca solo en el icono -->
-  <div class="kpi-grid">
-    <mat-card class="kpi-card kpi--primary">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">people</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">{{ stats.clientes }}</span><small>Clientes activos</small></div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="kpi-card kpi--primary">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">pets</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">{{ stats.mascotas }}</span><small>Mascotas</small></div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="kpi-card kpi--accent">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">medical_services</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">{{ stats.consultasMes }}</span><small>Consultas del mes</small></div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="kpi-card kpi--accent">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">history</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">{{ stats.consultasTotal }}</span><small>Consultas totales</small></div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="kpi-card kpi--success">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">payments</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del mes</small></div>
-      </mat-card-content>
-    </mat-card>
-    <mat-card class="kpi-card kpi--warning">
-      <mat-card-content>
-        <div class="kpi-icon"><mat-icon aria-hidden="true">vaccines</mat-icon></div>
-        <div class="kpi-data"><span class="kpi-value">{{ stats.vacunasPendientes }}</span><small>Vacunas pendientes</small></div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+  <!-- Indicadores: una sola banda tonal con separadores que se desvanecen (no una tarjeta por cifra).
+       El ámbar solo aparece si hay vacunas pendientes (requiere atención). -->
+  <section class="kpi-banda" aria-label="Indicadores generales">
+    <div class="kpi-item">
+      <mat-icon class="kpi-icon" aria-hidden="true">people</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">{{ stats.clientes }}</span><small>Clientes activos</small></div>
+    </div>
+    <div class="kpi-item">
+      <mat-icon class="kpi-icon" aria-hidden="true">pets</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">{{ stats.mascotas }}</span><small>Mascotas</small></div>
+    </div>
+    <div class="kpi-item">
+      <mat-icon class="kpi-icon" aria-hidden="true">medical_services</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">{{ stats.consultasMes }}</span><small>Consultas del mes</small></div>
+    </div>
+    <div class="kpi-item">
+      <mat-icon class="kpi-icon" aria-hidden="true">history</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">{{ stats.consultasTotal }}</span><small>Consultas totales</small></div>
+    </div>
+    <div class="kpi-item">
+      <mat-icon class="kpi-icon" aria-hidden="true">payments</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">${{ stats.ingresosMes | number:'1.0-0' }}</span><small>Ingresos del mes</small></div>
+    </div>
+    <div class="kpi-item" [class.kpi-item--atencion]="stats.vacunasPendientes > 0">
+      <mat-icon class="kpi-icon" aria-hidden="true">vaccines</mat-icon>
+      <div class="kpi-data"><span class="kpi-value">{{ stats.vacunasPendientes }}</span><small>Vacunas pendientes</small></div>
+    </div>
+  </section>
 
   <div class="charts-grid">
     <!-- Gráfico de consultas mensual -->
@@ -54,7 +43,7 @@
           @for (r of reporteMensual; track r) {
             <div class="bar-item" aria-hidden="true">
               <div class="bar-value">{{ r.consultas }}</div>
-              <div class="bar bar--primary" [style.height.%]="(r.consultas / maxConsultas) * 100"></div>
+              <div class="bar" [style.height.%]="(r.consultas / maxConsultas) * 100"></div>
               <div class="bar-label">{{ r.mes }}</div>
             </div>
           }
@@ -72,7 +61,7 @@
           @for (r of reporteMensual; track r) {
             <div class="bar-item" aria-hidden="true">
               <div class="bar-value">${{ r.ingresos | number:'1.0-0' }}</div>
-              <div class="bar bar--success" [style.height.%]="(r.ingresos / maxIngresos) * 100"></div>
+              <div class="bar" [style.height.%]="(r.ingresos / maxIngresos) * 100"></div>
               <div class="bar-label">{{ r.mes }}</div>
             </div>
           }
@@ -138,22 +127,24 @@
         </mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <mat-list>
+        <ul class="vacunas-lista">
           @for (v of vacunasPendientesList; track v) {
-            <mat-list-item>
-              <mat-icon matListItemIcon [class]="estadoVacuna(v) === 'vencida' ? 'danger-icon' : 'warn-icon'" aria-hidden="true">
+            <li class="vacuna-fila">
+              <mat-icon [class]="estadoVacuna(v) === 'vencida' ? 'danger-icon' : 'warn-icon'" aria-hidden="true">
                 {{ estadoVacuna(v) === 'vencida' ? 'error' : 'vaccines' }}
               </mat-icon>
-              <div matListItemTitle>{{ v.nombre }}</div>
-              <div matListItemLine [class]="estadoVacuna(v) === 'vencida' ? 'fecha-vencida' : 'prox-fecha'">
-                {{ estadoVacuna(v) === 'vencida' ? 'Vencida desde' : 'Próxima:' }} {{ v.proximaFecha | date:'dd/MM/yyyy' }}
+              <div class="vacuna-cuerpo">
+                <span class="vacuna-nombre">{{ v.nombre }}</span>
+                <span [class]="estadoVacuna(v) === 'vencida' ? 'fecha-vencida' : 'prox-fecha'">
+                  {{ estadoVacuna(v) === 'vencida' ? 'Vencida desde' : 'Próxima:' }} {{ v.proximaFecha | date:'dd/MM/yyyy' }}
+                </span>
               </div>
-              <mat-chip [class]="estadoVacuna(v) === 'vencida' ? 'chip-vencida' : 'chip-proxima'">
+              <span [class]="'vs-status ' + (estadoVacuna(v) === 'vencida' ? 'vs-status--warning' : 'vs-status--neutral')">
                 {{ estadoVacuna(v) === 'vencida' ? 'Vencida' : 'Próxima' }}
-              </mat-chip>
-            </mat-list-item>
+              </span>
+            </li>
           }
-        </mat-list>
+        </ul>
       </mat-card-content>
     </mat-card>
   }

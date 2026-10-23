@@ -7,9 +7,7 @@ import { PagosService } from '../../core/services/pagos.service';
 import { CitasService } from '../../core/services/citas.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatCardAvatar, MatCardSubtitle } from '@angular/material/card';
-import { MatChip } from '@angular/material/chips';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
 import { DecimalPipe, TitleCasePipe, DatePipe } from '@angular/common';
 import { MetodoPago, Vacuna } from '../../core/models';
 import { EstadoRecordatorio, estadoRecordatorio, porProximaFecha } from '../../core/utils/vacunas';
@@ -34,7 +32,7 @@ interface ReporteMes {
     selector: 'app-reportes',
     templateUrl: './reportes.component.html',
     styleUrls: ['./reportes.component.scss'],
-    imports: [MatIcon, MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatProgressBar, MatCardAvatar, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatCardSubtitle, MatChip, DecimalPipe, TitleCasePipe, DatePipe]
+    imports: [MatIcon, MatCard, MatCardContent, MatCardHeader, MatCardTitle, MatProgressBar, MatCardAvatar, MatCardSubtitle, DecimalPipe, TitleCasePipe, DatePipe]
 })
 export class ReportesComponent implements OnInit {
   private clientesService = inject(ClientesService);

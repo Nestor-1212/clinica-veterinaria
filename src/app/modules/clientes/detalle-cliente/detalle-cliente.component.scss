@@ -11,8 +11,8 @@
 .info-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--vs-text-secondary); mat-icon { font-size: 16px; width: 16px; height: 16px; } }
 .profile-stats { display: flex; gap: 24px; }
 .pstat { text-align: center; span { display: block; font-size: 24px; font-weight: 700; color: var(--vs-primary); } small { font-size: 12px; color: var(--vs-text-secondary); } }
-.detail-tabs { background: var(--vs-surface); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-md); overflow: hidden; }
-.tab-content { padding: 16px; }
+// Pestañas en píldora con el contenido en un panel blanco (.vs-tabs--panel, global)
+.tab-content { padding: var(--vs-space-5); @media (max-width: 600px) { padding: var(--vs-space-3); } }
 .mascotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
 /* Cada tarjeta es un enlace (<a routerLink>): se opera con teclado y lector de pantalla */
 .mascota-link {
@@ -21,23 +21,25 @@
   text-decoration: none;
   border-radius: var(--vs-radius-md);
   > .mascota-card { height: 100%; }
-  &:hover .mascota-card { box-shadow: var(--vs-shadow-2) !important; border-color: var(--vs-border-strong); }
+  &:hover .mascota-card { box-shadow: var(--vs-shadow-2) !important; transform: translateY(-2px); }
   &:hover .add-card { border-color: var(--vs-primary); color: var(--vs-primary); }
 }
 .mascota-card {
-  border-radius: var(--vs-radius-md) !important;
-  transition: box-shadow var(--vs-dur) var(--vs-ease), border-color var(--vs-dur) var(--vs-ease);
+  border-radius: var(--vs-radius-lg) !important;
+  // Tarjeta tonal dentro del panel blanco: se agrupa por tono, no por filo
+  background: var(--vs-surface-soft); box-shadow: none !important;
+  transition: box-shadow var(--vs-dur) var(--vs-ease), transform var(--vs-dur) var(--vs-ease-out), background-color var(--vs-dur) var(--vs-ease);
   h4 { margin: 0; font-size: 15px; font-weight: 600; }
   p { margin: 2px 0 0; font-size: 13px; color: var(--vs-text-secondary); }
   &.add-card {
     min-height: 120px;
-    border: 2px dashed var(--vs-border-strong); background: transparent;
+    border: 2px dashed #a9c2bb; background: transparent;
     display: flex; align-items: center; justify-content: center;
     mat-card-content { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } }
   }
 }
 .mascota-header { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-.mascota-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--vs-primary); color: var(--vs-on-primary); display: flex; align-items: center; justify-content: center; }
+.mascota-avatar { width: 40px; height: 40px; border-radius: var(--vs-radius-sm); background: var(--vs-primary); color: var(--vs-on-primary); display: flex; align-items: center; justify-content: center; }
 .mascota-details { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--vs-text-secondary); span { display: flex; align-items: center; gap: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } } }
 .list-row { border-bottom: 1px solid var(--vs-border); }
 /* Chips .chip-* y colores .estado-* : mapa único en src/styles.scss */

@@ -1,9 +1,11 @@
-.paciente-card { border-left: 4px solid var(--vs-primary); margin-bottom: 16px; }
+// Paciente: tarjeta con tinte de marca que se diluye (sin filete lateral de color)
+.paciente-card { margin-bottom: 16px; background: linear-gradient(100deg, var(--vs-primary-soft), var(--vs-surface) 60%) !important; }
 .paciente-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.p-icon { width: 44px; height: 44px; background: var(--vs-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; mat-icon { color: white; } flex-shrink: 0; }
-.consulta-ref { display: flex; align-items: center; gap: 6px; background: var(--vs-primary-soft); padding: 6px 10px; border-radius: 8px; font-size: 12px; mat-icon { font-size: 16px; color: var(--vs-primary); } }
+.p-icon { width: 44px; height: 44px; background: linear-gradient(160deg, var(--vs-chart-1), var(--vs-sidebar-bg)); border-radius: var(--vs-radius-md); display: flex; align-items: center; justify-content: center; mat-icon { color: white; } flex-shrink: 0; }
+.consulta-ref { display: flex; align-items: center; gap: 6px; background: var(--vs-primary-soft); padding: 6px 12px; border-radius: var(--vs-radius-full); font-size: 12px; mat-icon { font-size: 16px; color: var(--vs-primary); } }
 .receta-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; h3 { margin: 0; font-style: italic; color: var(--vs-text-secondary); } }
-.medicamento-card { margin-bottom: 12px; border: 1px solid var(--vs-border); border-radius: 8px !important; }
+// Cada medicamento: bloque tonal (agrupa por tono, sin borde)
+.medicamento-card { margin-bottom: 12px; border-radius: var(--vs-radius-md) !important; background: var(--vs-surface-soft) !important; box-shadow: none !important; }
 .medicamento-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .med-num { font-weight: 600; color: var(--vs-primary); }
 .med-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; .col-full { grid-column: 1 / -1; } @media (max-width: 600px) { grid-template-columns: 1fr; } }

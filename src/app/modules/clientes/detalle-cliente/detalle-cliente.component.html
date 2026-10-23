@@ -7,7 +7,7 @@
       </div>
       <div class="header-actions">
         <button mat-stroked-button class="vs-btn-urgent" (click)="nuevaAtencion()">
-          <mat-icon>flash_on</mat-icon> Atención Inmediata
+          <mat-icon>bolt</mat-icon> Atención Inmediata
         </button>
         <button mat-flat-button color="primary" (click)="nuevaCita()">
           <mat-icon>event</mat-icon> Nueva Cita
@@ -49,7 +49,7 @@
       </mat-card-actions>
     </mat-card>
     <!-- Tabs -->
-    <mat-tab-group [(selectedIndex)]="selectedTab" class="detail-tabs">
+    <mat-tab-group [(selectedIndex)]="selectedTab" class="detail-tabs vs-tabs vs-tabs--panel" mat-stretch-tabs="false" mat-align-tabs="start">
       <mat-tab label="Mascotas ({{ mascotas.length }})">
         <div class="tab-content">
           <div class="mascotas-grid">
