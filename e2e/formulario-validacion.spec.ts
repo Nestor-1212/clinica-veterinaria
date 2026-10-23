@@ -6,7 +6,7 @@ test('enviar el formulario de cliente vacío muestra los errores, enfoca el prim
   const antes = (await leerColeccion(page, 'vet_clientes')).length;
   await page.goto('/clientes/nuevo');
 
-  const enviar = page.getByRole('button', { name: /Registrar Cliente/ });
+  const enviar = page.getByRole('button', { name: /Registrar cliente/ });
   await expect(enviar).toBeEnabled();
   await enviar.click();
 

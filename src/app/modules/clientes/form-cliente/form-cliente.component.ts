@@ -7,14 +7,14 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatInput, MatSuffix, MatError } from '@angular/material/input';
+import { MatFormField, MatLabel, MatInput, MatError, MatHint } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
     selector: 'app-form-cliente',
     templateUrl: './form-cliente.component.html',
     styleUrls: ['./form-cliente.component.scss'],
-    imports: [MatIcon, MatButton, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatSuffix, MatError, MatProgressSpinner]
+    imports: [MatIcon, MatButton, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatHint, MatProgressSpinner]
 })
 export class FormClienteComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -26,6 +26,8 @@ export class FormClienteComponent implements OnInit {
   form: FormGroup;
   isEdit = false;
   clienteId = '';
+  /** Nombre guardado del cliente en edición (el subtítulo no cambia mientras se escribe). */
+  nombreOriginal = '';
   /** true desde que se acepta el envío hasta navegar: evita el doble envío. */
   loading = false;
   private host = inject(ElementRef, { optional: true });
@@ -45,7 +47,10 @@ export class FormClienteComponent implements OnInit {
     if (this.clienteId) {
       this.isEdit = true;
       const cliente = this.clientesService.getById(this.clienteId);
-      if (cliente) this.form.patchValue(cliente);
+      if (cliente) {
+        this.form.patchValue(cliente);
+        this.nombreOriginal = cliente.nombre;
+      }
     }
   }
 
@@ -68,10 +73,15 @@ export class FormClienteComponent implements OnInit {
       this.snack.open('Cliente registrado exitosamente', 'OK', { duration: 2000 });
     }
     // loading sigue en true hasta que la navegación desmonte el formulario
-    this.router.navigate(['/clientes']);
+    this.router.navigate(this.destino());
   }
 
   cancelar(): void {
-    this.router.navigate(['/clientes']);
+    this.router.navigate(this.destino());
+  }
+
+  /** Al editar se vuelve al expediente del cliente; al registrar, a la lista. */
+  private destino(): string[] {
+    return this.isEdit ? ['/clientes', this.clienteId] : ['/clientes'];
   }
 }

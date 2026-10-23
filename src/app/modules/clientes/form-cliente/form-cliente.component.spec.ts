@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { FormClienteComponent } from './form-cliente.component';
 import { Cliente } from '../../../core/models';
-import { USUARIOS, leer, sembrar } from '../../../../testing/fixtures';
+import { CLIENTES, USUARIOS, leer, sembrar } from '../../../../testing/fixtures';
 import { crearComponente, sesionComo } from '../../../../testing/component-harness';
 
 describe('FormClienteComponent: envío (UX Fase 4)', () => {
@@ -40,5 +40,19 @@ describe('FormClienteComponent: envío (UX Fase 4)', () => {
     expect(leer<Cliente>('vet_clientes')).toHaveLength(1);
     expect(navigate).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenCalledWith(['/clientes']);
+  });
+
+  it('al editar guarda y vuelve al expediente del cliente', () => {
+    sembrar({ vet_clientes: CLIENTES });
+    const id = CLIENTES[0].id;
+    const { componente, navigate } = crearComponente(FormClienteComponent, { params: { id } });
+    componente.ngOnInit();
+    expect(componente.nombreOriginal).toBe(CLIENTES[0].nombre);
+    componente.form.patchValue({ telefono: '6999-1234' });
+
+    componente.onSubmit();
+
+    expect(leer<Cliente>('vet_clientes').find(c => c.id === id)?.telefono).toBe('6999-1234');
+    expect(navigate).toHaveBeenCalledWith(['/clientes', id]);
   });
 });
