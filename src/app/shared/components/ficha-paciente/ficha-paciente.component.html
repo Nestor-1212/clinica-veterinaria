@@ -1,0 +1,59 @@
+@if (ficha(); as f) {
+  <div class="ficha-cabecera">
+    <span class="ficha-icono" aria-hidden="true"><mat-icon>{{ iconoEspecie[f.mascota.tipo] }}</mat-icon></span>
+    <div>
+      <h2 id="ficha-titulo">{{ f.mascota.nombre }}</h2>
+      <p>{{ f.mascota.tipo }} · {{ f.mascota.raza }} · {{ f.mascota.sexo === 'macho' ? 'Macho' : 'Hembra' }}</p>
+    </div>
+  </div>
+  @if (motivo()) {
+    <div class="ficha-motivo">
+      <h3>Motivo de la visita</h3>
+      <p>{{ motivo() }}</p>
+      @if (notas()) { <p class="ficha-notas">{{ notas() }}</p> }
+    </div>
+  }
+  <dl class="ficha-datos">
+    <div><dt>Edad</dt><dd>{{ f.mascota.edad | edad }}</dd></div>
+    <div><dt>Peso</dt><dd>{{ f.mascota.peso }} kg</dd></div>
+  </dl>
+  @if (f.mascota.alergias) {
+    <p class="ficha-alergia" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ f.mascota.alergias }}</span></p>
+  } @else {
+    <p class="ficha-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias registradas</p>
+  }
+  <p class="ficha-linea" [class.ficha-linea--atencion]="f.vacunas.estado === 'vencidas'">
+    <mat-icon aria-hidden="true">vaccines</mat-icon>
+    @switch (f.vacunas.estado) {
+      @case ('al-dia') { Vacunas al día }
+      @case ('vencidas') { Vacuna vencida: {{ f.vacunas.vencidas.join(', ') }} }
+      @default { Sin vacunas registradas }
+    }
+  </p>
+  <div class="ficha-bloque">
+    <h3>Última consulta</h3>
+    @if (f.ultima) {
+      <p class="ficha-ultima"><strong>{{ f.ultima.diagnostico }}</strong><span>{{ f.ultimaHace }} · {{ f.ultima.tratamiento }}</span></p>
+    } @else {
+      <p class="ficha-ultima"><span>Es su primera consulta en la clínica.</span></p>
+    }
+  </div>
+  @if (f.cliente; as c) {
+    <div class="ficha-bloque">
+      <h3>Dueño</h3>
+      <p class="ficha-dueno"><strong>{{ c.nombre }}</strong></p>
+      <div class="ficha-contacto">
+        <a mat-button [href]="'tel:+507' + c.telefono.replace('-', '')"><mat-icon>call</mat-icon>{{ c.telefono }}</a>
+        @if (f.whatsapp) {
+          <a mat-button [href]="f.whatsapp" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + c.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>WhatsApp</a>
+        }
+      </div>
+    </div>
+  }
+} @else {
+  <div class="ficha-vacia">
+    <mat-icon aria-hidden="true">pets</mat-icon>
+    <h2 id="ficha-titulo">Ficha del paciente</h2>
+    <p>{{ textoVacio() }}</p>
+  </div>
+}

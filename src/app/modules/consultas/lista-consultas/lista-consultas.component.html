@@ -1,79 +1,157 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h1><mat-icon>medical_services</mat-icon> Consultas Médicas</h1>
-      <p>Historial de todas las atenciones</p>
+      <h1><mat-icon>medical_services</mat-icon> Consultas</h1>
+      <p>{{ soloMias ? 'Sus pacientes de hoy y su historial de atenciones' : 'Pacientes de hoy e historial de atenciones de la clínica' }}</p>
     </div>
-    <button mat-flat-button color="primary" routerLink="/citas/nueva">
-      <mat-icon>add</mat-icon> Nueva Consulta
-    </button>
+    <div class="header-actions">
+      @if (esVet) {
+        <button mat-stroked-button type="button" (click)="alternarMias()" [attr.aria-pressed]="soloMias">
+          <mat-icon>{{ soloMias ? 'person' : 'groups' }}</mat-icon> {{ soloMias ? 'Viendo: solo mías' : 'Viendo: toda la clínica' }}
+        </button>
+      }
+      <button mat-flat-button routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }">
+        <mat-icon>add</mat-icon> Atender sin cita
+      </button>
+    </div>
   </div>
 
+  <!-- Sala de espera: lo primero para quien atiende -->
+  <section class="espera" aria-labelledby="espera-titulo">
+    <h2 id="espera-titulo">Por atender hoy <span class="vs-cuenta">{{ espera.length }}</span></h2>
+    @if (espera.length) {
+      <ul class="espera-lista">
+        @for (c of espera; track c.id) {
+          <li class="paciente" [class.paciente--urgente]="c.estado === 'inmediata'">
+            <span class="p-hora">
+              <strong>{{ c.estado === 'inmediata' ? 'Llegó ' + c.hora : c.hora }}</strong>
+              @if (esperando(c); as e) { <small>{{ e }}</small> }
+            </span>
+            <span class="p-icono" aria-hidden="true"><mat-icon>{{ especie(c.mascotaId) }}</mat-icon></span>
+            <span class="p-texto">
+              <span class="p-nombre">
+                <strong>{{ getMascota(c.mascotaId) }}</strong>
+                @if (mascota(c.mascotaId)?.alergias) { <span class="alergia"><mat-icon aria-hidden="true">warning</mat-icon>Alergia</span> }
+                @if (c.estado === 'inmediata') { <span class="vs-status vs-status--accent vs-status--pill">Inmediata</span> }
+              </span>
+              <small>{{ getCliente(c.clienteId) }} · {{ c.motivo }}@if (!soloMias) { · {{ vetCorto(c.veterinarioId) }} }</small>
+            </span>
+            <button mat-flat-button type="button" [class.btn-urgente]="c.estado === 'inmediata'" (click)="atender(c)" [attr.aria-label]="'Atender a ' + getMascota(c.mascotaId)">
+              <mat-icon>medical_services</mat-icon> Atender
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="espera-vacia"><mat-icon aria-hidden="true">task_alt</mat-icon>No hay pacientes esperando. Las atenciones sin cita y las citas de hoy aparecerán aquí.</p>
+    }
+  </section>
+
+  <!-- Historial -->
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar consultas...</mat-label>
+        <div class="vs-segmentado" role="group" aria-label="Período">
+          @for (p of periodos; track p.valor) {
+            <button type="button" [attr.aria-pressed]="periodo === p.valor" (click)="elegirPeriodo(p.valor)">{{ p.texto }} <span class="vs-cuenta">{{ conteos[p.valor] }}</span></button>
+          }
+        </div>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar paciente o diagnóstico</mat-label>
           <input matInput #searchInput (keyup)="applyFilter($event)">
           @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-          @if (!searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+          } @else {
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
       </div>
 
       <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
+        <table mat-table [dataSource]="dataSource" matSort class="full-table consultas-tabla">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-            <td mat-cell *matCellDef="let c" class="cell-nowrap cell-primary">{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td mat-cell *matCellDef="let c" class="c-fecha">
+              <span class="dato"><strong [title]="c.fecha | date: 'd MMM y, HH:mm'">{{ relativo(c.fecha) }}</strong><small>{{ c.fecha | date: 'd MMM · HH:mm' }}</small></span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="mascota">
-            <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let c" data-label="Mascota">{{ getMascota(c.mascotaId) }}</td>
+          <ng-container matColumnDef="paciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Paciente</th>
+            <td mat-cell *matCellDef="let c" class="cell-primary c-paciente">
+              <span class="paciente-celda">
+                <span class="p-icono p-icono--sm" aria-hidden="true"><mat-icon>{{ especie(c.mascotaId) }}</mat-icon></span>
+                <span class="dato">
+                  <a [routerLink]="['/mascotas', c.mascotaId]" (click)="$event.stopPropagation()">{{ getMascota(c.mascotaId) }}</a>
+                  <small>{{ getCliente(c.clienteId) }}</small>
+                </span>
+              </span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="cliente">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Propietario">{{ getCliente(c.clienteId) }}</td>
+          <ng-container matColumnDef="diagnostico">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Diagnóstico</th>
+            <td mat-cell *matCellDef="let c" class="c-diag">
+              <span class="dato">
+                <strong class="corta" [title]="c.diagnostico">{{ c.diagnostico }}</strong>
+                <small class="corta" [title]="c.tratamiento">{{ c.tratamiento }}</small>
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="signos">
+            <th mat-header-cell *matHeaderCellDef class="hide-md">Signos</th>
+            <td mat-cell *matCellDef="let c" class="hide-md c-signos" data-label="Signos">
+              <span class="signos">
+                <span>{{ c.temperatura }} °C @if (alertaTemperatura(c); as a) { <span class="vs-status vs-status--warning">{{ a }}</span> }</span>
+                <small>{{ c.peso }} kg</small>
+              </span>
+            </td>
           </ng-container>
           <ng-container matColumnDef="veterinario">
             <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
-            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Veterinario">{{ getVet(c.veterinarioId) }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-md c-vet" data-label="Veterinario">
+              <span class="dato"><span>{{ vetCorto(c.veterinarioId) }}</span>@if (c.tipo === 'inmediata') { <small class="inmediata"><mat-icon aria-hidden="true">bolt</mat-icon>Sin cita</small> }</span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="diagnostico">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Diagnóstico</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Diagnóstico">{{ c.diagnostico | slice:0:50 }}</td>
-          </ng-container>
-          <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef>Tipo</th>
-            <td mat-cell *matCellDef="let c" data-label="Tipo">
-              <mat-chip [class]="'chip-' + c.tipo">
-                <mat-icon class="chip-icon">{{ iconoTipo(c.tipo) }}</mat-icon>{{ c.tipo }}
-              </mat-chip>
+          <ng-container matColumnDef="receta">
+            <th mat-header-cell *matHeaderCellDef>Receta</th>
+            <td mat-cell *matCellDef="let c" class="c-receta" (click)="$event.stopPropagation()">
+              @if (recetaDe(c)) {
+                <a mat-button class="receta-ver" [routerLink]="verRecetas ? ['/recetas', recetaDe(c)] : null" [attr.aria-label]="'Ver receta de ' + getMascota(c.mascotaId)"><mat-icon>description</mat-icon>Ver</a>
+              } @else if (verRecetas) {
+                <button mat-button type="button" class="receta-crear" (click)="receta(c)" [attr.aria-label]="'Crear receta para ' + getMascota(c.mascotaId)"><mat-icon>add</mat-icon>Crear</button>
+              } @else {
+                <span class="tenue">—</span>
+              }
             </td>
           </ng-container>
           <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let c" class="cell-actions" (click)="$event.stopPropagation()">
-              <button mat-icon-button color="primary" (click)="verDetalle(c)" matTooltip="Ver historial mascota" aria-label="Ver historial de la mascota">
-                <mat-icon>visibility</mat-icon>
-              </button>
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let c" class="cell-actions c-acciones" (click)="$event.stopPropagation()">
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para la consulta de ' + getMascota(c.mascotaId)"><mat-icon>more_vert</mat-icon></button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="verHistorial(c)"><mat-icon>folder_open</mat-icon>Historial de la mascota</button>
+                <button mat-menu-item (click)="editar(c)"><mat-icon>edit</mat-icon>Editar consulta</button>
+                @if (verRecetas) {
+                  <button mat-menu-item (click)="receta(c)"><mat-icon>medication</mat-icon>{{ recetaDe(c) ? 'Ver receta' : 'Crear receta' }}</button>
+                }
+              </mat-menu>
             </td>
           </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let r; columns: displayedColumns;" class="table-row" (click)="verDetalle(r)"></tr>
+          <tr mat-row *matRowDef="let r; columns: displayedColumns;" class="table-row" (click)="verHistorial(r)"></tr>
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-              <mat-icon>search_off</mat-icon><p>No se encontraron consultas</p>
+              @if (dataSource.filter) {
+                <mat-icon>search_off</mat-icon><p>Ninguna consulta coincide con «{{ searchInput.value }}».</p>
+              } @else {
+                <mat-icon>event_note</mat-icon><p>No hay consultas en este período.</p>
+                @if (periodo !== 'todas') { <button mat-button type="button" (click)="elegirPeriodo('todas')">Ver todas</button> }
+              }
             </td>
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de consultas"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

@@ -1,5 +1,6 @@
-// Ficha del paciente (atención inmediata): lo que hay que saber antes de atenderlo.
-.ficha {
+// Ficha del paciente: lo que hay que saber antes de atenderlo (alergias, vacunas, última consulta, dueño).
+// El contenedor decide su posición (sticky en escritorio, arriba en móvil).
+:host {
   position: sticky;
   top: var(--vs-space-4);
   display: grid;
@@ -80,3 +81,14 @@
   p { font-size: 14px; color: var(--vs-text-secondary); max-width: 32ch; }
 }
 
+
+// Motivo de la visita (viene de la cita): lo primero que lee el veterinario
+.ficha-motivo {
+  padding: var(--vs-space-3) var(--vs-space-4);
+  border-radius: var(--vs-radius-md);
+  background: var(--vs-primary-soft);
+  color: var(--vs-on-primary-soft);
+  h3 { color: var(--vs-on-primary-soft); }
+  p { font-size: 15px; font-weight: 600; }
+  .ficha-notas { margin-top: 4px; font-size: 13px; font-weight: 400; }
+}

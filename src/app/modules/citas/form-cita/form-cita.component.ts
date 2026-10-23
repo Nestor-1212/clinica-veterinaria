@@ -12,10 +12,11 @@ import { ConsultasService } from '../../../core/services/consultas.service';
 import { VacunasService } from '../../../core/services/vacunas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { puedeAcceder } from '../../../core/auth/permisos';
-import { Cliente, Consulta, Mascota, Usuario } from '../../../core/models';
+import { Cliente, Mascota, Usuario } from '../../../core/models';
 import { DisponibilidadVet, Horario, MOTIVOS_FRECUENTES, MOTIVOS_PROGRAMADOS, agregarMotivo, citasDelDia, disponibilidadVeterinarios, horariosDelDia } from '../../../core/utils/atencion';
-import { EstadoVacunas, ICONO_ESPECIE, estadoVacunas, tiempoRelativo } from '../../../core/utils/clientes';
-import { enlaceWhatsApp } from '../../../core/utils/metricas';
+import { ICONO_ESPECIE } from '../../../core/utils/clientes';
+import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
+import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -24,21 +25,11 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatCalendar } from '@angular/material/datepicker';
 
-/** Lo que el veterinario necesita saber del paciente antes de atenderlo. */
-interface FichaPaciente {
-  mascota: Mascota;
-  cliente?: Cliente;
-  ultima?: Consulta;
-  ultimaHace?: string;
-  vacunas: EstadoVacunas;
-  whatsapp: string | null;
-}
-
 @Component({
     selector: 'app-form-cita',
     templateUrl: './form-cita.component.html',
-    styleUrls: ['./form-cita.component.scss', './atencion-inmediata.scss', './ficha-paciente.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe]
+    styleUrls: ['./form-cita.component.scss', './atencion-inmediata.scss'],
+    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe, FichaPacienteComponent]
 })
 export class FormCitaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -225,19 +216,11 @@ export class FormCitaComponent implements OnInit {
 
   private actualizarFicha(mascotaId: string): void {
     const mascota = this.mascotas.find(m => m.id === mascotaId);
-    if (!mascota) { this.ficha = null; return; }
-    const hoy = new Date();
-    const cliente = this.clientes.find(c => c.id === mascota.clienteId);
-    const ultima = this.consultasService.getAll()
-      .filter(c => c.mascotaId === mascota.id && new Date(c.fecha) <= hoy)
-      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())[0];
-    this.ficha = {
-      mascota, cliente, ultima,
-      ultimaHace: ultima ? tiempoRelativo(ultima.fecha, hoy) : undefined,
-      vacunas: estadoVacunas(this.vacunasService.getAll(), mascota.id, hoy),
-      whatsapp: cliente ? enlaceWhatsApp(cliente.telefono, `Hola ${cliente.nombre}, le escribimos de la clínica veterinaria sobre ${mascota.nombre}.`) : null
-    };
+    this.ficha = mascota
+      ? fichaPaciente(mascota, this.clientes.find(c => c.id === mascota.clienteId), this.consultasService.getAll(), this.vacunasService.getAll(), new Date())
+      : null;
   }
+
 }
 
 function inicioDelDia(fecha: Date): Date {

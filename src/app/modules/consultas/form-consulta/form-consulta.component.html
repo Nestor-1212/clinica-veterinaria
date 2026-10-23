@@ -1,60 +1,89 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h1><mat-icon>medical_services</mat-icon> {{ isEdit ? 'Editar Consulta' : 'Nueva Consulta Médica' }}</h1>
-      <p>Registro de atención clínica</p>
+      <h1><mat-icon>medical_services</mat-icon> {{ isEdit ? 'Editar consulta' : 'Consulta' }}@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
+      <p>{{ isEdit ? 'Corrija los datos de la atención' : 'Registre la evaluación; después puede crear la receta' }}</p>
     </div>
-    <button mat-stroked-button routerLink="/consultas"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <button mat-button type="button" routerLink="/consultas"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <!-- Info del paciente -->
-  @if (mascota && cliente) {
-    <mat-card class="paciente-card">
-      <mat-card-content>
-        <div class="paciente-info">
-          <div class="p-avatar"><mat-icon>pets</mat-icon></div>
-          <div>
-            <h3>{{ mascota.nombre }} <span class="tipo">{{ mascota.tipo }}</span></h3>
-            <p>{{ mascota.raza }} — {{ mascota.sexo | titlecase }} — {{ mascota.edad | edad }}</p>
-            @if (mascota.alergias) {
-              <p class="alergia"><mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}</p>
-            }
+  @if (!mascota) {
+    <div class="sin-paciente">
+      <mat-icon aria-hidden="true">pets</mat-icon>
+      <h2>Elija primero al paciente</h2>
+      <p>Las consultas se inician desde una cita de hoy o desde una atención sin cita.</p>
+      <div class="sin-paciente-acciones">
+        <a mat-stroked-button routerLink="/consultas"><mat-icon>list</mat-icon>Pacientes por atender</a>
+        <a mat-flat-button routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }"><mat-icon>add</mat-icon>Atender sin cita</a>
+      </div>
+    </div>
+  } @else {
+    <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="vs-registro-secciones">
+        <!-- Signos vitales -->
+        <section class="vs-seccion" aria-labelledby="s-signos">
+          <h2 id="s-signos"><mat-icon aria-hidden="true">monitor_heart</mat-icon>Signos vitales</h2>
+          <div class="dos">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Temperatura</mat-label>
+              <input matInput type="number" inputmode="decimal" formControlName="temperatura" step="0.1" placeholder="38.5">
+              <span matTextSuffix>°C</span>
+              <mat-hint>{{ rangoTexto }}</mat-hint>
+              <mat-error>Temperatura entre 30 y 45 °C</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Peso actual</mat-label>
+              <input matInput type="number" inputmode="decimal" formControlName="peso" step="0.1">
+              <span matTextSuffix>kg</span>
+              <mat-hint>@if (pesoAnterior) { Registrado: {{ pesoAnterior }} kg @if (cambioDePeso; as d) { · {{ d }} } } @else { Pese a la mascota }</mat-hint>
+              <mat-error>Ingrese el peso</mat-error>
+            </mat-form-field>
           </div>
-          <div class="propietario">
-            <mat-icon>person</mat-icon>
-            <div>
-              <strong>{{ cliente.nombre }}</strong>
-              <p>{{ cliente.telefono }}</p>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  }
+          @if (estadoTemperatura === 'alta' || estadoTemperatura === 'baja') {
+            <p class="aviso-temp" role="status">
+              <mat-icon aria-hidden="true">device_thermostat</mat-icon>
+              {{ estadoTemperatura === 'alta' ? 'Temperatura alta: posible fiebre.' : 'Temperatura baja: posible hipotermia.' }} {{ rangoTexto }}.
+            </p>
+          }
+        </section>
 
-  <!-- Formulario -->
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <!-- Campos ocultos -->
-        <input type="hidden" formControlName="mascotaId">
-        <input type="hidden" formControlName="clienteId">
-        <input type="hidden" formControlName="citaId">
-        <input type="hidden" formControlName="tipo">
+        <!-- Evaluación -->
+        <section class="vs-seccion" aria-labelledby="s-eval">
+          <h2 id="s-eval"><mat-icon aria-hidden="true">assignment</mat-icon>Evaluación</h2>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Síntomas</mat-label>
+            <textarea matInput formControlName="sintomas" rows="3" placeholder="Qué se observa y qué refiere el dueño"></textarea>
+            <mat-error>Describa los síntomas</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Diagnóstico</mat-label>
+            <textarea matInput formControlName="diagnostico" rows="2" placeholder="Diagnóstico clínico"></textarea>
+            <mat-error>Indique el diagnóstico</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Tratamiento</mat-label>
+            <textarea matInput formControlName="tratamiento" rows="3" placeholder="Plan de tratamiento y cuidados en casa"></textarea>
+            <mat-error>Indique el tratamiento</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Observaciones (opcional)</mat-label>
+            <textarea matInput formControlName="observaciones" rows="2" placeholder="Próximo control, recomendaciones…"></textarea>
+          </mat-form-field>
+        </section>
 
-        <div class="form-section">
-          <h3 class="section-title"><mat-icon>person_outline</mat-icon> Datos de la Consulta</h3>
-          <div class="form-grid">
+        <!-- Atención -->
+        <section class="vs-seccion" aria-labelledby="s-atencion">
+          <h2 id="s-atencion"><mat-icon aria-hidden="true">badge</mat-icon>Atención</h2>
+          <div class="dos">
             <mat-form-field appearance="outline">
               <mat-label>Veterinario</mat-label>
               <mat-select formControlName="veterinarioId">
-                @for (v of veterinarios; track v) {
-                  <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+                @for (v of veterinarios; track v.id) {
+                  <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}@if (v.especialidad) { · {{ v.especialidad }} }</mat-option>
                 }
               </mat-select>
               <mat-error>Seleccione el veterinario</mat-error>
             </mat-form-field>
-
             <mat-form-field appearance="outline">
               <mat-label>Fecha</mat-label>
               <input matInput [matDatepicker]="dp" formControlName="fecha">
@@ -62,69 +91,20 @@
               <mat-datepicker #dp></mat-datepicker>
             </mat-form-field>
           </div>
-        </div>
+        </section>
 
-        <mat-divider></mat-divider>
-
-        <div class="form-section">
-          <h3 class="section-title"><mat-icon>monitor_heart</mat-icon> Signos Vitales</h3>
-          <div class="form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>Temperatura (°C)</mat-label>
-              <input matInput type="number" formControlName="temperatura" step="0.1" placeholder="38.5">
-              <mat-icon matSuffix>device_thermostat</mat-icon>
-              <mat-error>Temperatura entre 30 y 45 °C</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Peso actual (kg)</mat-label>
-              <input matInput type="number" formControlName="peso" step="0.1">
-              <mat-icon matSuffix>monitor_weight</mat-icon>
-              <mat-error>Ingrese el peso</mat-error>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="form-section">
-          <h3 class="section-title"><mat-icon>assignment</mat-icon> Historia Clínica</h3>
-          <div class="form-grid-1">
-            <mat-form-field appearance="outline">
-              <mat-label>Síntomas</mat-label>
-              <textarea matInput formControlName="sintomas" rows="3" placeholder="Describe los síntomas observados..."></textarea>
-              <mat-error>Los síntomas son requeridos</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Diagnóstico</mat-label>
-              <textarea matInput formControlName="diagnostico" rows="3" placeholder="Diagnóstico clínico..."></textarea>
-              <mat-error>El diagnóstico es requerido</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Tratamiento</mat-label>
-              <textarea matInput formControlName="tratamiento" rows="3" placeholder="Plan de tratamiento..."></textarea>
-              <mat-error>El tratamiento es requerido</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Observaciones</mat-label>
-              <textarea matInput formControlName="observaciones" rows="2"></textarea>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-actions">
+        <div class="vs-acciones">
           <button mat-stroked-button type="button" routerLink="/consultas">Cancelar</button>
-          <button mat-stroked-button color="primary" type="button" (click)="guardarSinReceta()" [disabled]="enviando">
+          <button mat-stroked-button type="button" (click)="guardarSinReceta()" [disabled]="enviando">
             <mat-icon>save</mat-icon> Guardar sin receta
           </button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
+          <button mat-flat-button type="submit" [disabled]="enviando">
             <mat-icon>medication</mat-icon> Guardar y crear receta
           </button>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      </div>
+
+      <app-ficha-paciente class="ficha" [ficha]="ficha" [motivo]="motivo" [notas]="notas" />
+    </form>
+  }
 </div>

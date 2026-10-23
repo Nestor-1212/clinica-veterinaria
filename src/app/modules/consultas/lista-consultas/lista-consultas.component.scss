@@ -1,0 +1,90 @@
+// Consultas: primero quién espera hoy, luego el historial con lo clínico a la vista.
+
+.header-actions { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); }
+
+// ----- Por atender hoy -----
+.espera {
+  margin-bottom: var(--vs-space-5);
+  padding: var(--vs-space-5) var(--vs-space-6);
+  border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+  h2 { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0 0 var(--vs-space-3); font-size: 17px; font-weight: 700; color: var(--vs-text); }
+}
+.espera-lista { display: grid; gap: var(--vs-space-2); margin: 0; padding: 0; list-style: none; }
+.paciente {
+  display: grid; grid-template-columns: 112px 40px minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-3) var(--vs-space-4); border-radius: var(--vs-radius-lg); background: var(--vs-surface-muted);
+}
+.paciente--urgente { background: var(--vs-attention-container); }
+.p-hora { display: grid;
+  strong { font-size: 15px; font-variant-numeric: tabular-nums; color: var(--vs-text); }
+  small { font-size: 12px; color: var(--vs-text-secondary); } }
+.paciente--urgente .p-hora small { color: var(--vs-on-attention-container); font-weight: 600; }
+.p-icono { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--vs-surface); color: var(--vs-primary);
+  mat-icon { font-size: 22px; width: 22px; height: 22px; } }
+.p-icono--sm { flex-shrink: 0; width: 34px; height: 34px; background: var(--vs-primary-soft);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+.p-texto { display: grid; gap: 2px; min-width: 0;
+  small { font-size: 13px; color: var(--vs-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.p-nombre { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vs-space-2);
+  strong { font-size: 16px; color: var(--vs-text); } }
+.alergia { display: inline-flex; align-items: center; gap: 3px; padding: 0 8px 0 6px; border-radius: var(--vs-radius-full);
+  background: var(--vs-danger-container); color: var(--vs-on-danger-container); font-size: 12px; font-weight: 600; line-height: 20px;
+  mat-icon { font-size: 14px; width: 14px; height: 14px; } }
+.espera-vacia { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; color: var(--vs-text-secondary); font-size: 14px;
+  mat-icon { color: var(--vs-success); } }
+
+// Atender una inmediata: ámbar oscuro (blanco encima 6.36:1)
+.btn-urgente {
+  --mat-button-filled-container-color: var(--vs-attention-text);
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-filled-icon-color: #fff;
+}
+
+// ----- Historial -----
+.table-toolbar { justify-content: space-between; }
+.consultas-tabla td.mat-mdc-cell { vertical-align: middle; }
+.dato { display: inline-grid; justify-items: start; gap: 2px; min-width: 0;
+  strong { font-size: 14px; color: var(--vs-text); }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.c-fecha strong::first-letter { text-transform: uppercase; }
+.paciente-celda { display: flex; align-items: center; gap: var(--vs-space-3);
+  a { font-size: 14px; font-weight: 600; color: var(--vs-text); text-decoration: none; }
+  a:hover { color: var(--vs-primary); text-decoration: underline; } }
+.corta { display: block; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.signos { display: grid; gap: 2px; font-variant-numeric: tabular-nums;
+  > span { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--vs-text); white-space: nowrap; }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.inmediata { display: inline-flex; align-items: center; gap: 2px; color: var(--vs-attention-text) !important;
+  mat-icon { font-size: 14px; width: 14px; height: 14px; } }
+.receta-ver { --mat-button-text-label-text-color: var(--vs-primary); }
+.receta-crear { --mat-button-text-label-text-color: var(--vs-text-secondary); }
+.tenue { color: var(--vs-text-muted); }
+.no-data button { margin-top: var(--vs-space-2); }
+
+@media (max-width: 767px) {
+  .espera { padding: var(--vs-space-4); }
+  .paciente { grid-template-columns: 40px minmax(0, 1fr); row-gap: var(--vs-space-2);
+    .p-hora { grid-column: 1 / -1; display: flex; gap: var(--vs-space-2); align-items: baseline; }
+    button { grid-column: 1 / -1; } }
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .vs-segmentado { align-self: flex-start; }
+
+  // Tarjeta compacta: paciente y menú, diagnóstico, fecha y receta
+  .mat-mdc-table.consultas-tabla {
+    tr.mat-mdc-row {
+      display: grid !important; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--vs-space-3);
+      grid-template-areas: 'pac acc' 'dia dia' 'fec rec';
+      padding: var(--vs-space-3) var(--vs-space-4) !important;
+    }
+    td.mat-mdc-cell { border-bottom: 0 !important; padding: 4px 0 !important; justify-content: flex-start; text-align: left;
+      &::before { display: none; } }
+    .c-paciente { grid-area: pac; }
+    .c-acciones { grid-area: acc; align-self: start; }
+    .c-diag { grid-area: dia; .corta { max-width: 100%; white-space: normal; } }
+    .c-fecha { grid-area: fec; align-self: center; .dato { display: flex; gap: var(--vs-space-2); align-items: baseline; } }
+    .c-receta { grid-area: rec; justify-content: flex-end; }
+    .c-signos, .c-vet { display: none !important; }
+  }
+}

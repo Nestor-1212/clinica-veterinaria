@@ -49,4 +49,17 @@ describe('FormConsultaComponent', () => {
     expect(leer<Cita>('vet_citas')[0].estado).toBe('completada');
     expect(navigate).toHaveBeenCalledWith(['/recetas/nueva'], { queryParams: { consultaId: consulta.id } });
   });
+
+  it('muestra el motivo de la cita, evalúa la temperatura por especie y guarda el peso medido en la mascota', () => {
+    sembrar({ vet_citas: [cita({ id: 'cita3', estado: 'confirmada', motivo: 'Vómitos desde ayer' })] });
+    const { componente } = crearComponente(FormConsultaComponent, { queryParams: { citaId: 'cita3', mascotaId: 'm1', clienteId: 'c1' } });
+    componente.ngOnInit();
+    expect(componente.motivo).toBe('Vómitos desde ayer');
+    expect(componente.ficha?.mascota.id).toBe('m1');
+    rellenarClinica(componente);
+    componente.form.patchValue({ temperatura: 40.1, peso: 31.5 });
+    expect(componente.estadoTemperatura).toBe('alta'); // Rocky es perro: normal hasta 39.2 °C
+    componente.guardarSinReceta();
+    expect(leer<{ id: string; peso: number }>('vet_mascotas').find(m => m.id === 'm1')?.peso).toBe(31.5);
+  });
 });
