@@ -12,7 +12,10 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: var(--vs-space-2) 0;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: var(--vs-space-3) var(--vs-space-3);
 }
 
 .nav-item {
@@ -20,25 +23,25 @@
   align-items: center;
   gap: 14px;
   padding: 0 var(--vs-space-4);
-  height: 48px;
+  height: 44px;
+  border-radius: var(--vs-radius-full);
   color: var(--vs-sidebar-text);
   font-weight: 500;
   text-decoration: none;
-  border-left: 3px solid transparent;
-  transition: background-color var(--vs-dur-fast) var(--vs-ease), color var(--vs-dur-fast) var(--vs-ease);
+  transition: background-color var(--vs-dur) var(--vs-ease), color var(--vs-dur) var(--vs-ease);
 
   &:hover {
     background: var(--vs-sidebar-hover-bg);
     color: #fff;
   }
 
-  // El outline no debe recortarse contra el borde del drawer
-  &:focus-visible { outline-offset: -3px; }
+  &:focus-visible { outline-offset: 2px; }
 
+  // Sección activa: píldora clara de la familia teal (#cdeae3, texto #0c3833 10.11:1;
+  // contra el menú 10.1:1, se distingue sin depender del color del texto)
   &.active-link {
-    background: var(--vs-sidebar-active-bg);
-    color: var(--vs-sidebar-active-text);
-    border-left-color: var(--vs-sidebar-active-text);
+    background: var(--vs-primary-container);
+    color: var(--vs-sidebar-bg);
     font-weight: 600;
   }
 }

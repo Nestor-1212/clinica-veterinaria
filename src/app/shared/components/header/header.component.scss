@@ -6,11 +6,14 @@
 
   background: var(--vs-primary) !important;
   color: var(--vs-on-primary);
-  box-shadow: var(--vs-shadow-2);
+  // Sin sombra: la barra fluye hacia el contenido por la franja teñida
   z-index: 1000;
   position: sticky;
   top: 0;
 }
+
+// Con menú fijo: el teal profundo del menú se prolonga y fluye hacia el primario
+:host(.con-riel) .app-header { background: var(--vs-header-gradient) !important; }
 
 .menu-btn { color: var(--vs-on-primary); }
 
@@ -35,7 +38,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   color: var(--vs-on-primary);
   display: flex;
   align-items: center;

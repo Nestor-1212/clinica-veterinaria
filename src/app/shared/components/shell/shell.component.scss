@@ -28,11 +28,19 @@
   overflow: hidden;
 }
 
+// Con el menú fijo (escritorio), la barra superior y el menú forman un marco teal
+// continuo y el contenido es una hoja que se curva hacia él: sin sombra ni filo
+// entre zonas, el marco profundo asoma por la esquina redondeada.
+.sidenav-container.con-riel {
+  background: var(--vs-sidebar-bg) !important;
+  .main-content { border-top-left-radius: var(--vs-radius-xl); }
+}
+
 .app-sidenav {
   width: 240px;
   border-right: none !important;
   border-radius: 0;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+  box-shadow: none;
 }
 
 .main-content {
@@ -43,6 +51,8 @@
   display: block;
   padding: var(--vs-space-6);
   min-height: 100%;
+  // Continuidad con la barra superior: la franja teal se diluye en el fondo
+  background: var(--vs-gradient-wash) no-repeat, var(--vs-bg);
 
   // Recibe foco programático desde el skip link; no necesita anillo propio
   &:focus { outline: none; }
