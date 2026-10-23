@@ -12,7 +12,10 @@ test('atención inmediata → consulta queda vinculada, tipo inmediata y cita co
 
   // Ana Castillo tiene una sola mascota (Max) en la semilla demo: se autoselecciona.
   await elegirOpcion(page, 'Propietario', 'Ana Castillo');
-  await elegirOpcion(page, 'Veterinario', /Carlos/);
+  await expect(page.getByRole('radio', { name: /Max/ })).toBeChecked();
+  await page.getByRole('button', { name: 'Vómitos', exact: true }).click();
+  await expect(page.locator('textarea[formControlName="motivo"]')).toHaveValue('Vómitos');
+  await page.getByRole('radio', { name: /Carlos/ }).check();
   await page.locator('textarea[formControlName="motivo"]').fill('E2E urgencia por vómitos');
   await page.getByRole('button', { name: /Iniciar atención$/ }).click();
 
@@ -44,7 +47,7 @@ test('recepción registra atención inmediata y vuelve a Citas (no a Consultas)'
   await login(page, 'recepcion');
   await page.goto('/citas/nueva?tipo=inmediata');
   await elegirOpcion(page, 'Propietario', 'Ana Castillo');
-  await elegirOpcion(page, 'Veterinario', /Carlos/);
+  await page.getByRole('radio', { name: /Carlos/ }).check();
   await page.locator('textarea[formControlName="motivo"]').fill('E2E recepción inmediata');
   await page.getByRole('button', { name: /Iniciar atención$/ }).click();
   await expect(page).toHaveURL(/\/citas$/);

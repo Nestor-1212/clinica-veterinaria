@@ -1,0 +1,82 @@
+// Ficha del paciente (atención inmediata): lo que hay que saber antes de atenderlo.
+.ficha {
+  position: sticky;
+  top: var(--vs-space-4);
+  display: grid;
+  gap: var(--vs-space-4);
+  padding: var(--vs-space-6);
+  border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+
+  h3 { margin: 0 0 var(--vs-space-1); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--vs-text-muted); }
+  p { margin: 0; }
+}
+
+.ficha-cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--vs-space-3);
+  h2 { margin: 0; font-size: 22px; font-weight: 700; color: var(--vs-text); }
+  p { font-size: 14px; color: var(--vs-text-secondary); text-transform: capitalize; }
+}
+.ficha-icono {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--vs-radius-full);
+  background: var(--vs-primary);
+  color: var(--vs-on-primary);
+  mat-icon { font-size: 28px; width: 28px; height: 28px; }
+}
+
+.ficha-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--vs-space-3);
+  margin: 0;
+  div { padding: var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-surface-muted); }
+  dt { font-size: 12px; color: var(--vs-text-secondary); }
+  dd { margin: 0; font-size: 17px; font-weight: 600; color: var(--vs-text); }
+}
+
+.ficha-alergia,
+.ficha-linea {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vs-space-2);
+  font-size: 14px;
+  mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
+}
+.ficha-alergia {
+  padding: var(--vs-space-3);
+  border-radius: var(--vs-radius-md);
+  background: var(--vs-danger-container);
+  color: var(--vs-on-danger-container);
+}
+.ficha-linea { color: var(--vs-text); mat-icon { color: var(--vs-success); } }
+.ficha-linea--atencion { color: var(--vs-attention-text); mat-icon { color: var(--vs-attention-text); } }
+
+.ficha-bloque { padding-top: var(--vs-space-4); border-top: 1px solid var(--vs-border); }
+.ficha-ultima {
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+  strong { color: var(--vs-text); }
+  span { color: var(--vs-text-secondary); }
+}
+.ficha-dueno { font-size: 15px; }
+.ficha-contacto { display: flex; flex-wrap: wrap; gap: var(--vs-space-1); margin: var(--vs-space-1) 0 0 calc(-1 * var(--vs-space-3)); }
+
+.ficha-vacia {
+  display: grid;
+  justify-items: center;
+  gap: var(--vs-space-2);
+  padding: var(--vs-space-6) var(--vs-space-2);
+  text-align: center;
+  mat-icon { font-size: 40px; width: 40px; height: 40px; color: var(--vs-primary); opacity: .5; }
+  h2 { margin: 0; font-size: 17px; font-weight: 600; color: var(--vs-text); }
+  p { font-size: 14px; color: var(--vs-text-secondary); max-width: 32ch; }
+}
+
