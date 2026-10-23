@@ -1,2 +1,73 @@
-.total-mes { color: var(--vs-success); font-size: 18px; }
-.total-val { color: var(--vs-primary); font-size: 15px; }
+// Pagos: cuánto entró, cuánto falta cobrar y a quién.
+
+// ----- Indicadores -----
+.resumen {
+  display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: var(--vs-space-6);
+  margin-bottom: var(--vs-space-5); padding: var(--vs-space-6); border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface); box-shadow: var(--vs-shadow-soft);
+}
+.resumen-cifras { display: grid; gap: var(--vs-space-5); align-content: start; }
+.resumen-secundarias { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--vs-space-4);
+  padding-top: var(--vs-space-4); border-top: 1px solid var(--vs-border); }
+
+.metodos {
+  padding-left: var(--vs-space-6); border-left: 1px solid var(--vs-border);
+  h2 { margin: 0 0 var(--vs-space-4); font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }
+  ul { display: grid; gap: var(--vs-space-3); margin: 0; padding: 0; list-style: none; }
+  li { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-3); }
+}
+.m-nombre { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--vs-text);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); } }
+// Barras de una sola serie: magnitud, un solo tono
+.m-barra { height: 8px; border-radius: 4px; background: var(--vs-surface-muted); overflow: hidden;
+  span { display: block; height: 100%; border-radius: 4px; background: var(--vs-chart-1); } }
+.m-valor { font-size: 14px; font-weight: 600; color: var(--vs-text); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right;
+  small { font-weight: 400; color: var(--vs-text-muted); } }
+
+// ----- Tabla -----
+.table-toolbar { justify-content: space-between; }
+.pagos-tabla td.mat-mdc-cell { vertical-align: middle; }
+.num { text-align: right; }
+.dato { display: inline-grid; justify-items: start; gap: 2px; min-width: 0;
+  strong { font-size: 14px; color: var(--vs-text); }
+  small { font-size: 12px; color: var(--vs-text-muted); }
+  > a { font-size: 14px; font-weight: 600; color: var(--vs-text); text-decoration: none; }
+  > a:hover { color: var(--vs-primary); text-decoration: underline; } }
+.c-fecha strong::first-letter { text-transform: uppercase; }
+.corta { display: block; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--vs-text-secondary); }
+.metodo { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--vs-text-secondary); white-space: nowrap;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); } }
+.total { font-size: 15px; color: var(--vs-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.total--anulado { color: var(--vs-text-muted); text-decoration: line-through; }
+.fila-anulada .dato > a, .fila-anulada .dato strong { color: var(--vs-text-muted); }
+.c-acciones { white-space: nowrap; }
+.cobrar { margin-right: var(--vs-space-1); }
+.menu-peligro { color: var(--vs-danger); mat-icon { color: var(--vs-danger); } }
+
+@media (max-width: 1100px) {
+  .resumen { grid-template-columns: 1fr; }
+  .metodos { padding: var(--vs-space-4) 0 0; border-left: 0; border-top: 1px solid var(--vs-border); }
+}
+@media (max-width: 767px) {
+  .resumen { padding: var(--vs-space-4); }
+  .resumen-secundarias { grid-template-columns: 1fr 1fr; }
+  .metodos li { grid-template-columns: 104px minmax(0, 1fr) auto; }
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .vs-segmentado { align-self: flex-start; }
+
+  .mat-mdc-table.pagos-tabla {
+    tr.mat-mdc-row {
+      display: grid !important; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--vs-space-3);
+      grid-template-areas: 'cli tot' 'fec est' 'acc acc';
+      padding: var(--vs-space-3) var(--vs-space-4) !important;
+    }
+    td.mat-mdc-cell { border-bottom: 0 !important; padding: 4px 0 !important; justify-content: flex-start; text-align: left;
+      &::before { display: none; } }
+    .c-cliente { grid-area: cli; }
+    .c-total { grid-area: tot; justify-content: flex-end; }
+    .c-fecha { grid-area: fec; .dato { display: flex; gap: var(--vs-space-2); align-items: baseline; } }
+    .c-estado { grid-area: est; justify-content: flex-end; .dato { justify-items: end; } }
+    .c-acciones { grid-area: acc; justify-content: flex-end; }
+    .c-concepto, .c-metodo { display: none !important; }
+  }
+}

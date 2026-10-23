@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { descuentoValido, subtotalLineas, totalPago } from './pagos';
+import { cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, subtotalLineas, totalPago } from './pagos';
+import { Pago } from '../models';
 
 describe('Cálculo de pagos (B10)', () => {
   it('subtotal de las líneas redondeado a centavos', () => {
@@ -17,5 +18,36 @@ describe('Cálculo de pagos (B10)', () => {
   it('total = subtotal − descuento; con descuento excesivo no se calcula', () => {
     expect(totalPago(103, 3)).toBe(100);
     expect(() => totalPago(20, 25)).toThrow();
+  });
+});
+
+describe('lista de pagos', () => {
+  const HOY = new Date(2026, 9, 23, 15);
+  const pago = (total: number, metodoPago: Pago['metodoPago'], estado: Pago['estado'], fecha: Date, fechaPago?: Date): Pago => ({
+    id: String(Math.random()), clienteId: 'c', mascotaId: 'm', fecha, fechaPago, items: [{ descripcion: 'Consulta', categoria: 'consulta', cantidad: 1, precioUnitario: total, subtotal: total }],
+    subtotal: total, descuento: 0, total, metodoPago, estado
+  });
+  const pagos = [
+    pago(30, 'efectivo', 'pagado', new Date(2026, 9, 23, 9)),
+    pago(50, 'yappy', 'pagado', new Date(2026, 9, 2)),
+    pago(20, 'yappy', 'pagado', new Date(2026, 8, 28), new Date(2026, 9, 23, 10)), // pendiente de sept cobrado hoy
+    pago(99, 'tarjeta', 'pendiente', new Date(2026, 9, 23)),
+    pago(10, 'tarjeta', 'anulado', new Date(2026, 9, 23))
+  ];
+
+  it('cobrado hoy cuenta por fecha de cobro y solo lo pagado', () => {
+    expect(cobradoHoy(pagos, HOY)).toEqual({ total: 50, cantidad: 2 });
+  });
+
+  it('cobrado del mes por método, de mayor a menor', () => {
+    expect(cobradoPorMetodo(pagos, HOY)).toEqual([
+      { metodo: 'yappy', total: 70, porcentaje: 70 }, { metodo: 'efectivo', total: 30, porcentaje: 30 }
+    ]);
+  });
+
+  it('concepto: primer servicio y cuántos más', () => {
+    const p = pago(10, 'efectivo', 'pagado', HOY);
+    expect(conceptoPago(p)).toBe('Consulta');
+    expect(conceptoPago({ ...p, items: [...p.items, ...p.items] })).toBe('Consulta + 1 más');
   });
 });
