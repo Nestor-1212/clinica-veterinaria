@@ -1,115 +1,160 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h1><mat-icon>pets</mat-icon> {{ isEdit ? 'Editar Mascota' : 'Registrar Mascota' }}</h1>
-      <p>Complete todos los datos del paciente</p>
+      <h1><mat-icon>{{ isEdit ? 'edit' : 'pets' }}</mat-icon> {{ isEdit ? 'Editar a ' + (nombreOriginal || 'la mascota') : 'Nueva mascota' }}</h1>
+      <p>
+        @if (dueno; as d) { {{ isEdit ? 'Paciente' : 'Nuevo paciente' }} de {{ d.nombre }} }
+        @else { Registre al paciente; los campos con * son obligatorios }
+      </p>
     </div>
-    <button mat-stroked-button (click)="cancelar()">
-      <mat-icon>arrow_back</mat-icon> Volver
-    </button>
+    <button mat-button type="button" (click)="cancelar()"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="foto-section">
-          <div class="foto-preview" role="button" tabindex="0" aria-label="Seleccionar foto de la mascota"
-            (click)="fotoInput.click()" (keydown.enter)="fotoInput.click()" (keydown.space)="$event.preventDefault(); fotoInput.click()">
-            @if (fotoPreview) {
-              <img [src]="fotoPreview" alt="Foto mascota">
+  <form class="registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="registro-secciones">
+      <!-- Dueño -->
+      <section class="seccion" aria-labelledby="s-dueno">
+        <h2 id="s-dueno"><mat-icon aria-hidden="true">person</mat-icon>Dueño</h2>
+        <mat-form-field appearance="outline" class="ancho">
+          <mat-label>Propietario</mat-label>
+          <mat-select formControlName="clienteId">
+            @for (c of clientes; track c.id) {
+              <mat-option [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
             }
-            @if (!fotoPreview) {
-              <div class="foto-placeholder">
-                <mat-icon>add_photo_alternate</mat-icon>
-                <span>Agregar foto</span>
-              </div>
+          </mat-select>
+          <mat-error>Seleccione el propietario</mat-error>
+        </mat-form-field>
+      </section>
+
+      <!-- Identificación -->
+      <section class="seccion" aria-labelledby="s-id">
+        <h2 id="s-id"><mat-icon aria-hidden="true">badge</mat-icon>Identificación</h2>
+        <mat-form-field appearance="outline" class="ancho">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="nombre" placeholder="Ej: Max" autocomplete="off">
+          <mat-error>Escriba el nombre (mínimo 2 letras)</mat-error>
+        </mat-form-field>
+
+        <fieldset class="grupo">
+          <legend>Especie *</legend>
+          <div class="especies">
+            @for (t of tipos; track t) {
+              <label class="especie" [class.elegida]="v('tipo') === t">
+                <input type="radio" formControlName="tipo" [value]="t">
+                <mat-icon aria-hidden="true">{{ iconoEspecie[t] }}</mat-icon>
+                <span>{{ t }}</span>
+              </label>
             }
           </div>
-          <input #fotoInput type="file" accept="image/*" (change)="onFotoChange($event)" hidden>
-        </div>
+        </fieldset>
 
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Propietario</mat-label>
-            <mat-select formControlName="clienteId">
-              @for (c of clientes; track c) {
-                <mat-option [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
-              }
-            </mat-select>
-            <mat-icon matSuffix>person</mat-icon>
-            <mat-error>Seleccione el propietario</mat-error>
-          </mat-form-field>
+        <fieldset class="grupo">
+          <legend>Sexo *</legend>
+          <div class="sexos">
+            <label class="sexo" [class.elegida]="v('sexo') === 'macho'">
+              <input type="radio" formControlName="sexo" value="macho"><mat-icon aria-hidden="true">male</mat-icon>Macho
+            </label>
+            <label class="sexo" [class.elegida]="v('sexo') === 'hembra'">
+              <input type="radio" formControlName="sexo" value="hembra"><mat-icon aria-hidden="true">female</mat-icon>Hembra
+            </label>
+          </div>
+        </fieldset>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Ej: Max">
-            <mat-icon matSuffix>pets</mat-icon>
-            <mat-error>El nombre es requerido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Tipo</mat-label>
-            <mat-select formControlName="tipo">
-              @for (t of tipos; track t) {
-                <mat-option [value]="t">{{ t }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
+        <div class="dos">
           <mat-form-field appearance="outline">
             <mat-label>Raza</mat-label>
-            <input matInput formControlName="raza" placeholder="Ej: Golden Retriever">
-            <mat-error>La raza es requerida</mat-error>
+            <input matInput formControlName="raza" [matAutocomplete]="auto" placeholder="Escriba o elija" autocomplete="off">
+            <mat-autocomplete #auto="matAutocomplete">
+              @for (r of razas; track r) {
+                <mat-option [value]="r">{{ r }}</mat-option>
+              }
+            </mat-autocomplete>
+            <mat-error>Indique la raza (o «Mestizo»)</mat-error>
           </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Sexo</mat-label>
-            <mat-select formControlName="sexo">
-              <mat-option value="macho">Macho</mat-option>
-              <mat-option value="hembra">Hembra</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Edad (años)</mat-label>
-            <input matInput type="number" formControlName="edad" min="0">
-            <mat-error>Ingrese la edad</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Peso (kg)</mat-label>
-            <input matInput type="number" formControlName="peso" step="0.1" min="0.1">
-            <mat-icon matSuffix>monitor_weight</mat-icon>
-            <mat-error>Ingrese el peso</mat-error>
-          </mat-form-field>
-
           <mat-form-field appearance="outline">
             <mat-label>Color</mat-label>
-            <input matInput formControlName="color" placeholder="Ej: Dorado con blanco">
-            <mat-error>El color es requerido</mat-error>
+            <input matInput formControlName="color" placeholder="Ej: Dorado con blanco" autocomplete="off">
+            <mat-error>Indique el color</mat-error>
           </mat-form-field>
+        </div>
+      </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha de Nacimiento</mat-label>
-            <input matInput [matDatepicker]="dp" formControlName="fechaNacimiento">
+      <!-- Edad y peso -->
+      <section class="seccion" aria-labelledby="s-edad">
+        <h2 id="s-edad"><mat-icon aria-hidden="true">monitor_weight</mat-icon>Edad y peso</h2>
+        <div class="tres">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Fecha de nacimiento</mat-label>
+            <input matInput [matDatepicker]="dp" formControlName="fechaNacimiento" [max]="hoy">
             <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-            <mat-datepicker #dp></mat-datepicker>
+            <mat-datepicker #dp startView="multi-year"></mat-datepicker>
+            <mat-hint>Opcional: calcula la edad</mat-hint>
           </mat-form-field>
-
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Alergias conocidas</mat-label>
-            <textarea matInput formControlName="alergias" rows="2" placeholder="Describe las alergias si las hay..."></textarea>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Edad</mat-label>
+            <input matInput type="number" inputmode="numeric" formControlName="edad" min="0">
+            <span matTextSuffix>años</span>
+            <mat-hint>0 si tiene menos de un año</mat-hint>
+            <mat-error>Indique la edad</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Peso</mat-label>
+            <input matInput type="number" inputmode="decimal" formControlName="peso" step="0.1" min="0.1">
+            <span matTextSuffix>kg</span>
+            <mat-error>Indique el peso (mayor que 0)</mat-error>
           </mat-form-field>
         </div>
+      </section>
 
-        <div class="form-actions">
-          <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
-            <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
-            {{ isEdit ? 'Actualizar Mascota' : 'Registrar Mascota' }}
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <!-- Salud -->
+      <section class="seccion" aria-labelledby="s-salud">
+        <h2 id="s-salud"><mat-icon aria-hidden="true">health_and_safety</mat-icon>Salud</h2>
+        <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
+          <mat-label>Alergias conocidas</mat-label>
+          <textarea matInput formControlName="alergias" rows="2" placeholder="Ej: penicilina, pollo. Déjelo vacío si no tiene"></textarea>
+          <mat-hint>Se mostrará en rojo cada vez que se atienda</mat-hint>
+        </mat-form-field>
+      </section>
+
+      <div class="acciones">
+        <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon> {{ isEdit ? 'Guardar cambios' : 'Registrar mascota' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Vista previa de la ficha -->
+    <aside class="previa" aria-label="Vista previa de la ficha">
+      <p class="previa-titulo">Así se verá su ficha</p>
+      <div class="foto">
+        <button type="button" class="foto-boton" (click)="fotoInput.click()" [attr.aria-label]="fotoPreview ? 'Cambiar la foto' : 'Agregar una foto'">
+          @if (fotoPreview) {
+            <img [src]="fotoPreview" alt="">
+          } @else {
+            <mat-icon aria-hidden="true">{{ especie(v('tipo')) }}</mat-icon>
+          }
+          <span class="foto-camara" aria-hidden="true"><mat-icon>photo_camera</mat-icon></span>
+        </button>
+        <input #fotoInput type="file" accept="image/*" (change)="onFotoChange($event)" hidden>
+        @if (fotoPreview) {
+          <button mat-button type="button" class="foto-quitar" (click)="quitarFoto()">Quitar foto</button>
+        }
+      </div>
+      <h2 class="previa-nombre" [class.vacio]="!v('nombre')">{{ v('nombre') || 'Nombre' }}</h2>
+      <p class="previa-sub">{{ v('tipo') }}@if (v('raza')) { · {{ v('raza') }} } · {{ v('sexo') === 'hembra' ? 'Hembra' : 'Macho' }}</p>
+      <dl class="previa-datos">
+        <div><dt>Edad</dt><dd>{{ v('edad') !== null && v('edad') !== '' ? (v('edad') | edad) : '—' }}</dd></div>
+        <div><dt>Peso</dt><dd>{{ v('peso') ? v('peso') + ' kg' : '—' }}</dd></div>
+      </dl>
+      @if (v('alergias')?.trim()) {
+        <p class="previa-alergia"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ v('alergias') }}</span></p>
+      } @else {
+        <p class="previa-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias registradas</p>
+      }
+      @if (dueno; as d) {
+        <p class="previa-dueno"><mat-icon aria-hidden="true">person</mat-icon>{{ d.nombre }} · {{ d.telefono }}</p>
+      }
+    </aside>
+  </form>
 </div>

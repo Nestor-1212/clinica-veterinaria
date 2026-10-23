@@ -231,6 +231,14 @@ mat-progress-bar.mat-mdc-progress-bar { border-radius: var(--vs-radius-full); }
   margin-bottom: var(--vs-space-4);
   flex-wrap: wrap;
   align-items: center;
+
+  // Filtros compactos (40px): a la altura del control segmentado, no de un formulario
+  .mat-mdc-form-field {
+    @include mat.form-field-density(-4);
+    @include mat.select-density(-4);
+    @include mat.icon-button-density(-4);
+    font-size: 14px;
+  }
 }
 
 .filter-field {

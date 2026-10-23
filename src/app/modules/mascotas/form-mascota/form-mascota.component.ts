@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,18 +7,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { Cliente, TipoMascota } from '../../../core/models';
+import { ICONO_ESPECIE } from '../../../core/utils/clientes';
+import { edadEnAnios, sugerirRazas } from '../../../core/utils/mascotas';
+import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatSuffix, MatError, MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel, MatSuffix, MatError, MatHint, MatInput } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-form-mascota',
     templateUrl: './form-mascota.component.html',
     styleUrls: ['./form-mascota.component.scss'],
-    imports: [MatIcon, MatButton, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker]
+    imports: [MatIcon, MatButton, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatHint, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, EdadPipe]
 })
 export class FormMascotaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -26,6 +30,7 @@ export class FormMascotaComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
+  private destroyRef = inject(DestroyRef);
 
   form: FormGroup;
   /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
@@ -33,10 +38,15 @@ export class FormMascotaComponent implements OnInit {
   private host = inject(ElementRef, { optional: true });
   isEdit = false;
   mascotaId = '';
+  nombreOriginal = '';
   clientes: Cliente[] = [];
-  tipos: TipoMascota[] = ['Perro', 'Gato', 'Ave', 'Conejo', 'Reptil', 'Otro'];
-  sexos = ['macho', 'hembra'];
+  readonly tipos: TipoMascota[] = ['Perro', 'Gato', 'Ave', 'Conejo', 'Reptil', 'Otro'];
+  readonly iconoEspecie = ICONO_ESPECIE;
+  readonly hoy = new Date();
+  razas: string[] = sugerirRazas('Perro', '');
   fotoPreview: string | null = null;
+  /** A dónde vuelve Cancelar: al expediente si se llegó desde un cliente. */
+  volverA: string[] = ['/mascotas'];
 
   constructor() {
     this.form = this.fb.group({
@@ -45,12 +55,21 @@ export class FormMascotaComponent implements OnInit {
       tipo: ['Perro', Validators.required],
       raza: ['', Validators.required],
       sexo: ['macho', Validators.required],
-      edad: [0, [Validators.required, Validators.min(0)]],
-      peso: [0, [Validators.required, Validators.min(0.1)]],
+      // Vacíos al empezar (antes "0", que había que borrar)
+      edad: [null, [Validators.required, Validators.min(0)]],
+      peso: [null, [Validators.required, Validators.min(0.1)]],
       color: ['', Validators.required],
       fechaNacimiento: [''],
       alergias: [''],
       foto: ['']
+    });
+    const ctrl = (n: string) => this.form.get(n)!;
+    ctrl('tipo').valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.actualizarRazas());
+    ctrl('raza').valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.actualizarRazas());
+    // Con fecha de nacimiento, la edad se calcula sola
+    ctrl('fechaNacimiento').valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(f => {
+      const anios = edadEnAnios(f, this.hoy);
+      if (anios !== null) ctrl('edad').setValue(anios);
     });
   }
 
@@ -59,16 +78,35 @@ export class FormMascotaComponent implements OnInit {
     this.mascotaId = this.route.snapshot.params.id;
 
     const clienteId = this.route.snapshot.queryParams.clienteId;
-    if (clienteId) this.form.patchValue({ clienteId });
+    if (clienteId) {
+      this.form.patchValue({ clienteId });
+      this.volverA = ['/clientes', clienteId];
+    }
 
     if (this.mascotaId) {
       this.isEdit = true;
+      this.volverA = ['/mascotas', this.mascotaId];
       const m = this.mascotasService.getById(this.mascotaId);
       if (m) {
         this.form.patchValue(m);
+        this.nombreOriginal = m.nombre;
         this.fotoPreview = m.foto || null;
       }
     }
+  }
+
+  get dueno(): Cliente | undefined {
+    const id = this.form.get('clienteId')?.value;
+    return id ? this.clientes.find(c => c.id === id) : undefined;
+  }
+
+  especie(tipo: TipoMascota): string { return ICONO_ESPECIE[tipo] ?? ICONO_ESPECIE.Otro; }
+
+  /** Valor de un campo para la vista previa. */
+  v(nombre: string) { return this.form.get(nombre)?.value; }
+
+  private actualizarRazas(): void {
+    this.razas = sugerirRazas(this.v('tipo'), this.v('raza'));
   }
 
   onFotoChange(event: Event): void {
@@ -80,6 +118,11 @@ export class FormMascotaComponent implements OnInit {
       this.form.patchValue({ foto: this.fotoPreview });
     };
     reader.readAsDataURL(file);
+  }
+
+  quitarFoto(): void {
+    this.fotoPreview = null;
+    this.form.patchValue({ foto: '' });
   }
 
   onSubmit(): void {
@@ -99,6 +142,6 @@ export class FormMascotaComponent implements OnInit {
   }
 
   cancelar(): void {
-    this.router.navigate(['/mascotas']);
+    this.router.navigate(this.volverA);
   }
 }

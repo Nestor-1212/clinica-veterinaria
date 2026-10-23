@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Cita, Cliente, Consulta, Mascota, Vacuna } from '../models';
-import { conteoSegmentosMascotas, enSegmentoMascotas, filasMascotas } from './mascotas';
+import { conteoSegmentosMascotas, edadEnAnios, enSegmentoMascotas, filasMascotas, sugerirRazas } from './mascotas';
 
 const HOY = new Date(2026, 9, 22, 12, 0);
 const dias = (n: number, h = 10) => new Date(2026, 9, 22 + n, h, 0);
@@ -41,5 +41,21 @@ describe('filas de mascotas', () => {
     expect(enSegmentoMascotas(rex, 'alergias')).toBe(true);
     expect(enSegmentoMascotas(mia, 'alergias')).toBe(false);
     expect(conteoSegmentosMascotas(filas)).toEqual({ todos: 2, vacunas: 1, alergias: 1, cita: 1 });
+  });
+});
+
+describe('registro de mascotas', () => {
+  it('sugiere razas de la especie sin distinguir tildes', () => {
+    expect(sugerirRazas('Gato', 'siames')).toEqual(['Siamés']);
+    expect(sugerirRazas('Perro', '')).toContain('Mestizo');
+    expect(sugerirRazas('Ave', 'labrador')).toEqual([]);
+  });
+
+  it('calcula los años cumplidos desde la fecha de nacimiento', () => {
+    expect(edadEnAnios(new Date(2023, 9, 22), HOY)).toBe(3);
+    expect(edadEnAnios(new Date(2023, 9, 23), HOY)).toBe(2);
+    expect(edadEnAnios(new Date(2026, 5, 1), HOY)).toBe(0);
+    expect(edadEnAnios(new Date(2027, 0, 1), HOY)).toBeNull();
+    expect(edadEnAnios('', HOY)).toBeNull();
   });
 });

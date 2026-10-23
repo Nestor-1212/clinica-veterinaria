@@ -1,8 +1,112 @@
-.foto-section { display: flex; justify-content: center; margin-bottom: 24px; }
-.foto-preview {
-  width: 120px; height: 120px; border-radius: 50%; overflow: hidden;
-  border: 3px dashed var(--vs-border-strong); cursor: pointer; display: flex; align-items: center; justify-content: center;
-  img { width: 100%; height: 100%; object-fit: cover; }
-  &:hover { border-color: var(--vs-primary); }
+// Registro de mascota: secciones a la izquierda, vista previa de la ficha fija a la derecha.
+// Mismo lenguaje que la atención inmediata (tarjetas de un toque, ficha del paciente).
+
+.registro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: var(--vs-space-6);
+  align-items: start;
 }
-.foto-placeholder { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } span { display: block; font-size: 12px; } }
+.registro-secciones { display: grid; gap: var(--vs-space-4); }
+
+.seccion {
+  padding: var(--vs-space-5) var(--vs-space-6) var(--vs-space-3);
+  border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+  h2 {
+    display: flex; align-items: center; gap: var(--vs-space-2);
+    margin: 0 0 var(--vs-space-4); font-size: 17px; font-weight: 600; color: var(--vs-text);
+    mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); }
+  }
+}
+.ancho { width: 100%; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--vs-space-4); }
+.tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 var(--vs-space-4); align-items: start;
+  mat-form-field { margin-bottom: var(--vs-space-4); } }
+.seccion > mat-form-field[subscriptSizing='dynamic'] { margin-bottom: var(--vs-space-4); }
+
+// Especie y sexo: radios nativos dentro de etiquetas (teclado y lector de pantalla)
+.grupo {
+  margin: 0 0 var(--vs-space-4); padding: 0; border: 0; min-width: 0;
+  legend { margin-bottom: var(--vs-space-2); padding: 0; font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }
+}
+.especies { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--vs-space-2); }
+.sexos { display: inline-flex; gap: var(--vs-space-2); }
+
+.especie, .sexo {
+  position: relative; display: flex; align-items: center; cursor: pointer;
+  border: 1.5px solid var(--vs-border); border-radius: var(--vs-radius-lg); background: var(--vs-surface);
+  color: var(--vs-text); font-size: 14px; font-weight: 500;
+  transition: border-color var(--vs-dur-fast) var(--vs-ease), background var(--vs-dur-fast) var(--vs-ease);
+  input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  mat-icon { color: var(--vs-primary); }
+  &:hover { border-color: var(--vs-border-strong); background: var(--vs-row-hover); }
+  &:has(input:focus-visible) { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &.elegida { border-color: var(--vs-primary); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-weight: 600; }
+}
+.especie {
+  flex-direction: column; justify-content: center; gap: 4px; min-height: 76px; padding: var(--vs-space-2);
+  mat-icon { font-size: 26px; width: 26px; height: 26px; }
+}
+.sexo { gap: 6px; min-height: 44px; padding: 0 var(--vs-space-5) 0 var(--vs-space-4); }
+
+.acciones {
+  display: flex; justify-content: flex-end; gap: var(--vs-space-3); padding-top: var(--vs-space-2);
+  button { min-height: 48px; padding-inline: var(--vs-space-6); }
+}
+
+// Vista previa
+.previa {
+  position: sticky; top: var(--vs-space-4);
+  display: grid; justify-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-6); border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface); box-shadow: var(--vs-shadow-soft); text-align: center;
+  p { margin: 0; }
+}
+.previa-titulo { justify-self: stretch; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--vs-text-muted); text-align: left; }
+
+.foto { display: grid; justify-items: center; gap: 2px; }
+.foto-boton {
+  position: relative; display: grid; place-items: center; width: 112px; height: 112px; padding: 0;
+  border: 0; border-radius: 50%; background: var(--vs-primary-soft); color: var(--vs-primary); cursor: pointer;
+  img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  > mat-icon { font-size: 52px; width: 52px; height: 52px; }
+  &:hover .foto-camara { background: var(--vs-primary-hover); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 3px; }
+}
+.foto-camara {
+  position: absolute; right: 2px; bottom: 2px; display: grid; place-items: center; width: 34px; height: 34px;
+  border: 3px solid var(--vs-surface); border-radius: 50%; background: var(--vs-primary); color: var(--vs-on-primary);
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+.foto-quitar { --mat-button-text-label-text-color: var(--vs-text-secondary); }
+
+.previa-nombre { margin: 0; font-size: 22px; font-weight: 700; color: var(--vs-text); overflow-wrap: anywhere;
+  &.vacio { color: var(--vs-text-muted); font-weight: 500; } }
+.previa-sub { font-size: 14px; color: var(--vs-text-secondary); }
+.previa-datos {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--vs-space-3); justify-self: stretch; margin: 0;
+  div { padding: var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-surface-muted); text-align: left; }
+  dt { font-size: 12px; color: var(--vs-text-secondary); }
+  dd { margin: 0; font-size: 17px; font-weight: 600; color: var(--vs-text); }
+}
+.previa-alergia, .previa-linea, .previa-dueno {
+  display: flex; align-items: flex-start; gap: var(--vs-space-2); justify-self: stretch; text-align: left; font-size: 14px;
+  mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
+}
+.previa-alergia { padding: var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-danger-container); color: var(--vs-on-danger-container); }
+.previa-linea mat-icon { color: var(--vs-success); }
+.previa-dueno { padding-top: var(--vs-space-3); border-top: 1px solid var(--vs-border); color: var(--vs-text-secondary); mat-icon { color: var(--vs-primary); } }
+
+@media (max-width: 1023px) {
+  .registro { grid-template-columns: 1fr; }
+  .previa { position: static; order: -1; }
+}
+@media (max-width: 599px) {
+  .seccion { padding: var(--vs-space-4) var(--vs-space-4) var(--vs-space-2); }
+  .especies { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dos, .tres { grid-template-columns: 1fr; }
+  .acciones { flex-direction: column-reverse; button { width: 100%; } }
+}
+@media (prefers-reduced-motion: reduce) { .especie, .sexo { transition: none; } }
