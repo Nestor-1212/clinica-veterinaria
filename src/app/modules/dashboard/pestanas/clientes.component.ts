@@ -12,7 +12,7 @@ import { DatosDashboard, enDias, entero, plural } from '../dashboard-datos';
   selector: 'app-dashboard-clientes',
   imports: [RouterLink, DatePipe, MatIcon, MatButton, KpiComponent],
   templateUrl: './clientes.component.html',
-  styleUrls: ['./pestanas.scss', './clientes.component.scss'],
+  styleUrls: ['./pestanas.scss', './listas.scss', './clientes.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClientesComponent {

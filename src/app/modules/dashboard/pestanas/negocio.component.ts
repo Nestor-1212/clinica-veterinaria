@@ -12,7 +12,7 @@ import { DatosDashboard, entero, moneda, plural, tramoAnterior } from '../dashbo
   selector: 'app-dashboard-negocio',
   imports: [RouterLink, MatIcon, KpiComponent, GraficoColumnasComponent, GraficoBarrasComponent],
   templateUrl: './negocio.component.html',
-  styleUrls: ['./pestanas.scss', './negocio.component.scss'],
+  styleUrls: ['./pestanas.scss', './listas.scss', './negocio.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NegocioComponent {

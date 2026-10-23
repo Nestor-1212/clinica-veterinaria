@@ -1,0 +1,49 @@
+// Listas de acción, cifras y tablas de las pestañas del dashboard (separado de
+// pestanas.scss por el presupuesto de 6 kB por hoja).
+
+/* ----- Listas: nombre y dato completos (envuelven, no se recortan) ----- */
+// Separadores finos con sangría (no tocan los bordes) y fila teñida al pasar el puntero
+.lista { list-style: none; margin: 0 calc(var(--vs-space-3) * -1); padding: 0; }
+.lista-fila {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-1) var(--vs-space-3);
+  padding: var(--vs-space-3); border-radius: var(--vs-radius-md); transition: background-color var(--vs-dur-fast) var(--vs-ease);
+  & + &::before { content: ''; position: absolute; top: 0; left: var(--vs-space-3); right: var(--vs-space-3); height: 1px; background: var(--vs-border); transition: opacity var(--vs-dur-fast) var(--vs-ease); }
+}
+@media (hover: hover) {
+  .lista-fila:hover { background: var(--vs-row-hover); }
+  .lista-fila:hover::before, .lista-fila:hover + .lista-fila::before { opacity: 0; }
+}
+.lista-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.lista-titulo { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--vs-text); text-decoration: none; overflow-wrap: anywhere; }
+a.lista-titulo:hover { text-decoration: underline; text-underline-offset: 3px; }
+.lista-detalle { font-size: 13px; line-height: 18px; color: var(--vs-text-secondary); overflow-wrap: anywhere; }
+.lista-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--vs-space-2); font-size: 13px; line-height: 18px; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
+.lista-pie { margin: var(--vs-space-3) 0 0; font-size: 13px; color: var(--vs-text-muted); }
+
+/* Contacto: el teléfono se lee en el propio botón de llamar; número en neutro, icono teal */
+.contacto { display: inline-flex; align-items: center; gap: 2px; justify-self: end;
+  a[mat-button] { min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; --mat-button-text-label-text-color: var(--vs-text-secondary); }
+  a[mat-button] mat-icon { color: var(--vs-primary); }
+  a[mat-button] mat-icon:only-child { margin: 0; } }
+.ver-mas { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--vs-space-3); font-size: 14px; font-weight: 600; color: var(--vs-primary); text-underline-offset: 3px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; transition: transform var(--vs-dur-fast) var(--vs-ease); }
+  &:hover mat-icon { transform: translateX(3px); } }
+
+/* Vacío compacto: una línea, no un hueco */
+.vacio { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; font-size: 14px; color: var(--vs-text-muted);
+  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); } }
+
+/* ----- Cifras y tablas ----- */
+.cifras { display: grid; margin: 0;
+  div { display: flex; justify-content: space-between; align-items: baseline; padding: var(--vs-space-2) 0; border-bottom: 1px solid var(--vs-border); &:last-child { border-bottom: 0; } }
+  dt { font-size: 14px; color: var(--vs-text-secondary); }
+  dd { margin: 0; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; } }
+.cifras-detalle { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--vs-text-muted); }
+.tabla { width: 100%; border-collapse: collapse; font-size: 14px;
+  th, td { padding: var(--vs-space-2) 4px; border-bottom: 1px solid var(--vs-border); text-align: left; vertical-align: top; }
+  thead th { font-size: 12px; font-weight: 600; color: var(--vs-text-secondary); }
+  tbody th { font-weight: 500; }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; } }
+.tabla-nombre { display: block; }
+.tabla-detalle { display: block; font-size: 12px; font-weight: 400; color: var(--vs-text-muted); }

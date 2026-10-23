@@ -19,7 +19,7 @@
     </div>
   </header>
 
-  <mat-tab-group class="vistas" [selectedIndex]="indice()" (selectedIndexChange)="cambiarVista($event)"
+  <mat-tab-group class="vistas vs-tabs" [selectedIndex]="indice()" (selectedIndexChange)="cambiarVista($event)"
     mat-stretch-tabs="false" mat-align-tabs="start" animationDuration="0ms" aria-label="Vistas del dashboard">
     @for (v of vistas; track v) {
       <mat-tab [label]="etiquetas[v]">

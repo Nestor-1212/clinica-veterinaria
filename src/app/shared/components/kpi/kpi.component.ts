@@ -54,7 +54,11 @@ export type TonoKpi = 'atencion' | 'alerta' | null;
   styles: [`
     :host { display: block; min-width: 0; }
     .kpi { display: grid; align-content: start; gap: 2px; height: 100%; color: inherit; text-decoration: none; border-radius: var(--vs-radius-sm); }
-    .kpi--enlace { outline-offset: 6px; }
+    .kpi--enlace { position: relative; isolation: isolate; outline-offset: 8px; }
+    /* Puntero/foco: un tinte de marca aparece detrás de la cifra (sin mover el texto) */
+    .kpi--enlace::before { content: ''; position: absolute; inset: -8px -12px; z-index: -1; border-radius: var(--vs-radius-md); background: var(--vs-row-hover);
+      opacity: 0; transform: scale(.97); transition: opacity var(--vs-dur) var(--vs-ease), transform var(--vs-dur) var(--vs-ease-out); }
+    .kpi--enlace:hover::before { opacity: 1; transform: none; }
     .kpi--enlace:hover .etiqueta { color: var(--vs-primary); }
     .kpi--enlace:hover .ir { opacity: 1; transform: translateX(2px); }
     .etiqueta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--vs-text-secondary);
@@ -70,7 +74,7 @@ export type TonoKpi = 'atencion' | 'alerta' | null;
     .ayuda { font-size: 13px; line-height: 18px; color: var(--vs-text-muted); }
 
     /* Cifra protagonista */
-    :host(.hero) .valor { margin-top: 4px; font: var(--vs-text-hero); letter-spacing: var(--vs-tracking-hero); }
+    :host(.hero) .valor { margin-top: 4px; font: var(--vs-text-hero); letter-spacing: var(--vs-tracking-hero); color: var(--vs-ink); }
     :host(.hero) .etiqueta { font-size: 14px; color: var(--vs-text); }
     :host(.hero) .delta { margin-top: 4px; font-size: 14px; }
 
@@ -81,7 +85,7 @@ export type TonoKpi = 'atencion' | 'alerta' | null;
     .kpi--alerta .punto { background: var(--vs-danger); }
 
     @media (max-width: 600px) { :host(.hero) .valor { font: var(--vs-text-hero-sm); letter-spacing: var(--vs-tracking-hero); } }
-    @media (prefers-reduced-motion: reduce) { .etiqueta, .ir { transition: none; } }
+    @media (prefers-reduced-motion: reduce) { .etiqueta, .ir, .kpi--enlace::before { transition: none; } }
   `]
 })
 export class KpiComponent {

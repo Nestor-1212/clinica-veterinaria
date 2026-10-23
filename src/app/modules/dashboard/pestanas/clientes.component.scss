@@ -1,15 +1,11 @@
 // Pestaña Clientes: "Para recuperar" es el escenario; en pantallas anchas la lista va
 // en dos columnas para llenar el ancho sin alargar las filas.
-.recuperar { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); column-gap: var(--vs-space-7);
-  .lista-fila:first-child, .lista-fila:nth-child(2) { padding-top: 0; }
-  .lista-fila:nth-last-child(-n + 2) { border-bottom: 0; } }
-@media (min-width: 1600px) { .recuperar { --cols: 2; } }
-@media (max-width: 1599px) {
-  .recuperar .lista-fila:nth-child(2) { padding-top: var(--vs-space-3); }
-  .recuperar .lista-fila:nth-last-child(2) { border-bottom: 1px solid var(--vs-border); }
-}
-// 1600+: tres columnas (recuperar · vacunas · nuevos) para que ninguna deje un hueco
+.recuperar { display: grid; grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); column-gap: var(--vs-space-6); }
 @media (min-width: 1600px) {
+  .recuperar { --cols: 2; }
+  // La primera fila de la segunda columna no lleva separador encima
+  .recuperar > .lista-fila:nth-child(2)::before { display: none; }
+  // 1600+: tres columnas (recuperar · vacunas · nuevos) para que ninguna deje un hueco
   .clientes-columnas { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr); }
   .clientes-columnas > .lateral { display: contents; }
 }

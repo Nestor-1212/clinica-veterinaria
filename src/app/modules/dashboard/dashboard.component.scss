@@ -6,11 +6,8 @@
 // "jueves, 22 de octubre de 2026" -> solo la inicial en mayúscula
 .fecha::first-letter { text-transform: uppercase; }
 
-// Las pestañas sobre el fondo de la app, con la línea de base como divisor
-.vistas {
-  --mat-tab-header-divider-color: var(--vs-border);
-  --mat-tab-header-divider-height: 1px;
-}
+// Pestañas: control segmentado en píldora (.vs-tabs, global) sobre la franja teñida
+.vistas { margin-top: var(--vs-space-3); }
 
 // Móvil: la acción principal a lo ancho y las otras dos en una fila, sin partir etiquetas
 @media (max-width: 600px) {

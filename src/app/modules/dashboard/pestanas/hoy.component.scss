@@ -1,13 +1,16 @@
 // Pestaña Hoy: próximo paciente del veterinario, citas de mañana y el bloque urgente
 // de cobros. La línea de tiempo de la agenda vive en agenda.scss.
+// Mismo lenguaje que las pestañas (.vs-tabs): pista tonal y píldora blanca activa
 .segmentado {
-  display: inline-flex; padding: 2px; border: 1px solid var(--vs-border-strong); border-radius: var(--vs-radius-full);
-  button { min-height: 32px; padding: 0 var(--vs-space-3); border: 0; border-radius: var(--vs-radius-full); background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--vs-text-secondary); cursor: pointer; }
-  button[aria-pressed='true'] { background: var(--vs-primary-container); color: var(--vs-on-primary-container); font-weight: 600; }
+  display: inline-flex; padding: 3px; border-radius: var(--vs-radius-full); background: var(--vs-tonal);
+  button { min-height: 32px; padding: 0 var(--vs-space-3); border: 0; border-radius: var(--vs-radius-full); background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--vs-text-secondary); cursor: pointer;
+    transition: background-color var(--vs-dur) var(--vs-ease), color var(--vs-dur) var(--vs-ease), box-shadow var(--vs-dur) var(--vs-ease); }
+  button:hover { color: var(--vs-text); }
+  button[aria-pressed='true'] { background: var(--vs-surface); color: var(--vs-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(12, 56, 51, 0.14); }
 }
 
 /* ----- Próximo paciente (veterinario) ----- */
-.proximo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-4) var(--vs-space-7);
+.proximo { background: linear-gradient(100deg, var(--vs-surface-next), var(--vs-surface) 55%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-4) var(--vs-space-7);
   h2 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--vs-on-primary-soft); } }
 .paciente-nombre { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; font: var(--vs-text-figure); letter-spacing: -0.02em;
   mat-icon { color: var(--vs-primary); } }
@@ -26,10 +29,11 @@
 /* ----- Bloque urgente: por cobrar hoy -----
    Tinte ámbar muy claro; el texto sigue en los neutros de la app y solo la cifra
    y el enlace llevan el ámbar (antes durazno con texto café: sucio). */
-.urgente { padding: var(--vs-space-5); border-radius: var(--vs-radius-lg); background: var(--vs-attention-surface); color: var(--vs-text);
+.urgente { padding: var(--vs-space-5) var(--vs-space-6) var(--vs-space-6); border-radius: var(--vs-radius-xl); background: var(--vs-attention-surface); color: var(--vs-text);
   h2 { margin: 0; font: var(--vs-text-h3); }
   .lista { margin-top: var(--vs-space-4); }
-  .lista-fila { border-color: var(--vs-attention-container); }
+  .lista-fila + .lista-fila::before { background: var(--vs-attention-container); }
+  .lista-fila:hover { background: #f9ebdd; }
   .ver-mas { color: var(--vs-attention-text); } }
 .urgente-cifra { margin: var(--vs-space-2) 0 0; font: var(--vs-text-figure); letter-spacing: -0.02em; color: var(--vs-attention-text); }
 .urgente-ayuda { margin: 2px 0 0; font-size: 13px; color: var(--vs-text-secondary); }

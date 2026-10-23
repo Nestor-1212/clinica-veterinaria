@@ -12,10 +12,17 @@
 .tiempo > :first-child::before { top: 50%; }
 .tiempo > :last-child::before { bottom: 50%; }
 
-.cita { padding: var(--vs-space-4) var(--pad); }
+.cita { padding: var(--vs-space-4) var(--pad); border-radius: var(--vs-radius-md); transition: background-color var(--vs-dur-fast) var(--vs-ease); }
+// Puntero sobre una cita: la fila se tiñe y su nodo crece (sigue la fila con la vista)
+@media (hover: hover) {
+  .cita:not(.cita--siguiente):hover { --pad: 12px; margin-inline: -12px; background: var(--vs-row-hover); }
+  .cita:hover .nodo { transform: scale(1.25); }
+  .cita:hover::after, .cita:hover + .cita::after { opacity: 0; }
+}
 .cita + .cita::after { content: ''; position: absolute; top: 0; right: var(--pad); left: calc(var(--pad) + var(--hora) + var(--nodo) + var(--gap) * 2); height: 1px; background: var(--vs-border); }
 .cita-hora { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--vs-text); }
-.nodo { position: relative; z-index: 1; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: var(--vs-surface); border: 2px solid var(--vs-chart-1); }
+.nodo { position: relative; z-index: 1; justify-self: center; width: 12px; height: 12px; border-radius: 50%; background: var(--vs-surface); border: 2px solid var(--vs-chart-1);
+  transition: transform var(--vs-dur) var(--vs-ease-out); }
 .cita-cuerpo { display: grid; gap: 2px; min-width: 0; }
 .cita-titulo {
   display: inline-flex; flex-wrap: wrap; align-items: center; column-gap: 6px; min-width: 0; font-size: 15px; font-weight: 600; color: var(--vs-text); text-decoration: none;
@@ -34,9 +41,11 @@
 .cita--falta .nodo { border-color: var(--vs-attention); }
 .cita--inmediata .nodo { border: 0; background: var(--vs-attention); }
 
-// La siguiente cita: la fila protagonista de la agenda
+// La siguiente cita: la fila protagonista de la agenda. El tinte de marca fluye desde el
+// riel hacia la acción (peor punto del texto: --vs-surface-next, ratios en _tokens.scss).
 .cita--siguiente {
-  --pad: 12px; margin-inline: -12px; border-radius: var(--vs-radius-md); background: var(--vs-surface-next);
+  --pad: 12px; margin-inline: -12px; border-radius: var(--vs-radius-lg);
+  background: linear-gradient(90deg, var(--vs-surface-next) 0, var(--vs-surface-next) 40%, #ecf6f3 100%);
   + .cita::after { display: none; }
   .cita-hora { font-size: 18px; font-weight: 700; color: var(--vs-on-primary-soft); }
   .cita-titulo { font-size: 17px; }
@@ -50,10 +59,15 @@
   + .cita::after { display: none; }
   .ahora-hora { font-variant-numeric: tabular-nums; }
   .nodo { width: 12px; height: 12px; border: 0; background: var(--vs-primary); box-shadow: 0 0 0 3px var(--vs-surface); }
+  // Pulso sutil del nodo "Ahora": unas pocas ondas al mostrarse la agenda, luego reposa
+  .nodo::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--vs-primary); animation: ahora-pulso 2.4s var(--vs-ease-out) 400ms 4 both; }
   &::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(var(--hora) + var(--gap) + var(--nodo) / 2 - 1px); width: 2px; background: linear-gradient(var(--vs-timeline-past) 50%, var(--vs-timeline-next) 50%); }
 }
 .ahora-linea { grid-column: 3 / -1; display: flex; align-items: center; gap: var(--vs-space-2); text-transform: uppercase; letter-spacing: .06em; font-size: 12px;
-  &::after { content: ''; flex: 1; height: 2px; border-radius: 1px; background: var(--vs-primary); } }
+  // La línea se diluye hacia la derecha: marca el momento sin cortar la agenda en dos
+  &::after { content: ''; flex: 1; height: 2px; border-radius: 1px; background: linear-gradient(90deg, var(--vs-primary), var(--vs-chart-1-soft) 70%, transparent); } }
+@keyframes ahora-pulso { from { opacity: .45; transform: scale(1); } to { opacity: 0; transform: scale(3.2); } }
+@media (prefers-reduced-motion: reduce) { .ahora .nodo::after { display: none; } .cita .nodo { transition: none; } }
 .fin-jornada { margin: 0; padding: var(--vs-space-5) 0 0 calc(56px + 20px + 24px); font-size: 13px; color: var(--vs-text-muted); }
 
 .cita-hecha { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--vs-text-muted);

@@ -24,7 +24,7 @@ const ESTADO_CLASE: Record<Cita['estado'], string> = {
   selector: 'app-dashboard-hoy',
   imports: [RouterLink, DatePipe, NgTemplateOutlet, MatIcon, MatButton, EdadPipe, KpiComponent],
   templateUrl: './hoy.component.html',
-  styleUrls: ['./pestanas.scss', './agenda.scss', './hoy.component.scss'],
+  styleUrls: ['./pestanas.scss', './listas.scss', './agenda.scss', './hoy.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HoyComponent {

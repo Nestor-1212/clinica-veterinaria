@@ -1,28 +1,35 @@
-// Estilos compartidos por las pestañas del dashboard (Hoy, Negocio, Clientes).
-// Sistema: una banda de cifras sin cajas, un "escenario" (la única superficie elevada,
-// para el protagonista de la vista) y secciones de contexto sobre el fondo, separadas
-// por espacio y filetes, no por bordes.
+// Estilos compartidos por las pestañas del dashboard (Hoy, Negocio, Clientes): rejillas,
+// banda de cifras, escenario y secciones. Listas, cifras y tablas viven en listas.scss.
+// Fluidez: las zonas se agrupan por tono (escalones del teal), no por cajas con borde;
+// el escenario es la única superficie elevada y las secciones se funden con el fondo.
 :host { display: grid; gap: var(--vs-space-7); padding-top: var(--vs-space-6); }
 
-/* ----- Banda de cifras: filetes verticales entre cifras, sin tarjetas ----- */
+// Al cambiar de pestaña los bloques llegan escalonados (máx. 120 ms de retraso total)
+:host > * { animation: vs-entra var(--vs-dur-slow) var(--vs-ease-out) backwards; }
+:host > :nth-child(2) { animation-delay: 60ms; }
+:host > :nth-child(n + 3) { animation-delay: 120ms; }
+
+/* ----- Banda de cifras: separadores que se desvanecen arriba y abajo, sin tarjetas ----- */
 .banda { display: flex; flex-wrap: wrap; align-items: flex-end; row-gap: var(--vs-space-5);
-  > app-kpi { padding: 0 var(--vs-space-7); border-left: 1px solid var(--vs-border); }
-  > app-kpi:first-child { padding-left: 0; border-left: 0; }
+  > app-kpi { padding: 0 var(--vs-space-7); background: linear-gradient(transparent, var(--vs-timeline-past) 25% 75%, transparent) left / 1px 100% no-repeat; }
+  > app-kpi:first-child { padding-left: 0; background: none; }
   > app-kpi.hero { padding-right: var(--vs-space-8); }
 }
 
 /* ----- Escenario: el protagonista de la vista ----- */
-.escenario { padding: var(--vs-space-6); background: var(--vs-surface); border-radius: var(--vs-radius-lg); box-shadow: var(--vs-stage-shadow); }
+.escenario { padding: var(--vs-space-6) var(--vs-space-7); background: var(--vs-surface); border-radius: var(--vs-radius-xl); box-shadow: var(--vs-stage-shadow); }
 
 /* ----- Rejillas ----- */
 .columnas { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(320px, 1fr); gap: var(--vs-space-7); align-items: start; }
 .principal { display: flex; flex-direction: column; gap: var(--vs-space-7); align-self: stretch; min-width: 0; }
-.lateral { display: grid; gap: var(--vs-space-7); align-content: start; min-width: 0; }
-.contexto { display: grid; grid-template-columns: repeat(var(--columnas, 3), minmax(0, 1fr)); gap: var(--vs-space-6) var(--vs-space-7); align-items: start; }
+.lateral { display: grid; gap: var(--vs-space-6); align-content: start; min-width: 0; }
+.contexto { display: grid; grid-template-columns: repeat(var(--columnas, 3), minmax(0, 1fr)); gap: var(--vs-space-6); align-items: stretch; }
 
-/* Sección de contexto: sobre el fondo, con un filete arriba en lugar de caja */
+/* Sección de contexto: superficie tonal que se desvanece hacia el fondo (sin filo ni borde) */
 .seccion { min-width: 0; }
-.contexto > .seccion, .lateral > .seccion { padding-top: var(--vs-space-4); border-top: 1px solid var(--vs-border-strong); }
+.contexto > .seccion, .lateral > .seccion, .principal > .seccion {
+  padding: var(--vs-space-5) var(--vs-space-6) var(--vs-space-6); border-radius: var(--vs-radius-xl); background: var(--vs-gradient-soft);
+}
 
 .cabecera {
   display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vs-space-3); margin-bottom: var(--vs-space-4);
@@ -31,63 +38,22 @@
 }
 .escenario > .cabecera h2 { font: var(--vs-text-h2); }
 
-/* ----- Listas de acción: nombre y dato completos (envuelven, no se recortan) ----- */
-.lista { list-style: none; margin: 0; padding: 0; }
-.lista-fila {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-1) var(--vs-space-3);
-  padding: var(--vs-space-3) 0; border-bottom: 1px solid var(--vs-border);
-  &:first-child { padding-top: 0; }
-  &:last-child { border-bottom: 0; }
-}
-.lista-cuerpo { display: grid; gap: 2px; min-width: 0; }
-.lista-titulo { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--vs-text); text-decoration: none; overflow-wrap: anywhere; }
-a.lista-titulo:hover { text-decoration: underline; text-underline-offset: 3px; }
-.lista-detalle { font-size: 13px; line-height: 18px; color: var(--vs-text-secondary); overflow-wrap: anywhere; }
-.lista-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--vs-space-2); font-size: 13px; line-height: 18px; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
-.lista-pie { margin: var(--vs-space-3) 0 0; font-size: 13px; color: var(--vs-text-muted); }
-
-/* Contacto: el teléfono se lee en el propio botón de llamar; número en neutro, icono teal */
-.contacto { display: inline-flex; align-items: center; gap: 2px; justify-self: end;
-  a[mat-button] { min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; --mat-button-text-label-text-color: var(--vs-text-secondary); }
-  a[mat-button] mat-icon { color: var(--vs-primary); }
-  a[mat-button] mat-icon:only-child { margin: 0; } }
-.ver-mas { display: inline-flex; align-items: center; gap: 4px; margin-top: var(--vs-space-3); font-size: 14px; font-weight: 600; color: var(--vs-primary); text-underline-offset: 3px;
-  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
-
-/* Vacío compacto: una línea, no un hueco */
-.vacio { display: flex; align-items: center; gap: var(--vs-space-2); margin: 0; font-size: 14px; color: var(--vs-text-muted);
-  mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); } }
-
-/* ----- Cifras y tablas ----- */
-.cifras { display: grid; margin: 0;
-  div { display: flex; justify-content: space-between; align-items: baseline; padding: var(--vs-space-2) 0; border-bottom: 1px solid var(--vs-border); &:last-child { border-bottom: 0; } }
-  dt { font-size: 14px; color: var(--vs-text-secondary); }
-  dd { margin: 0; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; } }
-.cifras-detalle { margin-left: 6px; font-size: 12px; font-weight: 400; color: var(--vs-text-muted); }
-.tabla { width: 100%; border-collapse: collapse; font-size: 14px;
-  th, td { padding: var(--vs-space-2) 4px; border-bottom: 1px solid var(--vs-border); text-align: left; vertical-align: top; }
-  thead th { font-size: 12px; font-weight: 600; color: var(--vs-text-secondary); }
-  tbody th { font-weight: 500; }
-  tr:last-child th, tr:last-child td { border-bottom: 0; }
-  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; } }
-.tabla-nombre { display: block; }
-.tabla-detalle { display: block; font-size: 12px; font-weight: 400; color: var(--vs-text-muted); }
-
 @media (max-width: 1280px) {
   .contexto { --columnas: 2; }
 }
 @media (max-width: 960px) {
   .columnas { grid-template-columns: minmax(0, 1fr); }
-  // Banda en tablet y móvil: la cifra héroe a lo ancho y las demás en rejilla con filete superior
+  // Banda en tablet y móvil: la cifra héroe a lo ancho y las demás en rejilla
   .banda { display: grid; grid-template-columns: repeat(var(--banda-cols, 3), minmax(0, 1fr)); gap: var(--vs-space-4);
-    > app-kpi, > app-kpi:first-child { padding: var(--vs-space-3) 0 0; border-left: 0; border-top: 1px solid var(--vs-border); }
-    > app-kpi.hero { grid-column: 1 / -1; padding: 0; border-top: 0; } }
+    > app-kpi, > app-kpi:first-child { padding: var(--vs-space-3) 0 0; background: linear-gradient(90deg, var(--vs-timeline-past), transparent) top / 100% 1px no-repeat; }
+    > app-kpi.hero { grid-column: 1 / -1; padding: 0; background: none; } }
 }
 @media (max-width: 720px) {
   .contexto { --columnas: 1; }
 }
 @media (max-width: 600px) {
   :host { gap: var(--vs-space-6); padding-top: var(--vs-space-5); }
-  .escenario { padding: var(--vs-space-4); border-radius: var(--vs-radius-md); }
+  .escenario { padding: var(--vs-space-4); border-radius: var(--vs-radius-lg); }
+  .contexto > .seccion, .lateral > .seccion, .principal > .seccion { padding: var(--vs-space-4); border-radius: var(--vs-radius-lg); }
   .banda { --banda-cols: 2; }
 }
