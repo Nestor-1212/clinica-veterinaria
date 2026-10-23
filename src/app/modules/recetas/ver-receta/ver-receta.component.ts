@@ -8,7 +8,9 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Receta, Mascota, Cliente, Usuario, ItemReceta } from '../../../core/models';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatAnchor } from '@angular/material/button';
+import { enlaceWhatsApp } from '../../../core/utils/metricas';
+import { EstadoTratamiento, estadoTratamiento, textoReceta } from '../../../core/utils/recetas';
 import { DatePipe } from '@angular/common';
 
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
@@ -17,7 +19,7 @@ import { EdadPipe } from '../../../shared/pipes/edad.pipe';
     selector: 'app-ver-receta',
     templateUrl: './ver-receta.component.html',
     styleUrls: ['./ver-receta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, EdadPipe]
+    imports: [MatIcon, MatButton, MatAnchor, RouterLink, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, EdadPipe]
 })
 export class VerRecetaComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -44,6 +46,18 @@ export class VerRecetaComponent implements OnInit {
     this.cliente = this.clientesService.getById(r.clienteId)!;
     this.veterinario = this.usuariosService.getById(r.veterinarioId)!;
     this.dataSource.data = r.items;
+    this.tratamiento = estadoTratamiento(r, new Date());
+    this.whatsapp = this.cliente ? enlaceWhatsApp(this.cliente.telefono, textoReceta(r, this.mascota, this.cliente.nombre)) : null;
+  }
+
+  tratamiento: EstadoTratamiento | null = null;
+  whatsapp: string | null = null;
+
+  get textoTratamiento(): string {
+    const t = this.tratamiento;
+    if (!t?.fin) return '';
+    if (!t.enCurso) return 'Tratamiento terminado';
+    return t.diasRestantes === 0 ? 'Tratamiento en curso · termina hoy' : `Tratamiento en curso · termina en ${t.diasRestantes} ${t.diasRestantes === 1 ? 'día' : 'días'}`;
   }
 
   async descargarPDF(): Promise<void> {

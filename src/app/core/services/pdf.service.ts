@@ -91,7 +91,7 @@ export class PdfService {
     doc.line(60, y, pageW - 60, y);
     y += 5;
     doc.setFont('helvetica', 'bold');
-    doc.text(`Dr. ${veterinario.nombre} ${veterinario.apellido}`, pageW / 2, y, { align: 'center' });
+    doc.text(`${veterinario.nombre} ${veterinario.apellido}`, pageW / 2, y, { align: 'center' });
     y += 4;
     doc.setFont('helvetica', 'normal');
     if (veterinario.especialidad) {

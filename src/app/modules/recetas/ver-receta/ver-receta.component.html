@@ -2,15 +2,19 @@
   <div class="page-container">
     <div class="page-header">
       <div>
-        <h1><mat-icon>medication</mat-icon> Receta Médica</h1>
-        <p>{{ receta.fecha | date:'dd/MM/yyyy' }}</p>
+        <h1><mat-icon>medication</mat-icon> Receta de {{ mascota?.nombre }}</h1>
+        <p>
+          {{ receta.fecha | date: "d 'de' MMMM 'de' y" }}
+          @if (textoTratamiento) { · <span class="vs-status" [class.vs-status--success]="tratamiento?.enCurso" [class.vs-status--neutral]="!tratamiento?.enCurso">{{ textoTratamiento }}</span> }
+        </p>
       </div>
       <div class="header-actions">
-        <button mat-flat-button color="primary" (click)="descargarPDF()">
-          <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
-        </button>
-        <button mat-stroked-button (click)="editar()"><mat-icon>edit</mat-icon> Editar</button>
-        <button mat-stroked-button routerLink="/recetas"><mat-icon>arrow_back</mat-icon> Volver</button>
+        <button mat-button type="button" routerLink="/recetas"><mat-icon>arrow_back</mat-icon> Volver</button>
+        <button mat-stroked-button type="button" (click)="editar()"><mat-icon>edit</mat-icon> Editar</button>
+        @if (whatsapp) {
+          <a mat-stroked-button [href]="whatsapp" target="_blank" rel="noopener" [attr.aria-label]="'Enviar la receta por WhatsApp a ' + cliente?.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon> WhatsApp</a>
+        }
+        <button mat-flat-button type="button" (click)="descargarPDF()"><mat-icon>picture_as_pdf</mat-icon> Descargar PDF</button>
       </div>
     </div>
     <div class="receta-print">
@@ -64,7 +68,7 @@
       }
       <div class="firma-section">
         <div class="firma-line"></div>
-        <div class="firma-name">Dr. {{ veterinario?.nombre }} {{ veterinario?.apellido }}</div>
+        <div class="firma-name">{{ veterinario?.nombre }} {{ veterinario?.apellido }}</div>
         @if (veterinario?.especialidad) {
           <div class="firma-esp">{{ veterinario.especialidad }}</div>
         }

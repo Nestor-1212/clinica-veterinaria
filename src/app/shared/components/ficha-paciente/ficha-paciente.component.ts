@@ -18,6 +18,7 @@ export class FichaPacienteComponent {
   /** Motivo de la visita (de la cita), si lo hay. */
   readonly motivo = input<string>('');
   readonly notas = input<string>('');
+  readonly tituloMotivo = input('Motivo de la visita');
   readonly textoVacio = input('Elija el propietario y la mascota para ver sus alergias, vacunas y la última consulta.');
   readonly iconoEspecie = ICONO_ESPECIE;
 }

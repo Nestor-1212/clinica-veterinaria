@@ -8,7 +8,7 @@
   </div>
   @if (motivo()) {
     <div class="ficha-motivo">
-      <h3>Motivo de la visita</h3>
+      <h3>{{ tituloMotivo() }}</h3>
       <p>{{ motivo() }}</p>
       @if (notas()) { <p class="ficha-notas">{{ notas() }}</p> }
     </div>

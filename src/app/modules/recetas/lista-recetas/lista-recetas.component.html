@@ -1,8 +1,8 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h1><mat-icon>medication</mat-icon> Recetas Médicas</h1>
-      <p>Historial de prescripciones emitidas</p>
+      <h1><mat-icon>medication</mat-icon> Recetas</h1>
+      <p>{{ conteos.curso }} {{ conteos.curso === 1 ? 'tratamiento en curso' : 'tratamientos en curso' }} · las recetas se crean al guardar una consulta</p>
     </div>
     <button mat-stroked-button routerLink="/consultas">
       <mat-icon>medical_services</mat-icon> Ir a Consultas
@@ -12,61 +12,80 @@
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label>
+        <div class="vs-segmentado" role="group" aria-label="Filtrar recetas">
+          @for (f of filtros; track f.valor) {
+            <button type="button" [attr.aria-pressed]="filtro === f.valor" (click)="elegirFiltro(f.valor)">{{ f.texto }} <span class="vs-cuenta">{{ conteos[f.valor] }}</span></button>
+          }
+        </div>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar paciente o medicamento</mat-label>
           <input matInput #searchInput (keyup)="applyFilter($event)">
           @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-          @if (!searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+          } @else {
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
       </div>
 
       <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
+        <table mat-table [dataSource]="dataSource" matSort class="full-table recetas-tabla">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
-            <td mat-cell *matCellDef="let r" class="cell-nowrap cell-primary">{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+            <td mat-cell *matCellDef="let r" class="c-fecha">
+              <span class="dato"><strong>{{ relativo(r.fecha) }}</strong><small>{{ r.fecha | date: 'd MMM y' }}</small></span>
+            </td>
           </ng-container>
 
-          <ng-container matColumnDef="mascota">
-            <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let r" data-label="Mascota">{{ getMascota(r.mascotaId) }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="cliente">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let r" class="hide-sm" data-label="Propietario">{{ getCliente(r.clienteId) }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="veterinario">
-            <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
-            <td mat-cell *matCellDef="let r" class="hide-md" data-label="Veterinario">{{ getVet(r.veterinarioId) }}</td>
+          <ng-container matColumnDef="paciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Paciente</th>
+            <td mat-cell *matCellDef="let r" class="cell-primary c-paciente">
+              <span class="paciente-celda">
+                <span class="p-icono" aria-hidden="true"><mat-icon>{{ especie(r.mascotaId) }}</mat-icon></span>
+                <span class="dato">
+                  <a [routerLink]="['/recetas', r.id]" (click)="$event.stopPropagation()" [attr.aria-label]="'Ver receta de ' + getMascota(r.mascotaId)">{{ getMascota(r.mascotaId) }}</a>
+                  <small>{{ getCliente(r.clienteId) }}@if (diagnostico(r)) { · {{ diagnostico(r) }} }</small>
+                </span>
+              </span>
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="medicamentos">
             <th mat-header-cell *matHeaderCellDef>Medicamentos</th>
-            <td mat-cell *matCellDef="let r" data-label="Medicamentos">
-              <mat-chip>{{ r.items.length }} {{ r.items.length === 1 ? 'medicamento' : 'medicamentos' }}</mat-chip>
+            <td mat-cell *matCellDef="let r" class="c-meds">
+              <ul class="meds" [attr.aria-label]="'Medicamentos de la receta de ' + getMascota(r.mascotaId)">
+                @for (i of r.items.slice(0, 3); track $index) { <li [title]="i.dosis + ' · ' + i.frecuencia + ' · ' + i.duracion">{{ i.medicamento }}</li> }
+                @if (r.items.length > 3) { <li class="mas">+{{ r.items.length - 3 }}</li> }
+              </ul>
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="tratamiento">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tratamiento</th>
+            <td mat-cell *matCellDef="let r" class="c-trat">
+              <span class="vs-status" [class.vs-status--success]="estado(r).enCurso" [class.vs-status--neutral]="!estado(r).enCurso">{{ textoEstado(r) }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="veterinario">
+            <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
+            <td mat-cell *matCellDef="let r" class="hide-md c-vet">{{ vetCorto(r.veterinarioId) }}</td>
+          </ng-container>
+
           <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let r" class="cell-actions" (click)="$event.stopPropagation()">
-              <button mat-icon-button color="primary" (click)="ver(r)" matTooltip="Ver receta" [attr.aria-label]="'Ver receta de ' + getMascota(r.mascotaId)">
-                <mat-icon>visibility</mat-icon>
-              </button>
-              <button mat-icon-button (click)="editar(r)" matTooltip="Editar" [attr.aria-label]="'Editar receta de ' + getMascota(r.mascotaId)">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="eliminar(r)" matTooltip="Eliminar" [attr.aria-label]="'Eliminar receta de ' + getMascota(r.mascotaId)">
-                <mat-icon>delete</mat-icon>
-              </button>
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let r" class="cell-actions c-acciones" (click)="$event.stopPropagation()">
+              <button mat-icon-button (click)="pdf(r)" matTooltip="Descargar PDF" [attr.aria-label]="'Descargar PDF de la receta de ' + getMascota(r.mascotaId)"><mat-icon>picture_as_pdf</mat-icon></button>
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para la receta de ' + getMascota(r.mascotaId)"><mat-icon>more_vert</mat-icon></button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="ver(r)"><mat-icon>description</mat-icon>Ver receta</button>
+                @if (whatsapp(r); as wa) {
+                  <a mat-menu-item [href]="wa" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>Enviar por WhatsApp</a>
+                }
+                <button mat-menu-item (click)="editar(r)"><mat-icon>edit</mat-icon>Editar</button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item class="menu-peligro" (click)="eliminar(r)"><mat-icon>delete</mat-icon>Eliminar</button>
+              </mat-menu>
             </td>
           </ng-container>
 
@@ -75,16 +94,20 @@
 
           <tr class="mat-row" *matNoDataRow>
             <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-              <mat-icon>medication</mat-icon>
-              <p>Sin recetas registradas</p>
-              <p class="no-data-hint">Las recetas se generan al guardar una consulta médica con el botón "Guardar y crear receta".</p>
-              <button mat-stroked-button color="primary" routerLink="/consultas">Ir a Consultas</button>
+              @if (dataSource.filter) {
+                <mat-icon>search_off</mat-icon><p>Ninguna receta coincide con «{{ searchInput.value }}».</p>
+              } @else {
+                <mat-icon>medication</mat-icon>
+                <p>No hay recetas aquí.</p>
+                <p class="no-data-hint">Las recetas se crean al guardar una consulta con «Guardar y crear receta».</p>
+                <a mat-stroked-button routerLink="/consultas">Ir a Consultas</a>
+              }
             </td>
           </tr>
         </table>
       </div>
 
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de recetas"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

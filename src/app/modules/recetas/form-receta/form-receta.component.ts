@@ -12,18 +12,22 @@ import { AuthService } from '../../../core/services/auth.service';
 import { PdfService } from '../../../core/services/pdf.service';
 import { Mascota, Cliente, Consulta, ItemReceta } from '../../../core/models';
 import { veterinarioPorDefecto } from '../../../core/auth/permisos';
+import { VacunasService } from '../../../core/services/vacunas.service';
+import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
+import { DURACIONES, FRECUENCIAS, alergiaEnMedicamento, filtrarSugerencias, medicamentosFrecuentes } from '../../../core/utils/recetas';
+import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatFormField, MatLabel, MatInput, MatSuffix, MatError } from '@angular/material/input';
-import { SlicePipe } from '@angular/common';
+import { MatFormField, MatLabel, MatInput, MatError } from '@angular/material/input';
 
 @Component({
     selector: 'app-form-receta',
     templateUrl: './form-receta.component.html',
     styleUrls: ['./form-receta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatIconButton, MatTooltip, MatFormField, MatLabel, MatInput, MatSuffix, MatError, SlicePipe]
+    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatIconButton, MatTooltip, MatFormField, MatLabel, MatInput, MatError, MatAutocomplete, MatAutocompleteTrigger, MatOption, FichaPacienteComponent]
 })
 export class FormRecetaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -34,6 +38,7 @@ export class FormRecetaComponent implements OnInit {
   private usuariosService = inject(UsuariosService);
   private auth = inject(AuthService);
   private pdfService = inject(PdfService);
+  private vacunasService = inject(VacunasService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
@@ -47,6 +52,13 @@ export class FormRecetaComponent implements OnInit {
   consulta: Consulta | null = null;
   isEdit = false;
   recetaId = '';
+  ficha: FichaPaciente | null = null;
+  /** Medicamentos más usados en la clínica (sugerencias al escribir). */
+  medicamentos: string[] = [];
+  readonly frecuencias = FRECUENCIAS;
+  readonly duraciones = DURACIONES;
+  /** A dónde vuelven Cancelar y Volver: a la receta al editar, a Consultas al crear. */
+  volverA: string[] = ['/consultas'];
 
   constructor() {
     this.form = this.fb.group({
@@ -64,11 +76,13 @@ export class FormRecetaComponent implements OnInit {
     // B7: la receta la firma el veterinario de la consulta; sin consulta, solo se autoasigna a un veterinario.
     this.form.patchValue({ veterinarioId: veterinarioPorDefecto(this.auth.currentUser) });
 
+    this.medicamentos = medicamentosFrecuentes(this.recetasService.getAll());
     this.recetaId = this.route.snapshot.params.id;
     const params = this.route.snapshot.queryParams;
 
     if (this.recetaId) {
       this.isEdit = true;
+      this.volverA = ['/recetas', this.recetaId];
       const r = this.recetasService.getById(this.recetaId);
       if (r) {
         this.form.patchValue(r);
@@ -90,6 +104,19 @@ export class FormRecetaComponent implements OnInit {
     this.mascota = this.mascotasService.getById(mascotaId) || null;
     this.cliente = this.clientesService.getById(clienteId) || null;
     if (consultaId) this.consulta = this.consultasService.getById(consultaId) || null;
+    if (this.mascota) {
+      this.ficha = fichaPaciente(this.mascota, this.cliente ?? undefined, this.consultasService.getAll(), this.vacunasService.getAll(), new Date(), this.consulta?.id);
+    }
+  }
+
+  /** Sugerencias para un campo de un medicamento según lo escrito. */
+  sugerir(opciones: readonly string[], texto: string): string[] {
+    return filtrarSugerencias([...opciones], texto).slice(0, 8);
+  }
+
+  /** Palabra de las alergias de la mascota que aparece en el medicamento i (o null). */
+  alergiaDe(i: number): string | null {
+    return alergiaEnMedicamento(this.mascota?.alergias, this.items.at(i)?.get('medicamento')?.value);
   }
 
   get items(): FormArray { return this.form.get('items') as FormArray; }
@@ -104,7 +131,11 @@ export class FormRecetaComponent implements OnInit {
     });
   }
 
-  agregarItem(): void { this.items.push(this.crearItem()); }
+  agregarItem(): void {
+    this.items.push(this.crearItem());
+    // Foco en el nombre del nuevo medicamento
+    setTimeout(() => this.host?.nativeElement.querySelector(`#med-${this.items.length - 1}`)?.focus());
+  }
   removerItem(i: number): void { if (this.items.length > 1) this.items.removeAt(i); }
 
   onSubmit(): void {

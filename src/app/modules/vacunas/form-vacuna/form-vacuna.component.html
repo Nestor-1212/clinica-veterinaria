@@ -62,7 +62,7 @@
             <mat-label>Veterinario</mat-label>
             <mat-select formControlName="veterinarioId">
               @for (v of veterinarios; track v.id) {
-                <mat-option [value]="v.id">Dr. {{ v.nombre }} {{ v.apellido }}</mat-option>
+                <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}</mat-option>
               }
             </mat-select>
             <mat-error>Seleccione el veterinario que aplicó la vacuna</mat-error>
