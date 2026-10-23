@@ -1,0 +1,105 @@
+// Tablero del día: una columna por veterinario, una fila por media hora.
+// El estado de cada cita va en texto (no solo en color) y en el borde izquierdo.
+
+.tablero {
+  --cols: 64px repeat(var(--vets, 3), minmax(0, 1fr));
+  border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+  padding: 0 var(--vs-space-4) var(--vs-space-3);
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: var(--cols);
+  column-gap: var(--vs-space-2);
+  min-height: 48px;
+  border-top: 1px dashed var(--vs-border);
+  &.fila--hora { border-top-style: solid; }
+}
+.fila--cabecera {
+  position: sticky;
+  top: 64px;
+  z-index: 2;
+  min-height: 0;
+  padding: var(--vs-space-4) 0 var(--vs-space-3);
+  border-top: 0;
+  background: var(--vs-surface);
+  border-radius: var(--vs-radius-xl) var(--vs-radius-xl) 0 0;
+}
+
+.vet { display: flex; align-items: center; gap: var(--vs-space-2); min-width: 0; padding: 0 var(--vs-space-1); }
+.vet-avatar {
+  flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-weight: 700;
+}
+.vet--yo .vet-avatar { background: var(--vs-primary); color: var(--vs-on-primary); }
+.vet-texto { display: grid; min-width: 0;
+  strong { font-size: 14px; color: var(--vs-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  small { font-size: 12px; color: var(--vs-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.tu { margin-left: 6px; padding: 0 6px; border-radius: var(--vs-radius-full); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-size: 11px; }
+
+.tramo {
+  padding-top: 6px;
+  font-size: 12px;
+  color: var(--vs-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.fila--hora .tramo { font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }
+
+.hueco { display: grid; align-content: start; gap: 4px; padding: 4px 0; min-width: 0; }
+
+// Hueco libre: aparece al pasar el puntero o con el foco del teclado
+.libre {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 38px;
+  border: 1px dashed transparent; border-radius: var(--vs-radius-md); background: none;
+  color: transparent; font: 500 13px var(--vs-font); cursor: pointer;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover, &:focus-visible { border-color: var(--vs-primary); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); }
+}
+@media (hover: none) { .libre { display: none; } }
+
+// Bloque de cita
+.bloque {
+  display: grid; gap: 1px; width: 100%; min-width: 0; padding: 6px 10px 6px 12px;
+  border: 0; border-left: 4px solid var(--vs-chart-1); border-radius: var(--vs-radius-md);
+  background: var(--vs-primary-soft); color: var(--vs-text); text-align: left; font: inherit; cursor: pointer;
+  transition: box-shadow var(--vs-dur-fast) var(--vs-ease);
+  &:hover { box-shadow: var(--vs-shadow-1); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+}
+.bloque-linea { display: flex; align-items: center; gap: 6px; min-width: 0;
+  strong { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.bloque-hora { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--vs-text-secondary); }
+.bloque-especie { flex-shrink: 0; font-size: 16px; width: 16px; height: 16px; color: var(--vs-primary); }
+.bloque-alergia { flex-shrink: 0; font-size: 16px; width: 16px; height: 16px; color: var(--vs-danger); }
+.bloque-sub { font-size: 12px; color: var(--vs-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bloque-estado { font-size: 11px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--vs-on-primary-soft); }
+
+.bloque--pendiente { border-left-color: var(--vs-attention); background: var(--vs-attention-surface, #fff6ec);
+  .bloque-estado { color: var(--vs-attention-text); } }
+.bloque--inmediata { border-left-color: var(--vs-attention-text); background: var(--vs-attention-container);
+  .bloque-estado { color: var(--vs-on-attention-container); } }
+.bloque--completada { border-left-color: var(--vs-border-strong); background: var(--vs-surface-muted);
+  strong, .bloque-especie { color: var(--vs-text-muted); }
+  .bloque-estado { color: var(--vs-text-muted); } }
+.bloque--falta { border-left-style: dashed;
+  .bloque-estado { color: var(--vs-attention-text); } }
+
+// "Ahora": línea de marca que cruza el tablero
+.ahora {
+  position: relative; height: 0; margin-left: 64px; border-top: 2px solid var(--vs-primary); z-index: 1;
+  &::before { content: ''; position: absolute; left: -5px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--vs-primary); }
+  span { position: absolute; right: 0; top: -11px; padding: 0 8px; border-radius: var(--vs-radius-full);
+    background: var(--vs-primary); color: var(--vs-on-primary); font-size: 11px; font-weight: 700; line-height: 20px; }
+}
+
+// Móvil: lista del día en lugar del tablero
+.lista-dia { display: none; margin: 0; padding: 0; list-style: none; gap: var(--vs-space-2);
+  .bloque { padding: var(--vs-space-3) var(--vs-space-3) var(--vs-space-3) var(--vs-space-4); } }
+
+@media (max-width: 899px) {
+  .tablero { display: none; }
+  .lista-dia { display: grid; }
+}
+@media (prefers-reduced-motion: reduce) { .bloque, .libre { transition: none; } }

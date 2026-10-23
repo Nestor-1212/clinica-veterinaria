@@ -105,6 +105,16 @@ describe('FormCitaComponent: atención inmediata (B1)', () => {
     expect(h.navigate).toHaveBeenCalledWith(['/citas']);
   });
 
+  it('desde un hueco libre de la agenda llega con veterinario, día y hora puestos', () => {
+    sesionComo('u-rec');
+    const manana = new Date(); manana.setDate(manana.getDate() + 1);
+    const iso = `${manana.getFullYear()}-${String(manana.getMonth() + 1).padStart(2, '0')}-${String(manana.getDate()).padStart(2, '0')}`;
+    const h = crearComponente(FormCitaComponent, { queryParams: { veterinarioId: 'u-vet', fecha: iso, hora: '10:30' } });
+    h.componente.ngOnInit();
+    const v = h.componente.form.getRawValue();
+    expect([v.veterinarioId, new Date(v.fecha).getDate(), v.hora]).toEqual(['u-vet', manana.getDate(), '10:30']);
+  });
+
   it('las horas ocupadas del veterinario no se pueden elegir y al cambiar de veterinario se libera la hora', () => {
     sesionComo('u-rec');
     const manana = new Date(); manana.setDate(manana.getDate() + 1);

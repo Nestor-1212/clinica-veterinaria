@@ -2,98 +2,212 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>event</mat-icon> Citas</h1>
-      <p>Agenda y gestión de citas</p>
+      <p>Agenda de la clínica por veterinario</p>
     </div>
     <div class="header-actions">
-      <button mat-stroked-button class="vs-btn-urgent" routerLink="/citas/nueva" [queryParams]="{tipo:'inmediata'}">
-        <mat-icon>bolt</mat-icon> Atención Inmediata
+      <button mat-stroked-button class="vs-btn-urgent" routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }">
+        <mat-icon>bolt</mat-icon> Atención inmediata
       </button>
-      <button mat-flat-button color="primary" routerLink="/citas/nueva">
-        <mat-icon>event_available</mat-icon> Nueva Cita
+      <button mat-flat-button routerLink="/citas/nueva">
+        <mat-icon>event_available</mat-icon> Nueva cita
       </button>
     </div>
   </div>
 
-  <mat-card class="table-card">
+  <div class="vs-segmentado vistas" role="group" aria-label="Vista de citas">
+    <button type="button" [attr.aria-pressed]="vista === 'agenda'" (click)="elegirVista('agenda')"><mat-icon aria-hidden="true">view_week</mat-icon>Agenda</button>
+    <button type="button" [attr.aria-pressed]="vista === 'confirmar'" (click)="elegirVista('confirmar')"><mat-icon aria-hidden="true">mark_chat_read</mat-icon>Por confirmar <span class="vs-cuenta">{{ totalPorConfirmar }}</span></button>
+    <button type="button" [attr.aria-pressed]="vista === 'historial'" (click)="elegirVista('historial')"><mat-icon aria-hidden="true">history</mat-icon>Historial</button>
+  </div>
+
+  <!-- ===== Agenda del día ===== -->
+  @if (vista === 'agenda') {
+    <section class="agenda" aria-labelledby="agenda-dia">
+      <div class="agenda-barra">
+        <div class="dia-nav">
+          <button mat-icon-button type="button" (click)="moverDia(-1)" aria-label="Día anterior" matTooltip="Día anterior"><mat-icon>chevron_left</mat-icon></button>
+          <button mat-stroked-button type="button" class="hoy" [disabled]="esHoy" (click)="irA(ahora)">Hoy</button>
+          <button mat-icon-button type="button" (click)="moverDia(1)" aria-label="Día siguiente" matTooltip="Día siguiente"><mat-icon>chevron_right</mat-icon></button>
+          <h2 id="agenda-dia" class="dia-titulo">{{ dia | date: "EEEE d 'de' MMMM" }}</h2>
+          <input class="sr-only" [matDatepicker]="dp" [value]="dia" (dateChange)="irA($event.value)" tabindex="-1" aria-hidden="true">
+          <button mat-icon-button type="button" (click)="dp.open()" aria-label="Elegir día en el calendario" matTooltip="Elegir día"><mat-icon>calendar_month</mat-icon></button>
+          <mat-datepicker #dp></mat-datepicker>
+        </div>
+        <ul class="dia-resumen" aria-label="Resumen del día">
+          <li><strong>{{ resumen.total }}</strong> {{ resumen.total === 1 ? 'cita' : 'citas' }}</li>
+          @if (resumen.enEspera) { <li class="r-espera"><strong>{{ resumen.enEspera }}</strong> en espera</li> }
+          @if (resumen.porConfirmar) { <li class="r-pendiente"><strong>{{ resumen.porConfirmar }}</strong> por confirmar</li> }
+          @if (resumen.confirmadas) { <li><strong>{{ resumen.confirmadas }}</strong> confirmadas</li> }
+          @if (resumen.atendidas) { <li><strong>{{ resumen.atendidas }}</strong> atendidas</li> }
+          @if (resumen.noLlegaron) { <li class="r-pendiente"><strong>{{ resumen.noLlegaron }}</strong> no {{ resumen.noLlegaron === 1 ? 'llegó' : 'llegaron' }}</li> }
+        </ul>
+      </div>
+
+      <!-- Escritorio: tablero por veterinario -->
+      <div class="tablero" role="table" [attr.aria-label]="'Agenda del ' + (dia | date: 'd MMMM')" [style.--vets]="veterinarios.length">
+        <div class="fila fila--cabecera" role="row">
+          <span class="esquina" role="columnheader"><span class="sr-only">Hora</span></span>
+          @for (v of veterinarios; track v.id) {
+            <div class="vet" role="columnheader" [class.vet--yo]="v.id === yo">
+              <span class="vet-avatar" aria-hidden="true">{{ v.nombre.charAt(0) }}</span>
+              <span class="vet-texto">
+                <strong>{{ v.nombre }} {{ v.apellido }}@if (v.id === yo) { <span class="tu">Tú</span> }</strong>
+                <small>{{ v.especialidad || 'Medicina general' }} · {{ citasPorVet[v.id] || 0 }} {{ citasPorVet[v.id] === 1 ? 'cita' : 'citas' }}</small>
+              </span>
+            </div>
+          }
+        </div>
+        @for (t of tramos; track t) {
+          @if (t === tramoAhora) {
+            <div class="ahora" role="presentation"><span>Ahora · {{ horaAhora }}</span></div>
+          }
+          <div class="fila" role="row" [class.fila--hora]="t.endsWith(':00')">
+            <span class="tramo" role="rowheader">{{ t }}</span>
+            @for (v of veterinarios; track v.id) {
+              <div class="hueco" role="cell">
+                @for (c of citasEn(v.id, t); track c.id) {
+                  <button type="button" class="bloque" [class]="'bloque bloque--' + c.estado" [class.bloque--falta]="noLlego(c)"
+                    [matMenuTriggerFor]="menuCita" [matMenuTriggerData]="{ c: c }"
+                    [attr.aria-label]="c.hora + ', ' + getMascota(c.mascotaId) + ' de ' + getCliente(c.clienteId) + ', ' + textoEstado(c)">
+                    <span class="bloque-linea">
+                      <span class="bloque-hora">{{ c.hora }}</span>
+                      <mat-icon class="bloque-especie" aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>
+                      <strong>{{ getMascota(c.mascotaId) }}</strong>
+                      @if (mascota(c.mascotaId)?.alergias) { <mat-icon class="bloque-alergia" aria-hidden="true">warning</mat-icon> }
+                    </span>
+                    <span class="bloque-sub">{{ getCliente(c.clienteId) }} · {{ c.motivo }}</span>
+                    <span class="bloque-estado">{{ textoEstado(c) }}</span>
+                  </button>
+                } @empty {
+                  @if (puedeAgendar(t)) {
+                    <button type="button" class="libre" (click)="agendarEn(v, t)" [attr.aria-label]="'Agendar con ' + v.nombre + ' a las ' + t">
+                      <mat-icon aria-hidden="true">add</mat-icon>{{ t }}
+                    </button>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Móvil: lista del día -->
+      <ol class="lista-dia" aria-label="Citas del día">
+        @for (c of delDia; track c.id) {
+          <li>
+            <button type="button" class="bloque" [class]="'bloque bloque--' + c.estado" [class.bloque--falta]="noLlego(c)"
+              [matMenuTriggerFor]="menuCita" [matMenuTriggerData]="{ c: c }">
+              <span class="bloque-linea">
+                <span class="bloque-hora">{{ c.hora }}</span>
+                <mat-icon class="bloque-especie" aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>
+                <strong>{{ getMascota(c.mascotaId) }}</strong>
+                @if (mascota(c.mascotaId)?.alergias) { <mat-icon class="bloque-alergia" aria-label="Tiene alergias">warning</mat-icon> }
+              </span>
+              <span class="bloque-sub">{{ getCliente(c.clienteId) }} · {{ vetCorto(c.veterinarioId) }}</span>
+              <span class="bloque-sub">{{ c.motivo }}</span>
+              <span class="bloque-estado">{{ textoEstado(c) }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="vacio"><mat-icon aria-hidden="true">event_available</mat-icon>No hay citas este día.</li>
+        }
+      </ol>
+    </section>
+  }
+
+  <!-- ===== Por confirmar ===== -->
+  @if (vista === 'confirmar') {
+    <section class="confirmar" aria-label="Citas por confirmar">
+      <p class="ayuda">Citas pendientes de los próximos 7 días. Envíe el recordatorio por WhatsApp y marque la cita como confirmada cuando el dueño responda.</p>
+      @for (g of porConfirmar; track g.dia.getTime()) {
+        <div class="grupo">
+          <h2 class="grupo-titulo">{{ nombreDia(g.dia) }} <span>{{ g.dia | date: "d 'de' MMMM" }} · {{ g.citas.length }}</span></h2>
+          <ul class="filas">
+            @for (c of g.citas; track c.id) {
+              <li class="fila-confirmar">
+                <span class="fc-hora">{{ c.hora }}</span>
+                <span class="fc-paciente">
+                  <span class="fc-nombre"><mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon><strong>{{ getMascota(c.mascotaId) }}</strong> · {{ getCliente(c.clienteId) }}</span>
+                  <small>{{ c.motivo }} · con {{ vetCorto(c.veterinarioId) }}</small>
+                </span>
+                <a class="fc-tel" [href]="tel(c.clienteId)" [attr.aria-label]="'Llamar a ' + getCliente(c.clienteId)"><mat-icon aria-hidden="true">call</mat-icon>{{ telefono(c.clienteId) }}</a>
+                <span class="fc-acciones">
+                  @if (whatsapp(c); as wa) {
+                    <a mat-stroked-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Enviar recordatorio por WhatsApp a ' + getCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>Recordar</a>
+                  }
+                  <button mat-flat-button type="button" (click)="cambiarEstado(c, 'confirmada')" [attr.aria-label]="'Confirmar la cita de ' + getMascota(c.mascotaId)"><mat-icon>check</mat-icon>Confirmar</button>
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+      } @empty {
+        <div class="vacio vacio--grande"><mat-icon aria-hidden="true">task_alt</mat-icon><p>Todas las citas de los próximos 7 días están confirmadas.</p></div>
+      }
+    </section>
+  }
+
+  <!-- ===== Historial ===== -->
+  <mat-card class="table-card" [class.oculta]="vista !== 'historial'">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label>
-          <input matInput #searchInput (keyup)="applyFilter($event)">
-          @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-          @if (!searchInput.value) {
-            <mat-icon matSuffix>search</mat-icon>
-          }
-        </mat-form-field>
-        <mat-form-field appearance="outline" class="filter-field">
+        <mat-form-field appearance="outline" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Estado</mat-label>
-          <mat-select [(ngModel)]="filtroEstado" (ngModelChange)="cargar()">
+          <mat-select [value]="filtroEstado" (selectionChange)="elegirEstado($event.value)">
             <mat-option value="">Todos</mat-option>
             @for (e of estadosFiltro; track e) {
-              <mat-option [value]="e">{{ e | titlecase }}</mat-option>
+              <mat-option [value]="e">{{ ESTADO_TEXTO[e] }}</mat-option>
             }
           </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar mascota, dueño o veterinario</mat-label>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+          } @else {
+            <mat-icon matSuffix>search</mat-icon>
+          }
         </mat-form-field>
       </div>
 
       <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
+        <table mat-table [dataSource]="dataSource" matSort class="full-table historial">
           <ng-container matColumnDef="fecha">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha / Hora</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
             <td mat-cell *matCellDef="let c" class="cell-primary">
-              <strong>{{ c.fecha | date:'dd/MM/yyyy' }}</strong>
-              <br><small>{{ c.hora }}</small>
+              <span class="h-fecha"><strong>{{ momentoCita(c) | date: "EEE d MMM y" }}</strong><small>{{ c.hora }}</small></span>
             </td>
           </ng-container>
-
-          <ng-container matColumnDef="mascota">
-            <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let c" data-label="Mascota">{{ getMascota(c.mascotaId) }}</td>
+          <ng-container matColumnDef="paciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Paciente</th>
+            <td mat-cell *matCellDef="let c" data-label="Paciente">
+              <span class="h-paciente">
+                <a [routerLink]="['/mascotas', c.mascotaId]">{{ getMascota(c.mascotaId) }}</a>
+                <small>{{ getCliente(c.clienteId) }}</small>
+              </span>
+            </td>
           </ng-container>
-
-          <ng-container matColumnDef="cliente">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Propietario">{{ getCliente(c.clienteId) }}</td>
-          </ng-container>
-
           <ng-container matColumnDef="veterinario">
-            <th mat-header-cell *matHeaderCellDef class="hide-md">Veterinario</th>
-            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Veterinario">{{ getVet(c.veterinarioId) }}</td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="hide-md">Veterinario</th>
+            <td mat-cell *matCellDef="let c" class="hide-md" data-label="Veterinario">{{ vetCorto(c.veterinarioId) }}</td>
           </ng-container>
-
           <ng-container matColumnDef="motivo">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Motivo</th>
-            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Motivo">{{ c.motivo | slice:0:40 }}</td>
+            <td mat-cell *matCellDef="let c" class="hide-sm" data-label="Motivo"><span class="h-motivo" [title]="c.motivo">{{ c.motivo }}</span></td>
           </ng-container>
-
           <ng-container matColumnDef="estado">
             <th mat-header-cell *matHeaderCellDef>Estado</th>
             <td mat-cell *matCellDef="let c" data-label="Estado">
-              <mat-chip [class]="'chip-' + c.estado">
-                <mat-icon class="chip-icon">{{ iconoEstado(c.estado) }}</mat-icon>{{ c.estado }}
-              </mat-chip>
+              <span [class]="'vs-status ' + claseEstado(c)">{{ textoEstado(c) }}</span>
             </td>
           </ng-container>
-
           <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
             <td mat-cell *matCellDef="let c" class="cell-actions">
-              <button mat-icon-button color="primary" (click)="iniciarConsulta(c)" matTooltip="Iniciar consulta" aria-label="Iniciar consulta">
-                <mat-icon>medical_services</mat-icon>
-              </button>
-              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" aria-label="Más acciones para esta cita">
+              <button mat-icon-button [matMenuTriggerFor]="menuCita" [matMenuTriggerData]="{ c: c }" matTooltip="Acciones" [attr.aria-label]="'Acciones para la cita de ' + getMascota(c.mascotaId)">
                 <mat-icon>more_vert</mat-icon>
               </button>
-              <mat-menu #menu>
-                <button mat-menu-item (click)="cambiarEstado(c, 'confirmada')"><mat-icon>check_circle</mat-icon> Confirmar</button>
-                <button mat-menu-item (click)="cambiarEstado(c, 'completada')"><mat-icon>done_all</mat-icon> Completar</button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="cancelar(c)" class="warn-item"><mat-icon>cancel</mat-icon> Cancelar cita</button>
-              </mat-menu>
             </td>
           </ng-container>
 
@@ -106,7 +220,35 @@
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas del historial"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>
+
+<!-- Acciones de una cita (tablero, lista y historial) -->
+<mat-menu #menuCita="matMenu" xPosition="after">
+  <ng-template matMenuContent let-c="c">
+    <div class="menu-cabecera" role="presentation">
+      <strong>{{ getMascota(c.mascotaId) }}</strong>
+      <small>{{ momentoCita(c) | date: "EEE d MMM" }} · {{ c.hora }} · {{ vetCorto(c.veterinarioId) }}</small>
+    </div>
+    <mat-divider></mat-divider>
+    @if (puedeConsultar && c.estado !== 'completada' && c.estado !== 'cancelada') {
+      <button mat-menu-item (click)="iniciarConsulta(c)"><mat-icon>medical_services</mat-icon>Iniciar consulta</button>
+    }
+    @if (c.estado === 'pendiente') {
+      <button mat-menu-item (click)="cambiarEstado(c, 'confirmada')"><mat-icon>check_circle</mat-icon>Confirmar</button>
+    }
+    @if ((c.estado === 'pendiente' || c.estado === 'confirmada') && !noLlego(c) && whatsapp(c); as wa) {
+      <a mat-menu-item [href]="wa" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>Recordar por WhatsApp</a>
+    }
+    @if (c.estado !== 'completada' && c.estado !== 'cancelada') {
+      <button mat-menu-item (click)="cambiarEstado(c, 'completada')"><mat-icon>done_all</mat-icon>Marcar atendida</button>
+    }
+    <a mat-menu-item [routerLink]="['/mascotas', c.mascotaId]"><mat-icon>folder_open</mat-icon>Historial de la mascota</a>
+    @if (c.estado !== 'completada' && c.estado !== 'cancelada') {
+      <mat-divider></mat-divider>
+      <button mat-menu-item class="warn-item" (click)="cancelar(c)"><mat-icon>cancel</mat-icon>Cancelar cita</button>
+    }
+  </ng-template>
+</mat-menu>

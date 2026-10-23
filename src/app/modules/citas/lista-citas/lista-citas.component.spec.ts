@@ -46,4 +46,24 @@ describe('ListaCitasComponent', () => {
     h.componente.cancelar(h.componente.dataSource.data[0]);
     expect(leer<Cita>('vet_citas').every(c => c.estado === 'pendiente')).toBe(true);
   });
+
+  it('el tablero ubica cada cita en su veterinario y media hora; por confirmar solo trae pendientes futuras', () => {
+    const manana = new Date(); manana.setDate(manana.getDate() + 1);
+    sembrar({ vet_citas: [
+      cita({ id: 'p', fecha: manana, hora: '10:00', estado: 'pendiente' }),
+      cita({ id: 'k', fecha: manana, hora: '10:40', estado: 'confirmada' }),
+      cita({ id: 'x', fecha: manana, hora: '11:00', estado: 'cancelada' })
+    ] });
+    const { componente } = crearComponente(ListaCitasComponent);
+    componente.ngOnInit();
+    componente.irA(manana);
+    const vet = componente.veterinarios[0].id;
+    expect(componente.citasEn(vet, '10:00').map(c => c.id)).toEqual(['p']);
+    expect(componente.citasEn(vet, '10:30').map(c => c.id)).toEqual(['k']);
+    expect(componente.citasEn(vet, '11:00')).toEqual([]);
+    expect(componente.puedeAgendar('11:00')).toBe(true);
+    expect(componente.totalPorConfirmar).toBe(1);
+    componente.cambiarEstado(componente.citasEn(vet, '10:00')[0], 'confirmada');
+    expect(componente.totalPorConfirmar).toBe(0);
+  });
 });

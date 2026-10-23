@@ -9,15 +9,9 @@ import { CitasService } from '../../../core/services/citas.service';
 import { puedeAcceder } from '../../../core/auth/permisos';
 import { citasDelDia, enlaceWhatsApp, esInasistencia, porCobrarHoy, recordatoriosVacuna, siguienteDiaHabil, Recordatorio } from '../../../core/utils/metricas';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+import { ESTADO_CLASE, ESTADO_TEXTO } from '../../../core/utils/agenda';
 import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
 import { DatosDashboard, ICONO_ESPECIE, enDias, entero, moneda, plural } from '../dashboard-datos';
-
-const ESTADO_TEXTO: Record<Cita['estado'], string> = {
-  pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Atendida', cancelada: 'Cancelada', inmediata: 'Inmediata'
-};
-const ESTADO_CLASE: Record<Cita['estado'], string> = {
-  pendiente: 'vs-status--warning', confirmada: 'vs-status--success', completada: 'vs-status--neutral', cancelada: 'vs-status--neutral', inmediata: 'vs-status--accent vs-status--pill'
-};
 
 /** Pestaña "Hoy": la jornada en curso para quien atiende o recibe pacientes. */
 @Component({

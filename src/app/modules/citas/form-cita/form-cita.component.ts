@@ -145,7 +145,12 @@ export class FormCitaComponent implements OnInit {
       const yo = this.auth.currentUser;
       if (yo?.rol === 'veterinario' && this.veterinarios.some(v => v.id === yo.id)) this.form.patchValue({ veterinarioId: yo.id });
     } else {
+      // Desde un hueco libre de la agenda llegan veterinario, día y hora
+      if (this.veterinarios.some(v => v.id === params.veterinarioId)) this.form.patchValue({ veterinarioId: params.veterinarioId }, { emitEvent: false });
+      const fecha = params.fecha ? new Date(`${params.fecha}T00:00`) : null;
+      if (fecha && !isNaN(fecha.getTime()) && fecha >= this.hoy) this.form.patchValue({ fecha }, { emitEvent: false });
       this.actualizarAgenda();
+      if (params.hora && this.horarios.find(h => h.hora === params.hora)?.estado === 'libre') this.form.patchValue({ hora: params.hora });
     }
     if (params.clienteId) {
       this.form.patchValue({ clienteId: params.clienteId });
