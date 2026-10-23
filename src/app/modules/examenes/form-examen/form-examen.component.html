@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>biotech</mat-icon> {{ cargandoResultado ? 'Cargar resultado' : isEdit ? 'Editar examen' : 'Nuevo examen' }}@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
-      <p>{{ cargandoResultado ? 'Anote lo que informó el laboratorio' : 'Puede guardarlo sin resultado y cargarlo cuando llegue' }}</p>
+      <p>{{ cargandoResultado ? 'Anote lo que informó el laboratorio o adjunte su PDF' : 'Puede guardarlo sin resultado y cargarlo cuando llegue' }}</p>
     </div>
     <button mat-button type="button" routerLink="/examenes"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
@@ -65,10 +65,43 @@
           <mat-label>Resultado {{ cargandoResultado ? '' : '(si ya lo tiene)' }}</mat-label>
           <textarea matInput formControlName="resultado" rows="5" placeholder="Valores, hallazgos e interpretación"></textarea>
           @if (sinResultado && !cargandoResultado) {
-            <mat-hint>Si lo deja vacío, el examen queda «Pendiente de resultado» en la lista</mat-hint>
+            <mat-hint>Sin texto ni archivo, el examen queda «Pendiente de resultado» en la lista</mat-hint>
           }
-          <mat-error>Anote el resultado</mat-error>
+          <mat-error>Anote el resultado o adjunte el informe del laboratorio</mat-error>
         </mat-form-field>
+
+        <!-- Informe del laboratorio (PDF o imagen) -->
+        <h3 class="sub">Informe del laboratorio</h3>
+        <label class="zona" [class.zona--encima]="arrastrando"
+          (dragover)="alArrastrar($event, true)" (dragleave)="alArrastrar($event, false)" (drop)="alSoltar($event)">
+          <input type="file" class="sr-only" accept="application/pdf,image/jpeg,image/png,image/webp" multiple (change)="alElegirArchivos($event)">
+          <mat-icon aria-hidden="true">upload_file</mat-icon>
+          <span><strong>Elija el PDF</strong> o arrástrelo aquí</span>
+          <small>PDF o imagen (JPG, PNG), hasta 10 MB cada uno</small>
+        </label>
+        @for (e of erroresArchivo; track e) {
+          <p class="error-archivo" role="alert"><mat-icon aria-hidden="true">error</mat-icon>{{ e }}</p>
+        }
+        @if (archivos.length || nuevos.length) {
+          <ul class="adjuntos" aria-label="Archivos adjuntos">
+            @for (a of archivos; track a.id) {
+              <li>
+                <mat-icon class="adj-icono" aria-hidden="true">{{ a.tipo === 'application/pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+                <span class="adj-texto"><strong>{{ a.nombre }}</strong><small>{{ tamano(a.tamano) }}</small></span>
+                <button mat-button type="button" (click)="ver(a)" [attr.aria-label]="'Ver ' + a.nombre + ' (se abre en otra pestaña)'"><mat-icon>open_in_new</mat-icon>Ver</button>
+                <button mat-icon-button type="button" (click)="quitarGuardado(a)" [attr.aria-label]="'Quitar ' + a.nombre"><mat-icon>close</mat-icon></button>
+              </li>
+            }
+            @for (n of nuevos; track n.meta.id; let i = $index) {
+              <li class="adj-nuevo">
+                <mat-icon class="adj-icono" aria-hidden="true">{{ n.meta.tipo === 'application/pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+                <span class="adj-texto"><strong>{{ n.meta.nombre }}</strong><small>{{ tamano(n.meta.tamano) }} · se guarda al guardar el examen</small></span>
+                <button mat-button type="button" (click)="ver(n.meta, n.archivo)" [attr.aria-label]="'Ver ' + n.meta.nombre + ' (se abre en otra pestaña)'"><mat-icon>open_in_new</mat-icon>Ver</button>
+                <button mat-icon-button type="button" (click)="quitarNuevo(i)" [attr.aria-label]="'Quitar ' + n.meta.nombre"><mat-icon>close</mat-icon></button>
+              </li>
+            }
+          </ul>
+        }
       </section>
 
       <div class="vs-acciones">

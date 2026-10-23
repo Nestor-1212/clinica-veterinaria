@@ -22,6 +22,37 @@ test('vacunas: aplicar refuerzo desde la lista registra una nueva dosis con la m
   expect(new Date(nueva!.proximaFecha).getTime()).toBeGreaterThan(Date.now());
 });
 
+test('laboratorio: al cargar el resultado se adjunta el PDF del laboratorio y queda guardado', async ({ page }) => {
+  await login(page, 'veterinario');
+  await page.goto('/examenes');
+  await page.getByRole('button', { name: /^Pendientes de resultado/ }).click();
+  await page.getByRole('button', { name: /^Cargar resultado de/ }).first().click();
+  await expect(page).toHaveURL(/\/examenes\/editar\//);
+
+  const pdf = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF');
+  await page.locator('input[type="file"]').setInputFiles({ name: 'hemograma.pdf', mimeType: 'application/pdf', buffer: pdf });
+  await expect(page.getByText('hemograma.pdf')).toBeVisible();
+  // Un archivo de otro tipo se rechaza con un aviso
+  await page.locator('input[type="file"]').setInputFiles({ name: 'datos.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
+  await expect(page.getByRole('alert')).toContainText('no es PDF');
+
+  await page.getByRole('button', { name: /Guardar resultado$/ }).click();
+  await expect(page).toHaveURL(/\/examenes$/);
+  const examenes = await leerColeccion<ExamenLS & { archivos?: { id: string; nombre: string }[] }>(page, 'vet_examenes');
+  const conPdf = examenes.find(e => e.archivos?.some(a => a.nombre === 'hemograma.pdf'));
+  expect(conPdf).toBeTruthy();
+  // El contenido quedó en IndexedDB
+  const guardado = await page.evaluate(id => new Promise<number>((ok, mal) => {
+    const r = indexedDB.open('vetsystem-archivos');
+    r.onsuccess = () => {
+      const g = r.result.transaction('archivos').objectStore('archivos').get(id);
+      g.onsuccess = () => ok((g.result as Blob | undefined)?.size ?? 0);
+      g.onerror = () => mal(g.error);
+    };
+  }), conPdf!.archivos![0].id);
+  expect(guardado).toBe(pdf.length);
+});
+
 test('laboratorio: un examen se solicita sin resultado y luego se carga', async ({ page }) => {
   await login(page, 'veterinario');
   await page.goto('/examenes/nuevo');

@@ -61,7 +61,14 @@
               @if (pendiente(e)) {
                 <span class="vs-status vs-status--warning">Pendiente</span>
               } @else {
-                <span class="resultado corta" [title]="e.resultado">{{ e.resultado }}</span>
+                <span class="resultado-celda">
+                  @if (e.resultado) { <span class="resultado corta" [title]="e.resultado">{{ e.resultado }}</span> }
+                  @if (e.archivos?.length) {
+                    <button type="button" class="informe" (click)="verInforme(e)" [attr.aria-label]="'Abrir el informe de ' + e.tipo + ' de ' + getMascota(e.mascotaId) + ' (se abre en otra pestaña)'">
+                      <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>Informe@if (e.archivos.length > 1) { ({{ e.archivos.length }}) }
+                    </button>
+                  }
+                </span>
               }
             </td>
           </ng-container>

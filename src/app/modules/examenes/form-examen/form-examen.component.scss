@@ -16,6 +16,30 @@
 
 .resumen-examen p { margin: 0 0 var(--vs-space-3); color: var(--vs-text-secondary); }
 
+// Informe del laboratorio
+.sub { margin: var(--vs-space-2) 0; font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }
+.zona {
+  display: grid; justify-items: center; gap: 2px; margin-bottom: var(--vs-space-3); padding: var(--vs-space-5);
+  border: 1.5px dashed var(--vs-border-strong); border-radius: var(--vs-radius-lg); background: var(--vs-surface-muted);
+  color: var(--vs-text-secondary); text-align: center; cursor: pointer;
+  transition: border-color var(--vs-dur-fast) var(--vs-ease), background var(--vs-dur-fast) var(--vs-ease);
+  mat-icon { font-size: 30px; width: 30px; height: 30px; color: var(--vs-primary); }
+  strong { color: var(--vs-primary); }
+  small { font-size: 12px; color: var(--vs-text-muted); }
+  &:hover, &.zona--encima { border-color: var(--vs-primary); background: var(--vs-primary-soft); }
+  &:has(input:focus-visible) { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+}
+.error-archivo { display: flex; align-items: center; gap: 6px; margin: 0 0 var(--vs-space-2); color: var(--vs-danger); font-size: 13px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+.adjuntos { display: grid; gap: var(--vs-space-2); margin: 0 0 var(--vs-space-4); padding: 0; list-style: none;
+  li { display: flex; align-items: center; gap: var(--vs-space-3); padding: var(--vs-space-2) var(--vs-space-2) var(--vs-space-2) var(--vs-space-3);
+    border: 1px solid var(--vs-border); border-radius: var(--vs-radius-md); background: var(--vs-surface); }
+  .adj-nuevo { border-style: dashed; } }
+.adj-icono { flex-shrink: 0; color: var(--vs-danger); }
+.adj-texto { display: grid; flex: 1; min-width: 0;
+  strong { font-size: 14px; color: var(--vs-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+
 @media (max-width: 1023px) {
   .ficha { position: static; order: -1; }
 }

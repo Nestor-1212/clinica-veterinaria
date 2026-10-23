@@ -10,6 +10,8 @@ import { UsuariosService } from '../../../core/services/usuarios.service';
 import { Cliente, Examen, Mascota, TipoMascota } from '../../../core/models';
 import { ICONO_ESPECIE, tiempoRelativo } from '../../../core/utils/clientes';
 import { examenPendiente } from '../../../core/utils/examenes';
+import { ArchivosService } from '../../../core/services/archivos.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -33,6 +35,8 @@ export class ListaExamenesComponent implements OnInit, AfterViewInit {
   private clientesService = inject(ClientesService);
   private usuariosService = inject(UsuariosService);
   private router = inject(Router);
+  private archivosService = inject(ArchivosService);
+  private snack = inject(MatSnackBar);
 
   readonly filtros: { valor: FiltroExamenes; texto: string }[] = [
     { valor: 'pendientes', texto: 'Pendientes de resultado' }, { valor: 'mes', texto: 'Últimos 30 días' }, { valor: 'todos', texto: 'Todos' }
@@ -92,6 +96,16 @@ export class ListaExamenesComponent implements OnInit, AfterViewInit {
   }
   relativo(fecha: Date | string): string { return tiempoRelativo(fecha, this.hoy); }
   pendiente(e: Examen): boolean { return examenPendiente(e); }
+
+  /** Abre el primer informe adjunto en otra pestaña. */
+  async verInforme(e: Examen): Promise<void> {
+    const archivo = e.archivos?.[0];
+    const contenido = archivo ? await this.archivosService.obtener(archivo.id).catch(() => undefined) : undefined;
+    if (!contenido) { this.snack.open('El informe no está guardado en este navegador', 'OK', { duration: 3000 }); return; }
+    const url = URL.createObjectURL(contenido);
+    window.open(url, '_blank', 'noopener');
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
 
   editar(e: Examen): void { this.router.navigate(['/examenes/editar', e.id]); }
   verMascota(e: Examen): void { this.router.navigate(['/mascotas', e.mascotaId]); }

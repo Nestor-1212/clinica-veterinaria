@@ -6,7 +6,7 @@ export const TIPOS_EXAMEN = [
   'Radiografía', 'Ecografía', 'Cultivo y antibiograma', 'Test rápido (ELISA)', 'PCR'
 ];
 
-/** Un examen sin resultado está pendiente (solicitado, a la espera del laboratorio). */
-export function examenPendiente(e: Pick<Examen, 'resultado'>): boolean {
-  return !(e.resultado || '').trim();
+/** Un examen sin resultado escrito ni informe adjunto está pendiente (a la espera del laboratorio). */
+export function examenPendiente(e: Pick<Examen, 'resultado' | 'archivos'>): boolean {
+  return !(e.resultado || '').trim() && !e.archivos?.length;
 }

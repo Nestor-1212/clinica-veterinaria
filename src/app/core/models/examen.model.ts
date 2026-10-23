@@ -1,3 +1,13 @@
+/** Archivo adjunto (PDF del laboratorio, imagen). El contenido vive en IndexedDB (ArchivosService). */
+export interface ArchivoAdjunto {
+  id: string;
+  nombre: string;
+  tipo: string;
+  /** Bytes. */
+  tamano: number;
+  fecha: Date | string;
+}
+
 export interface Examen {
   id: string;
   mascotaId: string;
@@ -8,5 +18,5 @@ export interface Examen {
   descripcion: string;
   resultado: string;
   fecha: Date | string;
-  archivos?: string[];
+  archivos?: ArchivoAdjunto[];
 }
