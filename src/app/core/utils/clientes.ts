@@ -200,3 +200,13 @@ export function historialCliente(citas: Cita[], consultas: Consulta[], pagos: Pa
   ];
   return eventos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
 }
+
+/** Teléfono de Panamá con guion: "60001111" → "6000-1111", "2201234" → "220-1234". Otros formatos quedan igual. */
+export function formatearTelefono(telefono: string): string {
+  const t = (telefono || '').trim();
+  if (!/^[\d\s-]+$/.test(t)) return t;
+  const d = t.replace(/\D/g, '');
+  if (d.length === 8) return `${d.slice(0, 4)}-${d.slice(4)}`;
+  if (d.length === 7) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return t;
+}

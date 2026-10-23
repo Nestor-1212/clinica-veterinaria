@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 @use './theme-colors' as theme;
 @use './styles/tokens' as vs;
+@use './styles/registro';
 
 $theme: mat.define-theme((
   color: (
@@ -24,6 +25,11 @@ html {
   @include mat.color-variants-backwards-compatibility($theme);
   // Tokens semánticos del design system (src/styles/_tokens.scss)
   @include vs.tokens;
+
+  // Campos estándar de 44px en toda la app (los 56px de Material se veían enormes)
+  @include mat.form-field-density(-3);
+  @include mat.select-density(-3);
+  @include mat.datepicker-density(-3);
 
   // Roles M3 alineados con los tokens: neutros teñidos de teal y un contenedor
   // de marca sereno (la paleta generada daba menta #97f3e2 y grises #737876).
@@ -491,6 +497,12 @@ input:focus-visible,
   outline: 2px solid var(--vs-focus);
   outline-offset: 2px;
 }
+/* Hueco para la etiqueta flotante (sobresale del borde): así no pisa la ayuda o el error del campo de arriba */
+.mat-mdc-form-field.mat-form-field-appearance-outline { margin-top: 10px; }
+.table-toolbar .mat-mdc-form-field.mat-form-field-appearance-outline { margin-top: 0; }
+
+/* Dentro de un mat-form-field el foco ya lo marca su borde: sin segundo anillo dentro del campo */
+.mat-mdc-form-field :is(input, textarea):focus-visible { outline: none; }
 
 /* ===== SUPERFICIES DEL NAVEGADOR ===== */
 ::selection { background: var(--vs-primary-container); color: var(--vs-on-primary-container); }

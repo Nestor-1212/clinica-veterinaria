@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Cita, Cliente, Consulta, Mascota, Pago, Vacuna } from '../models';
 import {
-  conteoSegmentos, enSegmento, estadoVacunas, filasClientes, historialCliente, proximaCita, resumenExpediente, tiempoRelativo, ultimaVisita
+  conteoSegmentos, enSegmento, estadoVacunas, formatearTelefono, filasClientes, historialCliente, proximaCita, resumenExpediente, tiempoRelativo, ultimaVisita
 } from './clientes';
 
 const HOY = new Date(2026, 9, 22, 12, 0); // jueves 22 de octubre de 2026, 12:00
@@ -123,5 +123,14 @@ describe('expediente', () => {
     expect(h.find(e => e.id === cancelada.id)?.futuro).toBe(false);
     expect(h.find(e => e.tipo === 'pago')?.total).toBe(40);
     expect(h.find(e => e.tipo === 'vacuna')?.proximaFecha).toEqual(dias(305));
+  });
+});
+
+describe('formatearTelefono', () => {
+  it('pone el guion a celulares de 8 dígitos y fijos de 7; lo demás no lo toca', () => {
+    expect(formatearTelefono('60001111')).toBe('6000-1111');
+    expect(formatearTelefono(' 6000 1111 ')).toBe('6000-1111');
+    expect(formatearTelefono('2201234')).toBe('220-1234');
+    expect(formatearTelefono('+1 555 123')).toBe('+1 555 123');
   });
 });

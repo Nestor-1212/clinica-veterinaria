@@ -10,10 +10,10 @@
     <button mat-button type="button" (click)="cancelar()"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <form class="registro" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="registro-secciones">
+  <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="vs-registro-secciones">
       <!-- Dueño -->
-      <section class="seccion" aria-labelledby="s-dueno">
+      <section class="vs-seccion" aria-labelledby="s-dueno">
         <h2 id="s-dueno"><mat-icon aria-hidden="true">person</mat-icon>Dueño</h2>
         <mat-form-field appearance="outline" class="ancho">
           <mat-label>Propietario</mat-label>
@@ -27,7 +27,7 @@
       </section>
 
       <!-- Identificación -->
-      <section class="seccion" aria-labelledby="s-id">
+      <section class="vs-seccion" aria-labelledby="s-id">
         <h2 id="s-id"><mat-icon aria-hidden="true">badge</mat-icon>Identificación</h2>
         <mat-form-field appearance="outline" class="ancho">
           <mat-label>Nombre</mat-label>
@@ -80,7 +80,7 @@
       </section>
 
       <!-- Edad y peso -->
-      <section class="seccion" aria-labelledby="s-edad">
+      <section class="vs-seccion" aria-labelledby="s-edad">
         <h2 id="s-edad"><mat-icon aria-hidden="true">monitor_weight</mat-icon>Edad y peso</h2>
         <div class="tres">
           <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -107,7 +107,7 @@
       </section>
 
       <!-- Salud -->
-      <section class="seccion" aria-labelledby="s-salud">
+      <section class="vs-seccion" aria-labelledby="s-salud">
         <h2 id="s-salud"><mat-icon aria-hidden="true">health_and_safety</mat-icon>Salud</h2>
         <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
           <mat-label>Alergias conocidas</mat-label>
@@ -116,7 +116,7 @@
         </mat-form-field>
       </section>
 
-      <div class="acciones">
+      <div class="vs-acciones">
         <button mat-stroked-button type="button" (click)="cancelar()">Cancelar</button>
         <button mat-flat-button type="submit" [disabled]="enviando">
           <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon> {{ isEdit ? 'Guardar cambios' : 'Registrar mascota' }}
@@ -125,8 +125,8 @@
     </div>
 
     <!-- Vista previa de la ficha -->
-    <aside class="previa" aria-label="Vista previa de la ficha">
-      <p class="previa-titulo">Así se verá su ficha</p>
+    <aside class="vs-previa" aria-label="Vista previa de la ficha">
+      <p class="vs-previa-titulo">Así se verá su ficha</p>
       <div class="foto">
         <button type="button" class="foto-boton" (click)="fotoInput.click()" [attr.aria-label]="fotoPreview ? 'Cambiar la foto' : 'Agregar una foto'">
           @if (fotoPreview) {
@@ -141,8 +141,8 @@
           <button mat-button type="button" class="foto-quitar" (click)="quitarFoto()">Quitar foto</button>
         }
       </div>
-      <h2 class="previa-nombre" [class.vacio]="!v('nombre')">{{ v('nombre') || 'Nombre' }}</h2>
-      <p class="previa-sub">{{ v('tipo') }}@if (v('raza')) { · {{ v('raza') }} } · {{ v('sexo') === 'hembra' ? 'Hembra' : 'Macho' }}</p>
+      <h2 class="vs-previa-nombre" [class.vacio]="!v('nombre')">{{ v('nombre') || 'Nombre' }}</h2>
+      <p class="vs-previa-sub">{{ v('tipo') }}@if (v('raza')) { · {{ v('raza') }} } · {{ v('sexo') === 'hembra' ? 'Hembra' : 'Macho' }}</p>
       <dl class="previa-datos">
         <div><dt>Edad</dt><dd>{{ v('edad') !== null && v('edad') !== '' ? (v('edad') | edad) : '—' }}</dd></div>
         <div><dt>Peso</dt><dd>{{ v('peso') ? v('peso') + ' kg' : '—' }}</dd></div>

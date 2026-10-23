@@ -56,3 +56,36 @@ describe('FormClienteComponent: envío (UX Fase 4)', () => {
     expect(navigate).toHaveBeenCalledWith(['/clientes', id]);
   });
 });
+
+describe('FormClienteComponent: ayudas al registrar', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    TestBed.resetTestingModule();
+    sembrar({ vet_usuarios: USUARIOS, vet_clientes: CLIENTES });
+    sesionComo('u-rec');
+  });
+
+  it('avisa al escribir una cédula ya registrada y no deja guardar', () => {
+    const { componente, navigate } = crearComponente(FormClienteComponent);
+    componente.ngOnInit();
+    componente.form.patchValue({ nombre: 'Otra Persona', cedula: CLIENTES[0].cedula, telefono: '6000-0000' });
+    expect(componente.duplicado?.id).toBe(CLIENTES[0].id);
+    expect(componente.form.get('cedula')?.hasError('duplicada')).toBe(true);
+    componente.onSubmit();
+    expect(navigate).not.toHaveBeenCalled();
+    componente.form.patchValue({ cedula: '8-999-999' });
+    expect(componente.duplicado).toBeNull();
+    expect(componente.form.get('cedula')?.valid).toBe(true);
+  });
+
+  it('"Registrar y agregar mascota" guarda el teléfono con guion y abre el alta de su mascota', () => {
+    const { componente, navigate } = crearComponente(FormClienteComponent);
+    componente.ngOnInit();
+    componente.form.patchValue({ nombre: 'Laura Ruiz', cedula: '8-123-456', telefono: '60001111' });
+    componente.onSubmit(true);
+    const nuevo = leer<Cliente>('vet_clientes').find(c => c.cedula === '8-123-456')!;
+    expect(nuevo.telefono).toBe('6000-1111');
+    expect(navigate).toHaveBeenCalledWith(['/mascotas/nueva'], { queryParams: { clienteId: nuevo.id } });
+  });
+});

@@ -1,0 +1,56 @@
+// Formularios de registro (cliente, mascota): secciones en tarjetas a la izquierda y
+// vista previa fija a la derecha. En móvil la vista previa va arriba.
+//   <form class="vs-registro"><div class="vs-registro-secciones"><section class="vs-seccion"><h2>…
+//   … <div class="vs-acciones"></div></div><aside class="vs-previa"></aside></form>
+
+.vs-registro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: var(--vs-space-6);
+  align-items: start;
+}
+.vs-registro-secciones { display: grid; gap: var(--vs-space-4); }
+
+.vs-seccion {
+  padding: var(--vs-space-5) var(--vs-space-6) var(--vs-space-3);
+  border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface);
+  box-shadow: var(--vs-shadow-soft);
+  > h2 {
+    display: flex; align-items: center; gap: var(--vs-space-2);
+    margin: 0 0 var(--vs-space-4); font-size: 17px; font-weight: 600; color: var(--vs-text);
+    mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); }
+  }
+  mat-form-field[subscriptSizing='dynamic'] { margin-bottom: var(--vs-space-4); }
+}
+
+.vs-acciones {
+  display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--vs-space-3); padding-top: var(--vs-space-2);
+  button { min-height: 44px; padding-inline: var(--vs-space-5); }
+}
+
+.vs-previa {
+  position: sticky; top: var(--vs-space-4);
+  display: grid; justify-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-6); border-radius: var(--vs-radius-xl);
+  background: var(--vs-surface); box-shadow: var(--vs-shadow-soft); text-align: center;
+  p { margin: 0; }
+}
+.vs-previa-titulo {
+  justify-self: stretch; text-align: left;
+  font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--vs-text-muted);
+}
+.vs-previa-nombre {
+  margin: 0; font-size: 22px; font-weight: 700; color: var(--vs-text); overflow-wrap: anywhere;
+  &.vacio { color: var(--vs-text-muted); font-weight: 500; }
+}
+.vs-previa-sub { font-size: 14px; color: var(--vs-text-secondary); }
+
+@media (max-width: 1023px) {
+  .vs-registro { grid-template-columns: 1fr; }
+  .vs-previa { position: static; order: -1; }
+}
+@media (max-width: 599px) {
+  .vs-seccion { padding: var(--vs-space-4) var(--vs-space-4) var(--vs-space-2); }
+  .vs-acciones { flex-direction: column-reverse; button { width: 100%; } }
+}

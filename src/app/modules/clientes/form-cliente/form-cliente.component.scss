@@ -1,16 +1,45 @@
-/* .form-grid / .form-actions viven en src/styles.scss.
-   Secciones con <fieldset>/<legend>: el lector de pantalla anuncia el grupo de cada campo. */
-.obligatorios { margin: 0 0 var(--vs-space-2); font-size: 13px; color: var(--vs-text-muted); }
+// Registro de cliente. El esqueleto (.vs-registro, .vs-seccion, .vs-previa) está en src/styles/_registro.scss;
+// aquí solo lo propio: rejilla de campos, aviso de cédula duplicada y la tarjeta de vista previa.
 
-.seccion {
-  margin: 0; padding: var(--vs-space-5) 0 var(--vs-space-2); border: 0; min-width: 0;
-  & + & { border-top: 1px solid var(--vs-border); }
-  legend { float: left; width: 100%; margin-bottom: var(--vs-space-4); padding: 0; font: var(--vs-text-h3); color: var(--vs-text); }
-  legend + * { clear: both; }
+.campos {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--vs-space-4); align-items: start;
+  .col-full { grid-column: 1 / -1; }
+}
+.formato { white-space: nowrap; }
+
+// Cédula ya registrada: se avisa al escribir, con acceso directo al expediente existente
+.duplicado {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--vs-space-2);
+  margin: 0 0 var(--vs-space-4); padding: var(--vs-space-2) var(--vs-space-2) var(--vs-space-2) var(--vs-space-3);
+  border-radius: var(--vs-radius-md); background: var(--vs-attention-container); color: var(--vs-on-attention-container); font-size: 14px;
+  > mat-icon { flex-shrink: 0; color: var(--vs-attention-text); }
+  span { flex: 1; min-width: 180px; }
 }
 
-// Campos con ayuda de formato: subscriptSizing="dynamic" (la ayuda envuelve en móvil sin recortarse)
-mat-form-field[subscriptSizing='dynamic'] { margin-bottom: var(--vs-space-4); }
-.form-grid { align-items: start; }
-.form-actions { margin-top: var(--vs-space-4); }
-.formato { white-space: nowrap; }
+// Vista previa
+.avatar {
+  display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%;
+  background: var(--vs-primary); color: var(--vs-on-primary); font-size: 32px; font-weight: 700;
+  &.vacio { background: var(--vs-primary-soft); color: var(--vs-primary); }
+  mat-icon { font-size: 44px; width: 44px; height: 44px; }
+}
+.previa-datos {
+  display: grid; gap: var(--vs-space-2); justify-self: stretch; margin: 0; padding: var(--vs-space-3) 0 0;
+  border-top: 1px solid var(--vs-border); list-style: none; text-align: left;
+  li { display: flex; align-items: flex-start; gap: var(--vs-space-2); font-size: 14px; color: var(--vs-text); overflow-wrap: anywhere; }
+  li.vacio { color: var(--vs-text-muted); }
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+}
+.wa {
+  margin-left: auto; padding: 0 8px; border-radius: var(--vs-radius-full);
+  background: var(--vs-success-container); color: var(--vs-on-success-container); font-size: 12px; font-weight: 600; line-height: 20px;
+}
+.siguiente {
+  display: flex; align-items: flex-start; gap: var(--vs-space-2); justify-self: stretch; text-align: left;
+  padding: var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-size: 13px;
+  mat-icon { flex-shrink: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+}
+
+@media (max-width: 599px) {
+  .campos { grid-template-columns: 1fr; }
+}
