@@ -1,5 +1,5 @@
 import { formatNumber } from '@angular/common';
-import { Cita, Cliente, Consulta, Mascota, Pago, RolUsuario, TipoMascota, Usuario, Vacuna } from '../../core/models';
+import { Cita, Cliente, Consulta, Mascota, Pago, RolUsuario, Usuario, Vacuna } from '../../core/models';
 
 /** Colecciones leídas una sola vez por el dashboard y compartidas por sus pestañas. */
 export interface DatosDashboard {
@@ -36,9 +36,8 @@ export function tramoAnterior(hoy: Date): string {
   return `vs. 1–${Math.min(hoy.getDate(), ultimo)} ${MESES_CORTOS[ant.getMonth()]}`;
 }
 
-export const ICONO_ESPECIE: Record<TipoMascota, string> = {
-  Perro: 'pets', Gato: 'pets', Ave: 'flutter_dash', Conejo: 'cruelty_free', Reptil: 'eco', Otro: 'pest_control_rodent'
-};
+/** Icono por especie: definido en core/utils/clientes (lo comparten dashboard y clientes). */
+export { ICONO_ESPECIE } from '../../core/utils/clientes';
 
 /** "1 cita" / "3 citas" (plural regular o indicado). */
 export function plural(n: number, singular: string, pluralForma = singular + 's'): string {

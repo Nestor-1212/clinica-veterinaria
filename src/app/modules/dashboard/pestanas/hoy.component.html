@@ -37,7 +37,7 @@
           <p>{{ datos().hoy | date: "EEEE d 'de' MMMM" }} · {{ plural(agenda().length, 'cita') }}</p>
         </div>
         @if (esVet()) {
-          <div class="segmentado" role="group" aria-label="Qué citas mostrar">
+          <div class="vs-segmentado" role="group" aria-label="Qué citas mostrar">
             <button type="button" [attr.aria-pressed]="soloMias()" (click)="soloMias.set(true)">Mis citas</button>
             <button type="button" [attr.aria-pressed]="!soloMias()" (click)="soloMias.set(false)">Toda la clínica</button>
           </div>

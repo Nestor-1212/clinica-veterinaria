@@ -340,6 +340,25 @@ html .mat-mdc-tab-group.vs-tabs--panel > .mat-mdc-tab-body-wrapper {
   box-shadow: var(--vs-shadow-soft);
 }
 
+/* Control segmentado (.vs-segmentado): filtros rápidos en el mismo lenguaje que .vs-tabs.
+   <div role="group" aria-label="…"><button type="button" [attr.aria-pressed]>Texto <span class="vs-cuenta">N</span></button></div>
+   Inactivo #3a4a46 sobre la pista 7.19:1; activo #006b5e sobre blanco 6.43:1; cuenta
+   muted #55655f sobre pista 4.73:1 (inactivo) y sobre blanco 6.15:1 (activo). */
+.vs-segmentado {
+  display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: var(--vs-radius-full); background: var(--vs-tonal);
+  button {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 var(--vs-space-3);
+    border: 0; border-radius: var(--vs-radius-full); background: none; cursor: pointer;
+    font: inherit; font-size: 13px; font-weight: 500; color: var(--vs-text-secondary); white-space: nowrap;
+    transition: background-color var(--vs-dur) var(--vs-ease), color var(--vs-dur) var(--vs-ease), box-shadow var(--vs-dur) var(--vs-ease);
+    &:hover { color: var(--vs-text); }
+    &[aria-pressed='true'] { background: var(--vs-surface); color: var(--vs-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(12, 56, 51, 0.14); }
+  }
+  .vs-cuenta { font-size: 12px; font-weight: 600; color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
+  // Móvil: una sola fila que se desliza en horizontal (no una píldora partida en dos líneas)
+  @media (max-width: 600px) { flex-wrap: nowrap; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+}
+
 /* Diálogos sobre superficie blanca, como las tarjetas */
 html {
   @include mat.dialog-overrides((
