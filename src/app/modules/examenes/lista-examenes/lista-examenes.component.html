@@ -1,35 +1,108 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>biotech</mat-icon> Laboratorio / Exámenes</h1><p>Resultados de exámenes clínicos</p></div>
-    <button mat-flat-button color="primary" routerLink="/examenes/nuevo"><mat-icon>add</mat-icon> Nuevo Examen</button>
+    <div>
+      <h1><mat-icon>biotech</mat-icon> Laboratorio</h1>
+      <p>{{ conteos.pendientes }} {{ conteos.pendientes === 1 ? 'examen pendiente' : 'exámenes pendientes' }} de resultado · {{ conteos.mes }} en los últimos 30 días</p>
+    </div>
+    <button mat-flat-button routerLink="/examenes/nuevo"><mat-icon>add</mat-icon> Nuevo examen</button>
   </div>
+
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label><input matInput #searchInput (keyup)="applyFilter($event)">
-          @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''"><mat-icon>close</mat-icon></button>
+        <div class="vs-segmentado" role="group" aria-label="Filtrar exámenes">
+          @for (f of filtros; track f.valor) {
+            <button type="button" [attr.aria-pressed]="filtro === f.valor" (click)="elegirFiltro(f.valor)">{{ f.texto }} <span class="vs-cuenta">{{ conteos[f.valor] }}</span></button>
           }
-          @if (!searchInput.value) {
+        </div>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar paciente o examen</mat-label>
+          <input matInput #searchInput (keyup)="applyFilter($event)">
+          @if (searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+          } @else {
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
       </div>
+
       <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="fecha"><th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th><td mat-cell *matCellDef="let e" class="cell-nowrap cell-primary">{{ e.fecha | date:'dd/MM/yyyy' }}</td></ng-container>
-          <ng-container matColumnDef="mascota"><th mat-header-cell *matHeaderCellDef>Mascota</th><td mat-cell *matCellDef="let e" data-label="Mascota">{{ getMascota(e.mascotaId) }}</td></ng-container>
-          <ng-container matColumnDef="cliente"><th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th><td mat-cell *matCellDef="let e" class="hide-sm" data-label="Propietario">{{ getCliente(e.mascotaId) }}</td></ng-container>
-          <ng-container matColumnDef="tipo"><th mat-header-cell *matHeaderCellDef>Tipo</th><td mat-cell *matCellDef="let e" data-label="Tipo"><mat-chip>{{ e.tipo }}</mat-chip></td></ng-container>
-          <ng-container matColumnDef="resultado"><th mat-header-cell *matHeaderCellDef class="hide-sm">Resultado</th><td mat-cell *matCellDef="let e" class="hide-sm" data-label="Resultado">{{ e.resultado | slice:0:60 }}</td></ng-container>
-          <ng-container matColumnDef="acciones"><th mat-header-cell *matHeaderCellDef>Acciones</th><td mat-cell *matCellDef="let e" class="cell-actions"><button mat-icon-button (click)="editar(e)" matTooltip="Editar" aria-label="Editar examen"><mat-icon>edit</mat-icon></button></td></ng-container>
+        <table mat-table [dataSource]="dataSource" matSort class="full-table examenes-tabla">
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+            <td mat-cell *matCellDef="let e" class="c-fecha">
+              <span class="dato"><strong>{{ relativo(e.fecha) }}</strong><small>{{ e.fecha | date: 'd MMM y' }}</small></span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="paciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Paciente</th>
+            <td mat-cell *matCellDef="let e" class="cell-primary c-paciente">
+              <span class="paciente-celda">
+                <span class="p-icono" aria-hidden="true"><mat-icon>{{ especie(e.mascotaId) }}</mat-icon></span>
+                <span class="dato">
+                  <a [routerLink]="['/mascotas', e.mascotaId]">{{ getMascota(e.mascotaId) }}</a>
+                  <small>{{ getCliente(e.mascotaId) }}</small>
+                </span>
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="examen">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Examen</th>
+            <td mat-cell *matCellDef="let e" class="c-examen">
+              <span class="dato"><strong>{{ e.tipo }}</strong><small class="corta" [title]="e.descripcion">{{ e.descripcion }}</small></span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="resultado">
+            <th mat-header-cell *matHeaderCellDef>Resultado</th>
+            <td mat-cell *matCellDef="let e" class="c-resultado">
+              @if (pendiente(e)) {
+                <span class="vs-status vs-status--warning">Pendiente</span>
+              } @else {
+                <span class="resultado corta" [title]="e.resultado">{{ e.resultado }}</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="veterinario">
+            <th mat-header-cell *matHeaderCellDef class="hide-md">Solicitó</th>
+            <td mat-cell *matCellDef="let e" class="hide-md c-vet">{{ vet(e.veterinarioId) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let e" class="cell-actions c-acciones">
+              @if (pendiente(e)) {
+                <button mat-flat-button type="button" class="cargar" (click)="editar(e)" [attr.aria-label]="'Cargar resultado de ' + e.tipo + ' de ' + getMascota(e.mascotaId)">
+                  <mat-icon>edit_note</mat-icon> Cargar resultado
+                </button>
+              }
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para ' + e.tipo + ' de ' + getMascota(e.mascotaId)"><mat-icon>more_vert</mat-icon></button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="editar(e)"><mat-icon>edit</mat-icon>{{ pendiente(e) ? 'Cargar resultado' : 'Editar examen' }}</button>
+                <button mat-menu-item (click)="verMascota(e)"><mat-icon>folder_open</mat-icon>Historial de la mascota</button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
-          <tr class="mat-row" *matNoDataRow><td class="mat-cell no-data" [attr.colspan]="displayedColumns.length"><mat-icon>search_off</mat-icon><p>No se encontraron exámenes</p></td></tr>
+          <tr mat-row *matRowDef="let r; columns: displayedColumns;" [class.fila-pendiente]="pendiente(r)"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+              @if (dataSource.filter) {
+                <mat-icon>search_off</mat-icon><p>Ningún examen coincide con «{{ searchInput.value }}».</p>
+              } @else if (filtro === 'pendientes') {
+                <mat-icon>task_alt</mat-icon><p>No hay exámenes esperando resultado.</p>
+              } @else {
+                <mat-icon>biotech</mat-icon><p>No hay exámenes en este período.</p>
+              }
+            </td>
+          </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de exámenes"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

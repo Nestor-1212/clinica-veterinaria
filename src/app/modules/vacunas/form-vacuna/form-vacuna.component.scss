@@ -1,1 +1,30 @@
-.cliente-info { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; background: var(--vs-surface-muted); padding: 8px 12px; border-radius: var(--vs-radius-sm); font-size: 13px; mat-icon { font-size: 16px; color: var(--vs-primary); } }
+// Registro de vacuna: esqueleto en src/styles/_registro.scss; ficha y buscador de paciente compartidos.
+
+.h1-paciente { font-weight: 500; color: var(--vs-text-secondary); }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--vs-space-4); align-items: start;
+  mat-form-field[subscriptSizing='dynamic'] { margin-bottom: var(--vs-space-4); } }
+
+// Fichas de un toque (vacunas de la especie, intervalos de refuerzo)
+.chips { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); margin-bottom: var(--vs-space-4); }
+.chip {
+  min-height: 36px; padding: 0 var(--vs-space-4); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-full);
+  background: var(--vs-surface); color: var(--vs-text); font: 500 14px var(--vs-font); cursor: pointer;
+  transition: background var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
+  &:hover { background: var(--vs-row-hover); border-color: var(--vs-border-strong); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-pressed='true'] { border-color: var(--vs-primary); background: var(--vs-primary); color: var(--vs-on-primary); }
+}
+
+.refuerzo { margin: 0; padding: 0; border: 0; min-width: 0;
+  legend { margin-bottom: var(--vs-space-2); padding: 0; font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); } }
+.refuerzo-fila { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 var(--vs-space-4);
+  .chips { margin-top: 14px; }
+  .proxima { flex: 1; min-width: 220px; margin-bottom: var(--vs-space-4); } }
+
+@media (max-width: 1023px) {
+  .ficha { position: static; order: -1; }
+}
+@media (max-width: 599px) {
+  .dos { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }

@@ -1,4 +1,42 @@
-.row-pendiente { background: var(--vs-attention-surface); }
-.text-warn { color: var(--vs-warning); font-weight: 600; }
-.text-ok { color: var(--vs-success); }
-.warn-icon { color: var(--vs-warning); font-size: 16px; width: 16px; height: 16px; vertical-align: middle; }
+// Vacunas: a quién le toca el refuerzo y cómo avisarle.
+
+.table-toolbar { justify-content: space-between; }
+.vacunas-tabla td.mat-mdc-cell { vertical-align: middle; }
+
+.dato { display: inline-grid; justify-items: start; gap: 2px; min-width: 0;
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.paciente-celda { display: flex; align-items: center; gap: var(--vs-space-3);
+  .dato > a { font-size: 14px; font-weight: 600; color: var(--vs-text); text-decoration: none; }
+  .dato > a:hover { color: var(--vs-primary); text-decoration: underline; } }
+.p-icono { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--vs-primary-soft); color: var(--vs-primary);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+.tel { color: var(--vs-text-secondary); text-decoration: none; font-variant-numeric: tabular-nums;
+  &:hover { color: var(--vs-primary); text-decoration: underline; } }
+.c-vacuna strong { font-size: 14px; color: var(--vs-text); }
+.fecha { font-size: 13px; color: var(--vs-text-secondary); white-space: nowrap; }
+.c-proxima .vs-status::first-letter { text-transform: uppercase; }
+
+.c-acciones { white-space: nowrap; }
+.refuerzo { margin-left: var(--vs-space-1); }
+
+@media (max-width: 767px) {
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .vs-segmentado { align-self: flex-start; }
+
+  .mat-mdc-table.vacunas-tabla {
+    tr.mat-mdc-row {
+      display: grid !important; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--vs-space-3);
+      grid-template-areas: 'pac pac' 'vac pro' 'apl apl' 'acc acc';
+      padding: var(--vs-space-3) var(--vs-space-4) !important;
+    }
+    td.mat-mdc-cell { border-bottom: 0 !important; padding: 4px 0 !important; justify-content: flex-start; text-align: left;
+      &::before { display: none; } }
+    .c-paciente { grid-area: pac; }
+    .c-vacuna { grid-area: vac; }
+    .c-proxima { grid-area: pro; justify-content: flex-end; .dato { justify-items: end; } }
+    .c-aplicada { grid-area: apl; .fecha::before { content: 'Última dosis: '; } }
+    .c-acciones { grid-area: acc; justify-content: flex-end; }
+    .c-lote, .c-vet { display: none !important; }
+  }
+}

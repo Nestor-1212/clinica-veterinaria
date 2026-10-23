@@ -1,65 +1,85 @@
 <div class="page-container">
   <div class="page-header">
     <div>
-      <h1><mat-icon>vaccines</mat-icon> {{ isEdit ? 'Editar Vacuna' : 'Registrar Vacuna' }}</h1>
-      <p>Registro de vacunación del paciente</p>
+      <h1><mat-icon>vaccines</mat-icon> {{ isEdit ? 'Editar vacuna' : 'Registrar vacuna' }}@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
+      <p>Paciente, vacuna aplicada y cuándo toca el refuerzo</p>
     </div>
-    <button mat-stroked-button routerLink="/vacunas"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <button mat-button type="button" [routerLink]="volverA"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Mascota</mat-label>
-            <mat-select formControlName="mascotaId" (selectionChange)="onMascotaChange($event.value)">
-              @for (m of mascotas; track m) {
-                <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
-              }
-            </mat-select>
-            <mat-error>Seleccione la mascota</mat-error>
+  <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="vs-registro-secciones">
+      <section class="vs-seccion" aria-labelledby="s-paciente">
+        <h2 id="s-paciente"><mat-icon aria-hidden="true">pets</mat-icon>Paciente</h2>
+        <app-selector-paciente [mascotas]="mascotas" [clientes]="clientes" [seleccion]="form.value.mascotaId"
+          [invalido]="pacienteInvalido" (elegir)="onMascotaChange($event)" />
+      </section>
+
+      <section class="vs-seccion" aria-labelledby="s-vacuna">
+        <h2 id="s-vacuna"><mat-icon aria-hidden="true">vaccines</mat-icon>Vacuna</h2>
+        @if (sugeridas.length) {
+          <div class="chips" role="group" [attr.aria-label]="'Vacunas habituales en ' + (mascota?.tipo || '').toLowerCase() + 's'">
+            @for (n of sugeridas; track n) {
+              <button type="button" class="chip" [attr.aria-pressed]="form.value.nombre === n" (click)="elegirVacuna(n)">{{ n }}</button>
+            }
+          </div>
+        }
+        <div class="dos">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Vacuna</mat-label>
+            <input matInput formControlName="nombre" placeholder="Toque una arriba o escriba otra" autocomplete="off">
+            @if (ultimaDosis; as u) {
+              <mat-hint>Dosis anterior: {{ u.fechaAplicacion | date: "d MMM y" }}</mat-hint>
+            } @else if (form.value.nombre && mascota) {
+              <mat-hint>Primera dosis registrada de esta vacuna</mat-hint>
+            }
+            <mat-error>Indique la vacuna</mat-error>
           </mat-form-field>
-
-          @if (cliente) {
-            <div class="cliente-info">
-              <mat-icon>person</mat-icon> Propietario: <strong>{{ cliente.nombre }}</strong>
-            </div>
-          }
-
-          <mat-form-field appearance="outline">
-            <mat-label>Vacuna aplicada</mat-label>
-            <mat-select formControlName="nombre">
-              @for (v of vacunasComunes; track v) {
-                <mat-option [value]="v">{{ v }}</mat-option>
-              }
-              <mat-option value="Otra">Otra...</mat-option>
-            </mat-select>
-            <mat-error>Seleccione la vacuna</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Número de Lote</mat-label>
-            <input matInput formControlName="lote" placeholder="Ej: LAB-2024-001">
-            <mat-error>El lote es requerido</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label>Fecha de aplicación</mat-label>
-            <input matInput [matDatepicker]="dp1" formControlName="fechaAplicacion">
+            <input matInput [matDatepicker]="dp1" formControlName="fechaAplicacion" [max]="hoy">
             <mat-datepicker-toggle matSuffix [for]="dp1"></mat-datepicker-toggle>
             <mat-datepicker #dp1></mat-datepicker>
+            <mat-error>Indique la fecha</mat-error>
           </mat-form-field>
+        </div>
 
+        <fieldset class="refuerzo">
+          <legend>Próximo refuerzo</legend>
+          <div class="refuerzo-fila">
+            <div class="chips" role="group" aria-label="Intervalo del refuerzo">
+              @for (r of refuerzos; track r.dias) {
+                <button type="button" class="chip" [attr.aria-pressed]="refuerzoDias === r.dias" (click)="elegirRefuerzo(r.dias)">{{ r.texto }}</button>
+              }
+            </div>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="proxima">
+              <mat-label>Fecha del refuerzo</mat-label>
+              <input matInput [matDatepicker]="dp2" formControlName="proximaFecha" [min]="form.value.fechaAplicacion" (dateChange)="proximaManual()">
+              <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
+              <mat-datepicker #dp2></mat-datepicker>
+              <mat-error>Indique cuándo toca el refuerzo</mat-error>
+            </mat-form-field>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="vs-seccion" aria-labelledby="s-producto">
+        <h2 id="s-producto"><mat-icon aria-hidden="true">inventory_2</mat-icon>Producto y responsable</h2>
+        <div class="dos">
           <mat-form-field appearance="outline">
-            <mat-label>Próxima vacunación</mat-label>
-            <input matInput [matDatepicker]="dp2" formControlName="proximaFecha">
-            <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
-            <mat-datepicker #dp2></mat-datepicker>
+            <mat-label>Número de lote</mat-label>
+            <input matInput formControlName="lote" placeholder="Ej: RA-4821" autocomplete="off">
+            <mat-error>El lote es obligatorio (trazabilidad)</mat-error>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Veterinario</mat-label>
+            <mat-label>Laboratorio (opcional)</mat-label>
+            <input matInput formControlName="laboratorio" [matAutocomplete]="autoLab" placeholder="Ej: Zoetis" autocomplete="off">
+            <mat-autocomplete #autoLab="matAutocomplete">
+              @for (l of sugerirLaboratorio(form.value.laboratorio); track l) { <mat-option [value]="l">{{ l }}</mat-option> }
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Veterinario que la aplicó</mat-label>
             <mat-select formControlName="veterinarioId">
               @for (v of veterinarios; track v.id) {
                 <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}</mat-option>
@@ -67,25 +87,21 @@
             </mat-select>
             <mat-error>Seleccione el veterinario que aplicó la vacuna</mat-error>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Laboratorio</mat-label>
-            <input matInput formControlName="laboratorio" placeholder="Ej: MSD Animal Health">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Observaciones</mat-label>
-            <textarea matInput formControlName="observaciones" rows="2"></textarea>
+            <mat-label>Observaciones (opcional)</mat-label>
+            <input matInput formControlName="observaciones" placeholder="Reacción, zona de aplicación…" autocomplete="off">
           </mat-form-field>
         </div>
+      </section>
 
-        <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/vacunas">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
-            <mat-icon>vaccines</mat-icon> Registrar Vacuna
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      <div class="vs-acciones">
+        <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          <mat-icon>vaccines</mat-icon> {{ isEdit ? 'Guardar cambios' : 'Registrar vacuna' }}
+        </button>
+      </div>
+    </div>
+
+    <app-ficha-paciente class="ficha" [ficha]="ficha" textoVacio="Busque al paciente para ver sus vacunas, alergias y la última consulta." />
+  </form>
 </div>

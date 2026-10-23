@@ -2,80 +2,115 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>vaccines</mat-icon> Vacunas</h1>
-      <p>Control de vacunación y recordatorios</p>
+      <p>{{ conteos.vencida }} {{ conteos.vencida === 1 ? 'refuerzo vencido' : 'refuerzos vencidos' }} · {{ conteos.proxima }} en los próximos 30 días</p>
     </div>
-    <button mat-flat-button color="primary" routerLink="/vacunas/nueva">
-      <mat-icon>add</mat-icon> Registrar Vacuna
-    </button>
+    <button mat-flat-button routerLink="/vacunas/nueva"><mat-icon>add</mat-icon> Registrar vacuna</button>
   </div>
 
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar...</mat-label>
+        <div class="vs-segmentado" role="group" aria-label="Filtrar vacunas">
+          @for (v of vistas; track v.valor) {
+            <button type="button" [attr.aria-pressed]="vista === v.valor" (click)="elegirVista(v.valor)">{{ v.texto }} <span class="vs-cuenta">{{ conteos[v.valor] }}</span></button>
+          }
+        </div>
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-label>Buscar mascota, dueño o vacuna</mat-label>
           <input matInput #searchInput (keyup)="applyFilter($event)">
           @if (searchInput.value) {
-            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" matTooltip="Limpiar" (click)="searchInput.value=''; dataSource.filter=''">
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-          @if (!searchInput.value) {
+            <button mat-icon-button matSuffix type="button" aria-label="Limpiar búsqueda" (click)="limpiarBusqueda(searchInput)"><mat-icon>close</mat-icon></button>
+          } @else {
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
-        <mat-checkbox [(ngModel)]="mostrarSoloPendientes" (ngModelChange)="cargar()" color="warn">
-          Solo pendientes (próx. 7 días)
-        </mat-checkbox>
       </div>
 
       <div class="table-responsive">
-        <table mat-table [dataSource]="dataSource" matSort class="full-table">
-          <ng-container matColumnDef="mascota">
-            <th mat-header-cell *matHeaderCellDef>Mascota</th>
-            <td mat-cell *matCellDef="let v" class="cell-primary">{{ getMascota(v.mascotaId) }}</td>
+        <table mat-table [dataSource]="dataSource" matSort class="full-table vacunas-tabla">
+          <ng-container matColumnDef="paciente">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Paciente</th>
+            <td mat-cell *matCellDef="let f" class="cell-primary c-paciente">
+              <span class="paciente-celda">
+                <span class="p-icono" aria-hidden="true"><mat-icon>{{ especie(f) }}</mat-icon></span>
+                <span class="dato">
+                  <a [routerLink]="['/mascotas', f.vacuna.mascotaId]">{{ f.mascota?.nombre ?? '—' }}</a>
+                  <small>{{ f.cliente?.nombre }}@if (f.cliente && vista !== 'historial') { · <a class="tel" [href]="tel(f)">{{ f.cliente.telefono }}</a> }</small>
+                </span>
+              </span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="cliente">
-            <th mat-header-cell *matHeaderCellDef class="hide-sm">Propietario</th>
-            <td mat-cell *matCellDef="let v" class="hide-sm" data-label="Propietario">{{ getCliente(v.mascotaId) }}</td>
-          </ng-container>
+
           <ng-container matColumnDef="vacuna">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Vacuna</th>
-            <td mat-cell *matCellDef="let v" data-label="Vacuna"><strong>{{ v.nombre }}</strong></td>
+            <td mat-cell *matCellDef="let f" class="c-vacuna"><strong>{{ f.vacuna.nombre }}</strong></td>
           </ng-container>
-          <ng-container matColumnDef="fechaAplicacion">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Aplicada</th>
-            <td mat-cell class="cell-nowrap" *matCellDef="let v" data-label="Aplicada">{{ v.fechaAplicacion | date:'dd/MM/yyyy' }}</td>
+
+          <ng-container matColumnDef="aplicada">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ vista === 'historial' ? 'Aplicada' : 'Última dosis' }}</th>
+            <td mat-cell *matCellDef="let f" class="c-aplicada">
+              <span class="fecha">{{ f.vacuna.fechaAplicacion | date: 'd MMM y' }}</span>
+            </td>
           </ng-container>
-          <ng-container matColumnDef="proximaFecha">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Próxima</th>
-            <td mat-cell class="cell-nowrap" *matCellDef="let v" data-label="Próxima">
-              <span [class.text-warn]="esPendiente(v)" [class.text-ok]="!esPendiente(v)">
-                {{ v.proximaFecha | date:'dd/MM/yyyy' }}
+
+          <ng-container matColumnDef="proxima">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Refuerzo</th>
+            <td mat-cell *matCellDef="let f" class="c-proxima">
+              <span class="dato">
+                <span class="vs-status" [class.vs-status--warning]="f.estado === 'vencida'" [class.vs-status--success]="f.estado === 'al-dia'">{{ vencimiento(f) }}</span>
+                <small>{{ f.vacuna.proximaFecha | date: 'd MMM y' }}</small>
               </span>
-              @if (esPendiente(v)) {
-                <mat-icon class="warn-icon" matTooltip="Próxima en 7 días o menos">warning</mat-icon>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lote">
+            <th mat-header-cell *matHeaderCellDef class="hide-sm">Lote</th>
+            <td mat-cell *matCellDef="let f" class="hide-sm c-lote"><span class="dato"><span>{{ f.vacuna.lote }}</span>@if (f.vacuna.laboratorio) { <small>{{ f.vacuna.laboratorio }}</small> }</span></td>
+          </ng-container>
+
+          <ng-container matColumnDef="veterinario">
+            <th mat-header-cell *matHeaderCellDef class="hide-md">Aplicó</th>
+            <td mat-cell *matCellDef="let f" class="hide-md c-vet">{{ vet(f.vacuna.veterinarioId) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
+            <td mat-cell *matCellDef="let f" class="cell-actions c-acciones">
+              @if (vista === 'vencida' || vista === 'proxima') {
+                @if (whatsapp(f); as wa) {
+                  <a mat-icon-button [href]="wa" target="_blank" rel="noopener" matTooltip="Recordar por WhatsApp" [attr.aria-label]="'Recordar por WhatsApp a ' + f.cliente?.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                }
+                <button mat-stroked-button type="button" class="refuerzo" (click)="aplicarRefuerzo(f)" [attr.aria-label]="'Aplicar refuerzo de ' + f.vacuna.nombre + ' a ' + f.mascota?.nombre">
+                  <mat-icon>vaccines</mat-icon> Aplicar
+                </button>
+              }
+              <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para la vacuna ' + f.vacuna.nombre + ' de ' + f.mascota?.nombre"><mat-icon>more_vert</mat-icon></button>
+              <mat-menu #menu="matMenu" xPosition="before">
+                <button mat-menu-item (click)="aplicarRefuerzo(f)"><mat-icon>vaccines</mat-icon>Registrar nueva dosis</button>
+                <button mat-menu-item (click)="editar(f)"><mat-icon>edit</mat-icon>Corregir esta dosis</button>
+                <button mat-menu-item (click)="verMascota(f)"><mat-icon>folder_open</mat-icon>Historial de la mascota</button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+              @if (dataSource.filter) {
+                <mat-icon>search_off</mat-icon><p>Ninguna vacuna coincide con «{{ searchInput.value }}».</p>
+              } @else if (vista === 'vencida') {
+                <mat-icon>task_alt</mat-icon><p>No hay refuerzos vencidos.</p>
+              } @else if (vista === 'proxima') {
+                <mat-icon>event_available</mat-icon><p>Ningún refuerzo vence en los próximos 30 días.</p>
+              } @else {
+                <mat-icon>vaccines</mat-icon><p>No hay vacunas registradas.</p>
               }
             </td>
-          </ng-container>
-          <ng-container matColumnDef="lote">
-            <th mat-header-cell *matHeaderCellDef class="hide-md">Lote</th>
-            <td mat-cell *matCellDef="let v" class="hide-md" data-label="Lote">{{ v.lote }}</td>
-          </ng-container>
-          <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef>Acciones</th>
-            <td mat-cell *matCellDef="let v" class="cell-actions">
-              <button mat-icon-button (click)="editar(v)" matTooltip="Editar" [attr.aria-label]="'Editar vacuna de ' + getMascota(v.mascotaId)"><mat-icon>edit</mat-icon></button>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let r; columns: displayedColumns;" [class.row-pendiente]="esPendiente(r)"></tr>
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length"><mat-icon>search_off</mat-icon><p>No se encontraron vacunas</p></td>
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de vacunas"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

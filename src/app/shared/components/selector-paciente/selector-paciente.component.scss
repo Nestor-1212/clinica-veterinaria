@@ -1,0 +1,22 @@
+:host { display: block; margin-bottom: var(--vs-space-4); }
+
+.buscar { width: 100%; }
+.error { color: var(--vs-danger); }
+
+.elegida {
+  display: flex; align-items: center; gap: var(--vs-space-3);
+  padding: var(--vs-space-3) var(--vs-space-2) var(--vs-space-3) var(--vs-space-4);
+  border: 1.5px solid var(--vs-primary); border-radius: var(--vs-radius-lg); background: var(--vs-primary-soft);
+}
+.icono {
+  flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--vs-primary); color: var(--vs-on-primary);
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+.texto { display: grid; flex: 1; min-width: 0;
+  strong { font-size: 15px; color: var(--vs-text); }
+  small { font-size: 13px; color: var(--vs-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+
+.opcion { display: flex; align-items: center; gap: var(--vs-space-2);
+  mat-icon { margin: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  small { color: var(--vs-text-secondary); } }

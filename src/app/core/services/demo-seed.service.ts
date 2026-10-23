@@ -7,7 +7,7 @@ import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna
  * Versión de los datos de demostración. Al subirla, los navegadores en modo demo
  * regeneran los datos una vez (se reemplazan las colecciones clínicas; los usuarios se conservan).
  */
-export const VERSION_DATOS_DEMO = 6;
+export const VERSION_DATOS_DEMO = 7;
 const CLAVE_VERSION = 'vet_demo_version';
 const COLECCIONES_CLINICAS = ['vet_clientes', 'vet_mascotas', 'vet_citas', 'vet_consultas', 'vet_examenes', 'vet_recetas', 'vet_pagos', 'vet_vacunas'];
 
@@ -270,7 +270,7 @@ export class DemoSeedService {
             recetas.push({ id: id(), consultaId: consulta.id, mascotaId: mascota.id, clienteId: mascota.clienteId, veterinarioId: vet, fecha: fechaAtencion, items: servicio.receta.map(r => ({ ...r })) });
           }
           if (servicio.examen && azar.prob(0.45)) {
-            examenes.push({ id: id(), mascotaId: mascota.id, clienteId: mascota.clienteId, consultaId: consulta.id, veterinarioId: vet, tipo: servicio.examen.tipo, descripcion: servicio.examen.descripcion, resultado: servicio.examen.resultado, fecha: fechaAtencion });
+            examenes.push({ id: id(), mascotaId: mascota.id, clienteId: mascota.clienteId, consultaId: consulta.id, veterinarioId: vet, tipo: servicio.examen.tipo, descripcion: servicio.examen.descripcion, resultado: d >= -2 ? '' : servicio.examen.resultado, fecha: fechaAtencion }); // los de los últimos 2 días esperan resultado
             items.push(item(servicio.examen.tipo, 'examen', servicio.examen.precio));
           }
           if (servicio.vacuna) {

@@ -1,34 +1,49 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>biotech</mat-icon> {{ isEdit ? 'Editar Examen' : 'Nuevo Examen' }}</h1><p>Registro de laboratorio / diagnóstico</p></div>
-    <button mat-stroked-button routerLink="/examenes"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <div>
+      <h1><mat-icon>biotech</mat-icon> {{ cargandoResultado ? 'Cargar resultado' : isEdit ? 'Editar examen' : 'Nuevo examen' }}@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
+      <p>{{ cargandoResultado ? 'Anote lo que informó el laboratorio' : 'Puede guardarlo sin resultado y cargarlo cuando llegue' }}</p>
+    </div>
+    <button mat-button type="button" routerLink="/examenes"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Mascota</mat-label>
-            <mat-select formControlName="mascotaId" (selectionChange)="onMascotaChange($event.value)">
-              @for (m of mascotas; track m) {
-                <mat-option [value]="m.id">{{ m.nombre }} ({{ m.tipo }})</mat-option>
-              }
-            </mat-select>
-            <mat-error>Seleccione la mascota</mat-error>
-          </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Tipo de examen</mat-label>
-            <mat-select formControlName="tipo">
-              @for (t of tiposExamen; track t) {
-                <mat-option [value]="t">{{ t }}</mat-option>
-              }
-            </mat-select>
-            <mat-error>Seleccione el tipo</mat-error>
-          </mat-form-field>
+  <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="vs-registro-secciones">
+      @if (!cargandoResultado) {
+        <section class="vs-seccion" aria-labelledby="s-paciente">
+          <h2 id="s-paciente"><mat-icon aria-hidden="true">pets</mat-icon>Paciente</h2>
+          <app-selector-paciente [mascotas]="mascotas" [clientes]="clientes" [seleccion]="form.value.mascotaId"
+            [invalido]="pacienteInvalido" (elegir)="onMascotaChange($event)" />
+        </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Veterinario</mat-label>
+        <section class="vs-seccion" aria-labelledby="s-examen">
+          <h2 id="s-examen"><mat-icon aria-hidden="true">science</mat-icon>Examen</h2>
+          <div class="chips" role="group" aria-label="Exámenes frecuentes">
+            @for (t of tiposExamen; track t) {
+              <button type="button" class="chip" [attr.aria-pressed]="form.value.tipo === t" (click)="elegirTipo(t)">{{ t }}</button>
+            }
+          </div>
+          <div class="dos">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de examen</mat-label>
+              <input matInput formControlName="tipo" placeholder="Toque uno arriba o escriba otro" autocomplete="off">
+              <mat-error>Indique el examen</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de la muestra</mat-label>
+              <input matInput [matDatepicker]="dp" formControlName="fecha" [max]="hoy">
+              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+              <mat-datepicker #dp></mat-datepicker>
+              <mat-error>Indique la fecha</mat-error>
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Motivo o muestra</mat-label>
+            <textarea matInput formControlName="descripcion" rows="2" placeholder="Qué se busca descartar, tipo de muestra…"></textarea>
+            <mat-error>Indique el motivo o la muestra</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="ancho">
+            <mat-label>Veterinario que lo solicita</mat-label>
             <mat-select formControlName="veterinarioId">
               @for (v of veterinarios; track v.id) {
                 <mat-option [value]="v.id">{{ v.nombre }} {{ v.apellido }}</mat-option>
@@ -36,33 +51,35 @@
             </mat-select>
             <mat-error>Seleccione el veterinario responsable</mat-error>
           </mat-form-field>
+        </section>
+      } @else {
+        <section class="vs-seccion resumen-examen" aria-labelledby="s-solicitud">
+          <h2 id="s-solicitud"><mat-icon aria-hidden="true">science</mat-icon>{{ form.value.tipo }}</h2>
+          <p>{{ form.value.descripcion }}</p>
+        </section>
+      }
 
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="dp" formControlName="fecha">
-            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-            <mat-datepicker #dp></mat-datepicker>
-          </mat-form-field>
+      <section class="vs-seccion" aria-labelledby="s-resultado">
+        <h2 id="s-resultado"><mat-icon aria-hidden="true">assignment_turned_in</mat-icon>Resultado</h2>
+        <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
+          <mat-label>Resultado {{ cargandoResultado ? '' : '(si ya lo tiene)' }}</mat-label>
+          <textarea matInput formControlName="resultado" rows="5" placeholder="Valores, hallazgos e interpretación"></textarea>
+          @if (sinResultado && !cargandoResultado) {
+            <mat-hint>Si lo deja vacío, el examen queda «Pendiente de resultado» en la lista</mat-hint>
+          }
+          <mat-error>Anote el resultado</mat-error>
+        </mat-form-field>
+      </section>
 
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Descripción / Muestra</mat-label>
-            <textarea matInput formControlName="descripcion" rows="2" placeholder="Descripción del examen solicitado..."></textarea>
-            <mat-error>La descripción es requerida</mat-error>
-          </mat-form-field>
+      <div class="vs-acciones">
+        <button mat-stroked-button type="button" routerLink="/examenes">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          <mat-icon>{{ iconoGuardar }}</mat-icon> {{ textoGuardar }}
+        </button>
+      </div>
+    </div>
 
-          <mat-form-field appearance="outline" class="col-full">
-            <mat-label>Resultados</mat-label>
-            <textarea matInput formControlName="resultado" rows="4" placeholder="Resultados del examen..."></textarea>
-            <mat-error>Los resultados son requeridos</mat-error>
-          </mat-form-field>
-        </div>
-        <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/examenes">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
-            <mat-icon>biotech</mat-icon> Guardar Examen
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+    <app-ficha-paciente class="ficha" [ficha]="ficha" [motivo]="consulta?.diagnostico ?? ''" tituloMotivo="Diagnóstico de la consulta"
+      textoVacio="Busque al paciente para ver sus alergias, vacunas y la última consulta." />
+  </form>
 </div>

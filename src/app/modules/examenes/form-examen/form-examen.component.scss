@@ -1,0 +1,25 @@
+// Examen: esqueleto en src/styles/_registro.scss; ficha y buscador de paciente compartidos.
+
+.h1-paciente { font-weight: 500; color: var(--vs-text-secondary); }
+.ancho { width: 100%; }
+.dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--vs-space-4); align-items: start; }
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); margin-bottom: var(--vs-space-4); }
+.chip {
+  min-height: 36px; padding: 0 var(--vs-space-4); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-full);
+  background: var(--vs-surface); color: var(--vs-text); font: 500 14px var(--vs-font); cursor: pointer;
+  transition: background var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
+  &:hover { background: var(--vs-row-hover); border-color: var(--vs-border-strong); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-pressed='true'] { border-color: var(--vs-primary); background: var(--vs-primary); color: var(--vs-on-primary); }
+}
+
+.resumen-examen p { margin: 0 0 var(--vs-space-3); color: var(--vs-text-secondary); }
+
+@media (max-width: 1023px) {
+  .ficha { position: static; order: -1; }
+}
+@media (max-width: 599px) {
+  .dos { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }
