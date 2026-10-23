@@ -1,45 +1,74 @@
-.cliente-info-card { margin-bottom: 20px; }
-.cliente-profile { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
-.profile-avatar {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--vs-primary-container); color: var(--vs-on-primary-container);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; font-weight: 700; flex-shrink: 0;
+// Expediente: cabecera con el nombre, ficha (contacto + cifras) como única superficie
+// elevada, cobros pendientes en ámbar, mascotas en tono y una línea de tiempo unificada.
+.expediente { display: grid; gap: var(--vs-space-6); }
+.page-header { margin-bottom: 0; }
+.titulo { display: flex; align-items: center; gap: var(--vs-space-3); min-width: 0;
+  h1 { overflow-wrap: anywhere; } }
+.avatar { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 48px; height: 48px; border-radius: 50%;
+  background: var(--vs-surface); color: var(--vs-primary); font-size: 20px; font-weight: 700; box-shadow: var(--vs-shadow-soft); }
+h2 { margin: 0; font: var(--vs-text-h3); color: var(--vs-text); }
+.tenue { color: var(--vs-text-muted); }
+.cifra { font-variant-numeric: tabular-nums; }
+
+/* ----- Ficha ----- */
+.ficha { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr); gap: var(--vs-space-6) var(--vs-space-8);
+  padding: var(--vs-space-6) var(--vs-space-7); border-radius: var(--vs-radius-xl); background: var(--vs-surface); box-shadow: var(--vs-stage-shadow); }
+dl { margin: 0; }
+dt { font-size: 12px; font-weight: 500; color: var(--vs-text-muted); }
+dd { margin: 0; }
+.contacto { display: grid; gap: var(--vs-space-3);
+  > div { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; gap: var(--vs-space-3); }
+  dd { font-size: 14px; color: var(--vs-text); overflow-wrap: anywhere; }
+  a:not([mat-button]) { color: var(--vs-primary); text-underline-offset: 3px; } }
+.acciones-contacto { display: flex; flex-wrap: wrap; margin: -8px 0 -8px -12px !important;
+  a[mat-button] { font-variant-numeric: tabular-nums; --mat-button-text-label-text-color: var(--vs-text); }
+  mat-icon { color: var(--vs-primary); } }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); align-content: center; gap: var(--vs-space-5) var(--vs-space-6);
+  > div { display: grid; align-content: start; gap: 2px; padding-left: var(--vs-space-4);
+    background: linear-gradient(transparent, var(--vs-timeline-past) 20% 80%, transparent) left / 1px 100% no-repeat; }
+  .valor { font-size: 20px; line-height: 28px; font-weight: 600; color: var(--vs-ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .valor.tenue { color: var(--vs-text-muted); font-weight: 500; }
+  .nota { font-size: 13px; color: var(--vs-text-secondary); }
+  .atencion .valor { color: var(--vs-attention-text); } }
+.enlace { padding: 0; border: 0; background: none; font: inherit; color: var(--vs-primary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* ----- Por cobrar: el único bloque ámbar ----- */
+.por-cobrar { padding: var(--vs-space-4) var(--vs-space-6); border-radius: var(--vs-radius-lg); background: var(--vs-surface-urgent);
+  h2 { display: flex; align-items: center; gap: var(--vs-space-2); margin-bottom: var(--vs-space-2); mat-icon { color: var(--vs-attention); } }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--vs-space-4); padding: var(--vs-space-2) 0; }
+  li + li { border-top: 1px solid rgba(196, 95, 0, 0.18); }
+  .concepto { display: grid; font-size: 14px; color: var(--vs-text); small { font-size: 12px; color: var(--vs-text-muted); } }
+  .monto { font-weight: 600; color: var(--vs-attention-text); font-variant-numeric: tabular-nums; } }
+
+/* ----- Mascotas: tarjetas protagonistas en tono ----- */
+.cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--vs-space-3); margin-bottom: var(--vs-space-4); }
+.cuenta { margin-left: 4px; font-size: 14px; font-weight: 600; color: var(--vs-text-muted); }
+.mascotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--vs-space-4); margin: 0; padding: 0; list-style: none; }
+.mascota { display: flex; gap: var(--vs-space-3); height: 100%; box-sizing: border-box; padding: var(--vs-space-4); border-radius: var(--vs-radius-lg);
+  background: var(--vs-surface); box-shadow: var(--vs-shadow-soft); color: inherit; text-decoration: none;
+  transition: box-shadow var(--vs-dur) var(--vs-ease), transform var(--vs-dur) var(--vs-ease-out);
+  &:hover { box-shadow: var(--vs-shadow-2); transform: translateY(-2px); .mascota-nombre { color: var(--vs-primary); } } }
+.especie { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: var(--vs-radius-md);
+  background: var(--vs-primary-soft); color: var(--vs-primary); }
+.mascota-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.mascota-nombre { font-size: 16px; font-weight: 600; color: var(--vs-text); transition: color var(--vs-dur-fast) var(--vs-ease); }
+.mascota-detalle { font-size: 13px; color: var(--vs-text-secondary); }
+.mascota-estados { display: flex; flex-wrap: wrap; gap: 6px var(--vs-space-3); margin-top: var(--vs-space-2);
+  .vs-status { white-space: normal; } }
+.vacio { padding: var(--vs-space-6); border-radius: var(--vs-radius-lg); background: var(--vs-gradient-soft); text-align: center; color: var(--vs-text-secondary);
+  mat-icon { font-size: 36px; width: 36px; height: 36px; color: var(--vs-primary); } p { margin: var(--vs-space-2) 0 var(--vs-space-4); } }
+
+@media (max-width: 960px) {
+  .ficha { grid-template-columns: minmax(0, 1fr); }
 }
-.profile-info { flex: 1; h3 { margin: 0 0 8px; font-size: 22px; } }
-.info-grid { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-.info-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--vs-text-secondary); mat-icon { font-size: 16px; width: 16px; height: 16px; } }
-.profile-stats { display: flex; gap: 24px; }
-.pstat { text-align: center; span { display: block; font-size: 24px; font-weight: 700; color: var(--vs-primary); } small { font-size: 12px; color: var(--vs-text-secondary); } }
-// Pestañas en píldora con el contenido en un panel blanco (.vs-tabs--panel, global)
-.tab-content { padding: var(--vs-space-5); @media (max-width: 600px) { padding: var(--vs-space-3); } }
-.mascotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-/* Cada tarjeta es un enlace (<a routerLink>): se opera con teclado y lector de pantalla */
-.mascota-link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-  border-radius: var(--vs-radius-md);
-  > .mascota-card { height: 100%; }
-  &:hover .mascota-card { box-shadow: var(--vs-shadow-2) !important; transform: translateY(-2px); }
-  &:hover .add-card { border-color: var(--vs-primary); color: var(--vs-primary); }
+@media (max-width: 600px) {
+  .page-header .header-actions { display: grid; grid-template-columns: 1fr 1fr; > * { width: 100%; } }
+  .ficha { padding: var(--vs-space-4); border-radius: var(--vs-radius-lg); }
+  .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contacto > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .acciones-contacto { margin: 0 0 0 -12px !important; }
+  .por-cobrar { padding: var(--vs-space-4); }
+  .por-cobrar li { grid-template-columns: minmax(0, 1fr) auto; .concepto { grid-column: 1 / -1; } }
+  .mascotas-grid { grid-template-columns: minmax(0, 1fr); }
 }
-.mascota-card {
-  border-radius: var(--vs-radius-lg) !important;
-  // Tarjeta tonal dentro del panel blanco: se agrupa por tono, no por filo
-  background: var(--vs-surface-soft); box-shadow: none !important;
-  transition: box-shadow var(--vs-dur) var(--vs-ease), transform var(--vs-dur) var(--vs-ease-out), background-color var(--vs-dur) var(--vs-ease);
-  h4 { margin: 0; font-size: 15px; font-weight: 600; }
-  p { margin: 2px 0 0; font-size: 13px; color: var(--vs-text-secondary); }
-  &.add-card {
-    min-height: 120px;
-    border: 2px dashed #a9c2bb; background: transparent;
-    display: flex; align-items: center; justify-content: center;
-    mat-card-content { text-align: center; color: var(--vs-text-muted); mat-icon { font-size: 36px; width: 36px; height: 36px; } }
-  }
-}
-.mascota-header { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
-.mascota-avatar { width: 40px; height: 40px; border-radius: var(--vs-radius-sm); background: var(--vs-primary); color: var(--vs-on-primary); display: flex; align-items: center; justify-content: center; }
-.mascota-details { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--vs-text-secondary); span { display: flex; align-items: center; gap: 4px; mat-icon { font-size: 14px; width: 14px; height: 14px; } } }
-.list-row { border-bottom: 1px solid var(--vs-border); }
-/* Chips .chip-* y colores .estado-* : mapa único en src/styles.scss */

@@ -1,0 +1,25 @@
+// Expediente: línea de tiempo unificada (citas, consultas, pagos y vacunas) agrupada por mes.
+// Hoja aparte de detalle-cliente.component.scss por el presupuesto de 6 kB por hoja.
+.historial { padding: var(--vs-space-5) var(--vs-space-6) var(--vs-space-6); border-radius: var(--vs-radius-xl); background: var(--vs-gradient-soft); }
+.mes { margin: var(--vs-space-5) 0 var(--vs-space-2); font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); &::first-letter { text-transform: uppercase; } }
+.linea { margin: 0; padding: 0; list-style: none; border-radius: var(--vs-radius-md); background: var(--vs-surface); box-shadow: var(--vs-shadow-1); }
+.evento { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-3); padding: var(--vs-space-3) var(--vs-space-4); }
+.evento + .evento { border-top: 1px solid var(--vs-border); }
+.evento-icono { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--vs-surface-muted); color: var(--vs-text-secondary); mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+.evento--consulta .evento-icono { background: var(--vs-primary-soft); color: var(--vs-primary); }
+.evento-cuerpo { display: grid; gap: 2px; min-width: 0; }
+.evento-titulo { font-size: 14px; font-weight: 500; color: var(--vs-text); overflow-wrap: anywhere; }
+.evento-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--vs-space-3); font-size: 12px; color: var(--vs-text-muted); }
+.evento-meta .vs-status { font-size: 12px; }
+.evento-lado { display: grid; justify-items: end; gap: 2px; font-size: 13px; color: var(--vs-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums;
+  time::first-letter { text-transform: uppercase; } }
+.evento-monto { font-weight: 600; color: var(--vs-text); }
+.vacio-linea { margin: var(--vs-space-4) 0 0; font-size: 14px; color: var(--vs-text-muted); }
+.mas { margin-top: var(--vs-space-3); }
+
+@media (max-width: 600px) {
+  .historial { padding: var(--vs-space-4); }
+  .evento { grid-template-columns: auto minmax(0, 1fr); }
+  .evento-lado { grid-column: 2; justify-items: start; }
+}

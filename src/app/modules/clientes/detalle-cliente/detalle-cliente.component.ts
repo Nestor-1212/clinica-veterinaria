@@ -1,52 +1,183 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
 import { CitasService } from '../../../core/services/citas.service';
 import { PagosService } from '../../../core/services/pagos.service';
-import { Cliente, Mascota, Consulta, Cita, Pago } from '../../../core/models';
+import { VacunasService } from '../../../core/services/vacunas.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { puedeAcceder } from '../../../core/auth/permisos';
+import { Cliente, Mascota, Pago } from '../../../core/models';
+import { enlaceWhatsApp, momentoCita } from '../../../core/utils/metricas';
+import {
+  EstadoVacunas, EventoHistorial, ICONO_ESPECIE, ResumenExpediente, TipoEvento, estadoVacunas, historialCliente, resumenExpediente, tiempoRelativo
+} from '../../../core/utils/clientes';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine } from '@angular/material/list';
-import { MatChip } from '@angular/material/chips';
-import { DecimalPipe, DatePipe, TitleCasePipe } from '@angular/common';
-
+import { MatButton, MatAnchor } from '@angular/material/button';
+import { DecimalPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
+
+type FiltroHistorial = 'todo' | TipoEvento;
+
+interface Estado { texto: string; clase: string; }
+
+const ESTADOS: Record<string, Estado> = {
+  'cita:pendiente': { texto: 'Pendiente', clase: 'vs-status--warning' },
+  'cita:confirmada': { texto: 'Confirmada', clase: 'vs-status--success' },
+  'cita:completada': { texto: 'Atendida', clase: 'vs-status--neutral' },
+  'cita:cancelada': { texto: 'Cancelada', clase: 'vs-status--neutral' },
+  'cita:inmediata': { texto: 'Inmediata', clase: 'vs-status--accent' },
+  'consulta:inmediata': { texto: 'Atención inmediata', clase: 'vs-status--accent' },
+  'pago:pagado': { texto: 'Pagado', clase: 'vs-status--success' },
+  'pago:pendiente': { texto: 'Pendiente', clase: 'vs-status--warning' },
+  'pago:anulado': { texto: 'Anulado', clase: 'vs-status--neutral' }
+};
+
+const TIPO: Record<TipoEvento, { icono: string; texto: string }> = {
+  consulta: { icono: 'medical_services', texto: 'Consulta' },
+  cita: { icono: 'event', texto: 'Cita' },
+  pago: { icono: 'payments', texto: 'Pago' },
+  vacuna: { icono: 'vaccines', texto: 'Vacuna' }
+};
+
+/** Cuántos eventos del historial se muestran antes de "Mostrar más". */
+const PASO_HISTORIAL = 12;
 
 @Component({
     selector: 'app-detalle-cliente',
     templateUrl: './detalle-cliente.component.html',
-    styleUrls: ['./detalle-cliente.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, MatCardActions, MatTabGroup, MatTab, MatList, MatListItem, MatListItemIcon, MatListItemTitle, MatListItemLine, MatChip, DecimalPipe, DatePipe, TitleCasePipe, EdadPipe]
+    styleUrls: ['./detalle-cliente.component.scss', './historial.scss'],
+    imports: [MatIcon, MatButton, MatAnchor, RouterLink, NgTemplateOutlet, DecimalPipe, DatePipe, EdadPipe]
 })
 export class DetalleClienteComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
+  private auth = inject(AuthService);
   private clientesService = inject(ClientesService);
   private mascotasService = inject(MascotasService);
   private consultasService = inject(ConsultasService);
   private citasService = inject(CitasService);
   private pagosService = inject(PagosService);
+  private vacunasService = inject(VacunasService);
+
+  /** Dinero (pagos, saldo, cobrar) solo para quien cobra: admin y recepción. */
+  readonly verPagos = puedeAcceder(this.auth.currentUser?.rol, 'pagos');
+  readonly ICONO_ESPECIE = ICONO_ESPECIE;
+  readonly relativo = tiempoRelativo;
+  readonly momentoCita = momentoCita;
 
   cliente!: Cliente;
   mascotas: Mascota[] = [];
-  consultas: Consulta[] = [];
-  citas: Cita[] = [];
-  pagos: Pago[] = [];
-  selectedTab = 0;
+  hoy = new Date();
+  resumen!: ResumenExpediente;
+  vacunas = new Map<string, EstadoVacunas>();
+  private nombreMascota = new Map<string, string>();
+  private eventos: EventoHistorial[] = [];
+  proximos: EventoHistorial[] = [];
+  private pasados: EventoHistorial[] = [];
+  filtros: { valor: FiltroHistorial; texto: string; cuenta: number }[] = [];
+  filtro: FiltroHistorial = 'todo';
+  limite = PASO_HISTORIAL;
+  grupos: { mes: string; eventos: EventoHistorial[] }[] = [];
+  totalFiltrados = 0;
 
   ngOnInit(): void {
     const id = this.route.snapshot.params.id;
     const c = this.clientesService.getById(id);
     if (!c) { this.router.navigate(['/clientes']); return; }
     this.cliente = c;
+    this.cargar();
+  }
+
+  private cargar(): void {
+    const id = this.cliente.id;
+    this.hoy = new Date();
     this.mascotas = this.mascotasService.getByCliente(id);
-    this.consultas = this.consultasService.getByCliente(id);
-    this.citas = this.citasService.getByCliente(id);
-    this.pagos = this.pagosService.getByCliente(id);
+    const consultas = this.consultasService.getByCliente(id);
+    const citas = this.citasService.getByCliente(id);
+    const pagos = this.verPagos ? this.pagosService.getByCliente(id) : [];
+    const vacunas = this.vacunasService.getAll().filter(v => v.clienteId === id);
+
+    this.resumen = resumenExpediente(consultas, citas, pagos, this.hoy);
+    this.nombreMascota = new Map(this.mascotasService.getAll().filter(m => m.clienteId === id).map(m => [m.id, m.nombre]));
+    this.vacunas = new Map(this.mascotas.map(m => [m.id, estadoVacunas(vacunas, m.id, this.hoy)]));
+    this.eventos = historialCliente(citas, consultas, pagos, vacunas, this.hoy);
+    this.proximos = this.eventos.filter(e => e.futuro).reverse();
+    this.pasados = this.eventos.filter(e => !e.futuro);
+
+    const cuenta = (t: TipoEvento) => this.pasados.filter(e => e.tipo === t).length;
+    this.filtros = [
+      { valor: 'todo', texto: 'Todo', cuenta: this.pasados.length },
+      { valor: 'consulta', texto: 'Consultas', cuenta: cuenta('consulta') },
+      { valor: 'cita', texto: 'Citas', cuenta: cuenta('cita') },
+      { valor: 'vacuna', texto: 'Vacunas', cuenta: cuenta('vacuna') },
+      ...(this.verPagos ? [{ valor: 'pago' as const, texto: 'Pagos', cuenta: cuenta('pago') }] : [])
+    ];
+    this.agrupar();
+  }
+
+  /** Eventos visibles agrupados por mes ("octubre de 2026"); se recalcula al cambiar filtro o límite. */
+  private agrupar(): void {
+    const filtrados = this.filtro === 'todo' ? this.pasados : this.pasados.filter(e => e.tipo === this.filtro);
+    this.totalFiltrados = filtrados.length;
+    this.grupos = [];
+    for (const e of filtrados.slice(0, this.limite)) {
+      const mes = e.fecha.toLocaleDateString('es-PA', { month: 'long', year: 'numeric' });
+      const ultimo = this.grupos[this.grupos.length - 1];
+      if (ultimo?.mes === mes) ultimo.eventos.push(e); else this.grupos.push({ mes, eventos: [e] });
+    }
+  }
+
+  elegirFiltro(f: FiltroHistorial): void {
+    this.filtro = f;
+    this.limite = PASO_HISTORIAL;
+    this.agrupar();
+  }
+
+  mostrarMas(): void {
+    this.limite += PASO_HISTORIAL * 2;
+    this.agrupar();
+  }
+
+  tipo(e: EventoHistorial): { icono: string; texto: string } { return TIPO[e.tipo]; }
+
+  mascota(id: string): string { return this.nombreMascota.get(id) ?? 'Mascota'; }
+
+  estado(e: EventoHistorial): Estado | null {
+    return e.estado ? ESTADOS[`${e.tipo}:${e.estado}`] ?? null : null;
+  }
+
+  tel(telefono: string): string { return `tel:+507${telefono.replace(/\D/g, '')}`; }
+
+  get whatsapp(): string | null {
+    return enlaceWhatsApp(this.cliente.telefono, `Hola ${this.cliente.nombre}, le escribimos de la clínica veterinaria.`);
+  }
+
+  conceptoPago(p: Pago): string {
+    return p.items.map(i => i.descripcion).filter(Boolean).join(', ') || 'Cobro';
+  }
+
+  /** Mismo flujo que en Pagos: confirmación y PagosService.marcarPagado. */
+  cobrar(pago: Pago): void {
+    const data: ConfirmDialogData = {
+      title: 'Registrar cobro',
+      message: `¿Marcar como pagado el cobro de $${pago.total.toFixed(2)} de ${this.cliente.nombre}?`,
+      confirmText: 'Marcar pagado',
+      color: 'primary'
+    };
+    this.dialog.open(ConfirmDialogComponent, { data }).afterClosed().subscribe(ok => {
+      if (!ok) return;
+      if (this.pagosService.marcarPagado(pago.id)) {
+        this.cargar();
+        this.snack.open('Pago registrado como pagado', 'OK', { duration: 2000 });
+      }
+    });
   }
 
   nuevaMascota(): void {
@@ -59,23 +190,5 @@ export class DetalleClienteComponent implements OnInit {
 
   nuevaAtencion(): void {
     this.router.navigate(['/citas/nueva'], { queryParams: { clienteId: this.cliente.id, tipo: 'inmediata' } });
-  }
-
-  get totalPagado(): number {
-    return this.pagos.filter(p => p.estado === 'pagado').reduce((a, p) => a + p.total, 0);
-  }
-
-  iconoEstadoCita(estado: string): string {
-    const iconos: Record<string, string> = {
-      pendiente: 'schedule', confirmada: 'check_circle', completada: 'done_all', cancelada: 'cancel', inmediata: 'bolt'
-    };
-    return iconos[estado] || 'event';
-  }
-
-  iconoTipoConsulta(tipo: string): string { return tipo === 'inmediata' ? 'bolt' : 'event'; }
-
-  iconoEstadoPago(estado: string): string {
-    const iconos: Record<string, string> = { pagado: 'check_circle', pendiente: 'schedule', anulado: 'cancel' };
-    return iconos[estado] || 'payments';
   }
 }

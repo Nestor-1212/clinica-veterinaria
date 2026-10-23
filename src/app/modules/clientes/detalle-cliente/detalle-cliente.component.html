@@ -1,142 +1,201 @@
 @if (cliente) {
-  <div class="page-container">
+  <div class="page-container expediente">
     <div class="page-header">
-      <div>
-        <h1><mat-icon>folder_open</mat-icon> Expediente del Cliente</h1>
-        <p>Historial completo y datos del propietario</p>
+      <div class="titulo">
+        <span class="avatar" aria-hidden="true">{{ cliente.nombre.charAt(0) }}</span>
+        <div>
+          <h1>{{ cliente.nombre }}</h1>
+          <p>Expediente del cliente · cliente desde {{ cliente.fechaRegistro | date: "MMMM 'de' y" }}</p>
+        </div>
       </div>
       <div class="header-actions">
+        <a mat-button routerLink="/clientes"><mat-icon>arrow_back</mat-icon> Clientes</a>
+        <a mat-stroked-button [routerLink]="['/clientes/editar', cliente.id]"><mat-icon>edit</mat-icon> Editar</a>
         <button mat-stroked-button class="vs-btn-urgent" (click)="nuevaAtencion()">
-          <mat-icon>bolt</mat-icon> Atención Inmediata
+          <mat-icon>bolt</mat-icon> Atención inmediata
         </button>
         <button mat-flat-button color="primary" (click)="nuevaCita()">
-          <mat-icon>event</mat-icon> Nueva Cita
-        </button>
-        <button mat-stroked-button routerLink="/clientes">
-          <mat-icon>arrow_back</mat-icon> Volver
+          <mat-icon>event</mat-icon> Nueva cita
         </button>
       </div>
     </div>
-    <!-- Info del cliente -->
-    <mat-card class="cliente-info-card">
-      <mat-card-content>
-        <div class="cliente-profile">
-          <div class="profile-avatar">{{ cliente.nombre.charAt(0) }}</div>
-          <div class="profile-info">
-            <h3>{{ cliente.nombre }}</h3>
-            <div class="info-grid">
-              <div class="info-item"><mat-icon>badge</mat-icon> {{ cliente.cedula }}</div>
-              <div class="info-item"><mat-icon>phone</mat-icon> {{ cliente.telefono }}</div>
-              @if (cliente.correo) {
-                <div class="info-item"><mat-icon>email</mat-icon> {{ cliente.correo }}</div>
-              }
-              @if (cliente.direccion) {
-                <div class="info-item"><mat-icon>location_on</mat-icon> {{ cliente.direccion }}</div>
-              }
-              <div class="info-item"><mat-icon>calendar_today</mat-icon> Cliente desde {{ cliente.fechaRegistro | date:'dd/MM/yyyy' }}</div>
-            </div>
-          </div>
-          <div class="profile-stats">
-            <div class="pstat"><span>{{ mascotas.length }}</span><small>Mascotas</small></div>
-            <div class="pstat"><span>{{ consultas.length }}</span><small>Consultas</small></div>
-            <div class="pstat"><span>${{ totalPagado | number:'1.2-2' }}</span><small>Total Pagado</small></div>
-          </div>
+
+    <!-- Ficha: contacto y situación del cliente de un vistazo -->
+    <section class="ficha" aria-label="Resumen del cliente">
+      <dl class="contacto">
+        <div>
+          <dt>Teléfono</dt>
+          <dd class="acciones-contacto">
+            <a mat-button [href]="tel(cliente.telefono)" [attr.aria-label]="'Llamar a ' + cliente.nombre + ', ' + cliente.telefono"><mat-icon>call</mat-icon>{{ cliente.telefono }}</a>
+            @if (whatsapp; as wa) {
+              <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + cliente.nombre + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>WhatsApp</a>
+            }
+          </dd>
         </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button [routerLink]="['/clientes/editar', cliente.id]"><mat-icon>edit</mat-icon> Editar</button>
-        <button mat-button color="primary" (click)="nuevaMascota()"><mat-icon>pets</mat-icon> Agregar Mascota</button>
-      </mat-card-actions>
-    </mat-card>
-    <!-- Tabs -->
-    <mat-tab-group [(selectedIndex)]="selectedTab" class="detail-tabs vs-tabs vs-tabs--panel" mat-stretch-tabs="false" mat-align-tabs="start">
-      <mat-tab label="Mascotas ({{ mascotas.length }})">
-        <div class="tab-content">
-          <div class="mascotas-grid">
-            @for (m of mascotas; track m) {
-              <a class="mascota-link" [routerLink]="['/mascotas', m.id]" [attr.aria-label]="'Ver historial médico de ' + m.nombre">
-              <mat-card class="mascota-card">
-                <mat-card-content>
-                  <div class="mascota-header">
-                    <div class="mascota-avatar">
-                      <mat-icon>{{ m.tipo === 'Perro' ? 'pets' : m.tipo === 'Gato' ? 'catching_pokemon' : 'cruelty_free' }}</mat-icon>
-                    </div>
-                    <div>
-                      <h4>{{ m.nombre }}</h4>
-                      <p>{{ m.tipo }} — {{ m.raza }}</p>
-                    </div>
-                  </div>
-                  <div class="mascota-details">
-                    <span><mat-icon>straighten</mat-icon> {{ m.peso }} kg</span>
-                    <span><mat-icon>cake</mat-icon> {{ m.edad | edad }}</span>
-                    <span><mat-icon>{{ m.sexo === 'macho' ? 'male' : 'female' }}</mat-icon> {{ m.sexo }}</span>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+        <div><dt>Cédula</dt><dd class="cifra">{{ cliente.cedula }}</dd></div>
+        <div><dt>Correo</dt><dd>@if (cliente.correo) {<a [href]="'mailto:' + cliente.correo">{{ cliente.correo }}</a>} @else {<span class="tenue">Sin correo</span>}</dd></div>
+        <div><dt>Dirección</dt><dd>{{ cliente.direccion || 'Sin dirección' }}</dd></div>
+      </dl>
+
+      <dl class="cifras">
+        <div>
+          <dt>Última visita</dt>
+          @if (resumen.ultimaVisita) {
+            <dd class="valor">{{ relativo(resumen.ultimaVisita, hoy) }}</dd>
+            <dd class="nota">{{ resumen.ultimaVisita | date: "d 'de' MMM y" }}</dd>
+          } @else {
+            <dd class="valor tenue">Sin visitas</dd>
+          }
+        </div>
+        <div>
+          <dt>Próxima cita</dt>
+          @if (resumen.proximaCita; as c) {
+            <dd class="valor">{{ momentoCita(c) | date: 'EEE d MMM' }} · {{ c.hora }}</dd>
+            <dd class="nota">{{ relativo(momentoCita(c), hoy) }} · {{ mascota(c.mascotaId) }}</dd>
+          } @else {
+            <dd class="valor tenue">Sin cita</dd>
+            <dd class="nota"><button type="button" class="enlace" (click)="nuevaCita()">Agendar una cita</button></dd>
+          }
+        </div>
+        @if (verPagos) {
+          <div>
+            <dt>Total pagado</dt>
+            <dd class="valor">${{ resumen.totalPagado | number: '1.2-2' }}</dd>
+          </div>
+          <div [class.atencion]="resumen.saldo > 0">
+            <dt>Saldo pendiente</dt>
+            @if (resumen.saldo > 0) {
+              <dd class="valor">${{ resumen.saldo | number: '1.2-2' }}</dd>
+              <dd class="nota">{{ resumen.pendientes.length }} {{ resumen.pendientes.length === 1 ? 'cobro pendiente' : 'cobros pendientes' }}</dd>
+            } @else {
+              <dd class="valor tenue">Al día</dd>
+            }
+          </div>
+        }
+      </dl>
+    </section>
+
+    @if (verPagos && resumen.pendientes.length) {
+      <section class="por-cobrar" aria-labelledby="titulo-cobrar">
+        <h2 id="titulo-cobrar"><mat-icon aria-hidden="true">schedule</mat-icon> Por cobrar</h2>
+        <ul>
+          @for (p of resumen.pendientes; track p.id) {
+            <li>
+              <span class="concepto">{{ conceptoPago(p) }}<small>{{ mascota(p.mascotaId) }} · {{ p.fecha | date: "d 'de' MMM" }} · {{ relativo(p.fecha, hoy) }}</small></span>
+              <span class="monto">${{ p.total | number: '1.2-2' }}</span>
+              <button mat-stroked-button type="button" (click)="cobrar(p)" [attr.aria-label]="'Cobrar $' + (p.total | number: '1.2-2') + ' de ' + conceptoPago(p)">Cobrar</button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="mascotas" aria-labelledby="titulo-mascotas">
+      <header class="cabecera">
+        <h2 id="titulo-mascotas">Mascotas <span class="cuenta">{{ mascotas.length }}</span></h2>
+        <button mat-button type="button" (click)="nuevaMascota()"><mat-icon>add</mat-icon> Agregar mascota</button>
+      </header>
+      @if (mascotas.length) {
+        <ul class="mascotas-grid">
+          @for (m of mascotas; track m.id) {
+            <li>
+              <a class="mascota" [routerLink]="['/mascotas', m.id]" [attr.aria-label]="'Ver historial médico de ' + m.nombre">
+                <span class="especie" aria-hidden="true"><mat-icon>{{ ICONO_ESPECIE[m.tipo] }}</mat-icon></span>
+                <span class="mascota-cuerpo">
+                  <span class="mascota-nombre">{{ m.nombre }}</span>
+                  <span class="mascota-detalle">{{ m.tipo }}{{ m.raza ? ' · ' + m.raza : '' }} · {{ m.sexo === 'macho' ? 'Macho' : 'Hembra' }}</span>
+                  <span class="mascota-detalle">{{ m.edad | edad }}{{ m.peso ? ' · ' + m.peso + ' kg' : '' }}</span>
+                  <span class="mascota-estados">
+                    @if (m.alergias) {
+                      <span class="vs-status vs-status--danger vs-status--pill">Alergia: {{ m.alergias }}</span>
+                    }
+                    @switch (vacunas.get(m.id)?.estado) {
+                      @case ('al-dia') { <span class="vs-status vs-status--success">Vacunas al día</span> }
+                      @case ('vencidas') { <span class="vs-status vs-status--warning">Vencida: {{ vacunas.get(m.id)!.vencidas.join(', ') }}</span> }
+                      @default { <span class="vs-status vs-status--neutral">Sin vacunas registradas</span> }
+                    }
+                  </span>
+                </span>
               </a>
-            }
-            <a class="mascota-link" routerLink="/mascotas/nueva" [queryParams]="{ clienteId: cliente.id }">
-            <mat-card class="mascota-card add-card">
-              <mat-card-content>
-                <mat-icon>add_circle</mat-icon>
-                <p>Agregar Mascota</p>
-              </mat-card-content>
-            </mat-card>
-            </a>
-          </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="vacio">
+          <mat-icon aria-hidden="true">pets</mat-icon>
+          <p>{{ cliente.nombre }} aún no tiene mascotas registradas.</p>
+          <button mat-flat-button color="primary" type="button" (click)="nuevaMascota()"><mat-icon>add</mat-icon> Registrar mascota</button>
         </div>
-      </mat-tab>
-      <mat-tab label="Citas ({{ citas.length }})">
-        <div class="tab-content">
-          <mat-list>
-            @for (cita of citas; track cita) {
-              <mat-list-item class="list-row">
-                <mat-icon matListItemIcon [class]="'estado-' + cita.estado">event</mat-icon>
-                <div matListItemTitle><strong>{{ cita.fecha | date:'dd/MM/yyyy' }} {{ cita.hora }}</strong></div>
-                <div matListItemLine>{{ cita.motivo }}</div>
-                <mat-chip [class]="'chip-' + cita.estado"><mat-icon class="chip-icon">{{ iconoEstadoCita(cita.estado) }}</mat-icon>{{ cita.estado | titlecase }}</mat-chip>
-              </mat-list-item>
-            }
-            @if (citas.length === 0) {
-              <div class="vs-empty"><p>No hay citas registradas</p></div>
-            }
-          </mat-list>
+      }
+    </section>
+
+    <section class="historial" aria-labelledby="titulo-historial">
+      <header class="cabecera">
+        <h2 id="titulo-historial">Historial</h2>
+        <div class="vs-segmentado" role="group" aria-label="Filtrar el historial">
+          @for (f of filtros; track f.valor) {
+            <button type="button" [attr.aria-pressed]="filtro === f.valor" (click)="elegirFiltro(f.valor)">
+              {{ f.texto }} <span class="vs-cuenta">{{ f.cuenta }}</span>
+            </button>
+          }
         </div>
-      </mat-tab>
-      <mat-tab label="Consultas ({{ consultas.length }})">
-        <div class="tab-content">
-          <mat-list>
-            @for (c of consultas; track c) {
-              <mat-list-item class="list-row">
-                <mat-icon matListItemIcon>medical_services</mat-icon>
-                <div matListItemTitle><strong>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</strong></div>
-                <div matListItemLine>{{ c.diagnostico }}</div>
-                <mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo | titlecase }}</mat-chip>
-              </mat-list-item>
-            }
-            @if (consultas.length === 0) {
-              <div class="vs-empty"><p>No hay consultas registradas</p></div>
-            }
-          </mat-list>
-        </div>
-      </mat-tab>
-      <mat-tab label="Pagos ({{ pagos.length }})">
-        <div class="tab-content">
-          <mat-list>
-            @for (p of pagos; track p) {
-              <mat-list-item class="list-row">
-                <mat-icon matListItemIcon [class]="'estado-' + p.estado">payments</mat-icon>
-                <div matListItemTitle><strong>{{ p.fecha | date:'dd/MM/yyyy' }}</strong> — ${{ p.total | number:'1.2-2' }}</div>
-                <div matListItemLine>{{ p.metodoPago }}</div>
-                <mat-chip [class]="'chip-' + p.estado"><mat-icon class="chip-icon">{{ iconoEstadoPago(p.estado) }}</mat-icon>{{ p.estado | titlecase }}</mat-chip>
-              </mat-list-item>
-            }
-            @if (pagos.length === 0) {
-              <div class="vs-empty"><p>No hay pagos registrados</p></div>
-            }
-          </mat-list>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
+      </header>
+
+      @if (proximos.length && (filtro === 'todo' || filtro === 'cita')) {
+        <h3 class="mes">Próximas citas</h3>
+        <ul class="linea">
+          @for (e of proximos; track e.id) {
+            <ng-container *ngTemplateOutlet="evento; context: { $implicit: e }" />
+          }
+        </ul>
+      }
+
+      @for (g of grupos; track g.mes) {
+        <h3 class="mes">{{ g.mes }}</h3>
+        <ul class="linea">
+          @for (e of g.eventos; track e.id) {
+            <ng-container *ngTemplateOutlet="evento; context: { $implicit: e }" />
+          }
+        </ul>
+      } @empty {
+        <p class="vacio-linea">
+          @if (filtro === 'todo') {
+            Todavía no hay visitas, citas{{ verPagos ? ', pagos' : '' }} ni vacunas registradas.
+          } @else {
+            No hay {{ filtro === 'consulta' ? 'consultas' : filtro === 'cita' ? 'citas pasadas' : filtro === 'pago' ? 'pagos' : 'vacunas' }} registradas.
+          }
+        </p>
+      }
+
+      @if (totalFiltrados > limite) {
+        <button mat-button type="button" class="mas" (click)="mostrarMas()">
+          <mat-icon>expand_more</mat-icon> Mostrar más ({{ totalFiltrados - limite }} restantes)
+        </button>
+      }
+    </section>
   </div>
+
+  <ng-template #evento let-e>
+    <li class="evento" [class]="'evento--' + e.tipo">
+      <span class="evento-icono" aria-hidden="true"><mat-icon>{{ tipo(e).icono }}</mat-icon></span>
+      <span class="evento-cuerpo">
+        <span class="evento-titulo">{{ e.tipo === 'vacuna' ? 'Vacuna ' + e.titulo : e.titulo }}</span>
+        <span class="evento-meta">
+          <span>{{ tipo(e).texto }} · {{ mascota(e.mascotaId) }}</span>
+          @if (estado(e); as s) {
+            <span class="vs-status" [class]="s.clase">{{ s.texto }}</span>
+          }
+          @if (e.proximaFecha) {
+            <span>Próxima dosis {{ e.proximaFecha | date: "d 'de' MMM y" }}</span>
+          }
+        </span>
+      </span>
+      <span class="evento-lado">
+        <time [attr.datetime]="e.fecha.toISOString()">{{ e.fecha | date: "EEE d 'de' MMM" }}{{ e.tipo === 'cita' ? ' · ' + (e.fecha | date: 'HH:mm') : '' }}</time>
+        @if (e.total !== undefined) {
+          <span class="evento-monto">${{ e.total | number: '1.2-2' }}</span>
+        }
+      </span>
+    </li>
+  </ng-template>
 }
