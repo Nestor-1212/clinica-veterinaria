@@ -13,7 +13,8 @@
       @if (puedeCitas()) {
         <button mat-flat-button type="button" (click)="nuevaCita()"><mat-icon>event_available</mat-icon> Nueva cita</button>
       }
-      @if (puedeClientes()) {
+      <!-- Registrar clientes es tarea de recepción: el veterinario no lo ve en su inicio -->
+      @if (puedeClientes() && !esVet) {
         <button mat-button type="button" (click)="nuevoCliente()"><mat-icon>person_add</mat-icon> Nuevo cliente</button>
       }
     </div>

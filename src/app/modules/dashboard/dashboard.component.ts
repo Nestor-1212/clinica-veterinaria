@@ -49,6 +49,7 @@ export class DashboardComponent {
 
   readonly puedeCitas = computed(() => puedeAcceder(this.datos.rol, 'citas'));
   readonly puedeClientes = computed(() => puedeAcceder(this.datos.rol, 'clientes'));
+  get esVet(): boolean { return this.datos.rol === 'veterinario'; }
 
   constructor() {
     const usuario = this.auth.currentUser;

@@ -1,0 +1,52 @@
+// Panel de cobro: conceptos y total arriba, método de pago en un toque, cambio en efectivo.
+
+.titulo { display: grid; gap: 2px;
+  small { font-size: 14px; font-weight: 400; color: var(--vs-text-secondary); } }
+
+.conceptos { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none;
+  li { display: flex; justify-content: space-between; gap: var(--vs-space-4); font-size: 14px; color: var(--vs-text); }
+  small { margin-left: 4px; color: var(--vs-text-muted); }
+  .descuento { color: var(--vs-text-secondary); } }
+.monto { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.total {
+  display: flex; align-items: baseline; justify-content: space-between; margin: var(--vs-space-3) 0 var(--vs-space-5);
+  padding-top: var(--vs-space-3); border-top: 1px solid var(--vs-border); color: var(--vs-text-secondary); font-size: 14px;
+  strong { font-size: 28px; font-weight: 700; color: var(--vs-text); font-variant-numeric: tabular-nums; }
+}
+
+.metodos { margin: 0 0 var(--vs-space-4); padding: 0; border: 0; min-width: 0;
+  legend { margin-bottom: var(--vs-space-2); padding: 0; font-size: 14px; font-weight: 600; color: var(--vs-text); } }
+.metodos-rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--vs-space-2); }
+.metodo {
+  display: grid; justify-items: center; gap: 4px; min-height: 64px; padding: var(--vs-space-2);
+  border: 1.5px solid var(--vs-border); border-radius: var(--vs-radius-lg); background: var(--vs-surface);
+  color: var(--vs-text); font: 500 13px var(--vs-font); cursor: pointer;
+  mat-icon { color: var(--vs-primary); }
+  &:hover { border-color: var(--vs-border-strong); background: var(--vs-row-hover); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-checked='true'] { border-color: var(--vs-primary); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-weight: 600; }
+}
+.metodos--error .metodo { border-color: var(--vs-danger); }
+.error { margin: var(--vs-space-2) 0 0; color: var(--vs-danger); font-size: 13px; }
+
+.efectivo { display: grid; gap: var(--vs-space-3); }
+.billetes { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); }
+.billete {
+  min-height: 36px; padding: 0 var(--vs-space-4); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-full);
+  background: var(--vs-surface); color: var(--vs-text); font: 500 14px var(--vs-font); font-variant-numeric: tabular-nums; cursor: pointer;
+  &:hover { background: var(--vs-row-hover); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-pressed='true'] { border-color: var(--vs-primary); background: var(--vs-primary); color: var(--vs-on-primary); }
+}
+.cambio { margin: 0; padding: var(--vs-space-3) var(--vs-space-4); border-radius: var(--vs-radius-md);
+  background: var(--vs-success-container); color: var(--vs-on-success-container); font-size: 14px;
+  strong { margin-left: 6px; font-size: 18px; font-variant-numeric: tabular-nums; } }
+.cambio--falta { background: var(--vs-attention-container); color: var(--vs-on-attention-container); font-weight: 600; }
+.ancho { width: 100%; }
+
+mat-dialog-actions { gap: var(--vs-space-2); }
+
+@media (max-width: 480px) {
+  .metodos-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

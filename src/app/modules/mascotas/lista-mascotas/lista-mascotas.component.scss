@@ -22,10 +22,10 @@
 
 /* Alergia: dato clínico crítico, el único rojo de la lista */
 .alergia {
-  display: inline-flex; align-items: center; gap: 4px; max-width: 280px; margin-top: 2px; padding: 1px 8px 1px 6px;
-  border-radius: var(--vs-radius-full); background: var(--vs-danger-container); color: var(--vs-on-danger-container);
-  font-size: 12px; font-weight: 600; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  mat-icon { flex-shrink: 0; font-size: 14px; width: 14px; height: 14px; }
+  display: inline-flex; align-items: flex-start; gap: 4px; max-width: 320px; margin-top: 2px; padding: 2px 8px 2px 6px;
+  border-radius: var(--vs-radius-md); background: var(--vs-danger-container); color: var(--vs-on-danger-container);
+  font-size: 12px; font-weight: 600; line-height: 16px; white-space: normal;
+  mat-icon { flex-shrink: 0; margin-top: 1px; font-size: 14px; width: 14px; height: 14px; }
 }
 
 /* Datos con subtítulo: valor arriba, contexto debajo */

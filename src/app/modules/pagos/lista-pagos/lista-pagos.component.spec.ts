@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { ListaPagosComponent } from './lista-pagos.component';
 import { Pago } from '../../../core/models';
+import { PagosService } from '../../../core/services/pagos.service';
 import { CLIENTES, MASCOTAS, USUARIOS, leer, sembrar } from '../../../../testing/fixtures';
 import { crearComponente, sesionComo } from '../../../../testing/component-harness';
 
@@ -47,5 +48,32 @@ describe('ListaPagosComponent (B3)', () => {
     expect(p.estado).toBe('anulado');
     expect(p.motivoAnulacion).toBe('Error de digitación');
     expect(p.anuladoPor).toBe('u-rec');
+  });
+
+  it('el panel de cobro guarda el método y la referencia con que pagó el cliente', () => {
+    const h = crearComponente(ListaPagosComponent);
+    h.dialogResult({ metodoPago: 'efectivo', referencia: '  ' });
+    h.componente.ngOnInit();
+    h.componente.marcarPagado(h.componente.dataSource.data[0]);
+    const [p] = leer<Pago>('vet_pagos');
+    expect([p.estado, p.metodoPago, p.referencia]).toEqual(['pagado', 'efectivo', undefined]);
+  });
+});
+
+describe('PagosService.deshacerCobro', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    TestBed.resetTestingModule();
+    sembrar({ vet_pagos: [PENDIENTE] });
+  });
+
+  it('vuelve a pendiente con el método y la referencia anteriores', () => {
+    const s = TestBed.inject(PagosService);
+    expect(s.marcarPagado('p1', { metodoPago: 'tarjeta', referencia: '4321' })).toBe(true);
+    expect(s.getById('p1')?.metodoPago).toBe('tarjeta');
+    expect(s.deshacerCobro('p1', { metodoPago: 'yappy', referencia: undefined })).toBe(true);
+    const p = s.getById('p1')!;
+    expect([p.estado, p.metodoPago, p.referencia, p.fechaPago]).toEqual(['pendiente', 'yappy', undefined, undefined]);
+    expect(s.deshacerCobro('p1', { metodoPago: 'yappy' })).toBe(false);
   });
 });

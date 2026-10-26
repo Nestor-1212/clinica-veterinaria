@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { vi } from 'vitest';
 import { DEMO_MODE } from '../app/core/config/demo-mode.token';
 
@@ -23,7 +23,8 @@ export function crearComponente<T>(
   opciones: { params?: Record<string, string>; queryParams?: Record<string, string> } = {}
 ): Harness<T> {
   let resultadoDialogo: unknown = true;
-  const snack = { open: vi.fn() };
+  // Como MatSnackBar real: open() devuelve una referencia con onAction() (p. ej. "Deshacer")
+  const snack = { open: vi.fn(() => ({ onAction: () => EMPTY })) };
   const dialog = { open: vi.fn(() => ({ afterClosed: () => of(resultadoDialogo) })) };
   TestBed.configureTestingModule({
     providers: [

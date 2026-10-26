@@ -92,3 +92,6 @@
   p { font-size: 15px; font-weight: 600; }
   .ficha-notas { margin-top: 4px; font-size: 13px; font-weight: 400; }
 }
+
+// Sin alergias anotadas no significa "sin alergias": tono neutro, nunca el check verde
+.ficha-linea--sin-dato { color: var(--vs-text-secondary); mat-icon { color: var(--vs-text-muted); } }

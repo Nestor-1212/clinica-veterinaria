@@ -150,7 +150,7 @@
       @if (v('alergias')?.trim()) {
         <p class="previa-alergia"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ v('alergias') }}</span></p>
       } @else {
-        <p class="previa-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias registradas</p>
+        <p class="previa-linea previa-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias: no indicadas</p>
       }
       @if (dueno; as d) {
         <p class="previa-dueno"><mat-icon aria-hidden="true">person</mat-icon>{{ d.nombre }} · {{ d.telefono }}</p>

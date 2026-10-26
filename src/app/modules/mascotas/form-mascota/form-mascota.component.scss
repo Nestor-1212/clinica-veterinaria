@@ -60,6 +60,7 @@
 }
 .previa-alergia { padding: var(--vs-space-3); border-radius: var(--vs-radius-md); background: var(--vs-danger-container); color: var(--vs-on-danger-container); }
 .previa-linea mat-icon { color: var(--vs-success); }
+.previa-linea--sin-dato { color: var(--vs-text-secondary); mat-icon { color: var(--vs-text-muted); } }
 .previa-dueno { padding-top: var(--vs-space-3); border-top: 1px solid var(--vs-border); color: var(--vs-text-secondary); mat-icon { color: var(--vs-primary); } }
 
 @media (max-width: 599px) {

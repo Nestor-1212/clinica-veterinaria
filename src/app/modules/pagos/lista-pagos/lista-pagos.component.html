@@ -118,7 +118,7 @@
                   <mat-icon>price_check</mat-icon> Cobrar
                 </button>
               }
-              <button mat-icon-button (click)="imprimirFactura(p)" matTooltip="Descargar factura" [attr.aria-label]="'Descargar factura de ' + getCliente(p.clienteId)"><mat-icon>picture_as_pdf</mat-icon></button>
+              <button mat-icon-button (click)="imprimirFactura(p)" matTooltip="Descargar comprobante" [attr.aria-label]="'Descargar comprobante de pago de ' + getCliente(p.clienteId)"><mat-icon>picture_as_pdf</mat-icon></button>
               <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para el pago de ' + getCliente(p.clienteId)"><mat-icon>more_vert</mat-icon></button>
               <mat-menu #menu="matMenu" xPosition="before">
                 @if (p.estado === 'pendiente' && whatsapp(p); as wa) {

@@ -20,7 +20,7 @@
     <div class="receta-print">
       <div class="receta-header-print">
         <div class="clinic-name">CLÍNICA VETERINARIA</div>
-        <div class="clinic-sub">Tel: (507) 000-0000 | Ciudad de Panamá</div>
+        <div class="clinic-sub">VetSystem · Ciudad de Panamá</div>
       </div>
       <h2 class="receta-title">RECETA MÉDICA VETERINARIA</h2>
       <dl class="receta-datos">
@@ -31,8 +31,13 @@
         <div class="dato"><dt>Peso</dt><dd>{{ mascota?.peso }} kg</dd></div>
         <div class="dato"><dt>Propietario</dt><dd>{{ cliente?.nombre }}</dd></div>
         <div class="dato"><dt>Fecha</dt><dd>{{ receta.fecha | date:'dd/MM/yyyy' }}</dd></div>
-        <div class="dato"><dt>No. Receta</dt><dd>{{ receta.id }}</dd></div>
+        <div class="dato"><dt>Folio</dt><dd>{{ receta.id.slice(-6).toUpperCase() }}</dd></div>
       </dl>
+      @if (mascota?.alergias) {
+        <p class="alergias" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ mascota?.alergias }}</span></p>
+      } @else {
+        <p class="alergias alergias--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias: no indicadas en el expediente</p>
+      }
       <div class="receta-rx">
         <div class="rx-symbol">Rp/</div>
         <table mat-table [dataSource]="dataSource" class="rx-table">

@@ -1,0 +1,64 @@
+<h2 mat-dialog-title class="titulo">
+  <span>Cobrar a {{ datos.cliente }}</span>
+  <small>{{ datos.mascota }}</small>
+</h2>
+
+<mat-dialog-content>
+  <!-- Qué se cobra -->
+  <ul class="conceptos" aria-label="Conceptos del cobro">
+    @for (i of datos.pago.items; track $index) {
+      <li><span>{{ i.descripcion }}@if (i.cantidad > 1) { <small>× {{ i.cantidad }}</small> }</span><span class="monto">{{ moneda(i.subtotal) }}</span></li>
+    }
+    @if (datos.pago.descuento > 0) {
+      <li class="descuento"><span>Descuento</span><span class="monto">−{{ moneda(datos.pago.descuento) }}</span></li>
+    }
+  </ul>
+  <p class="total"><span>Total a cobrar</span><strong>{{ moneda(total) }}</strong></p>
+
+  <!-- Con qué paga -->
+  <fieldset class="metodos" [class.metodos--error]="intentado() && !metodo()">
+    <legend>¿Con qué paga el cliente?</legend>
+    <div class="metodos-rejilla" role="radiogroup">
+      @for (m of metodos; track m) {
+        <button type="button" class="metodo" role="radio" [attr.aria-checked]="metodo() === m" (click)="elegir(m)">
+          <mat-icon aria-hidden="true">{{ METODO_ICONO[m] }}</mat-icon>{{ METODO_TEXTO[m] }}
+        </button>
+      }
+    </div>
+    @if (intentado() && !metodo()) { <p class="error" role="alert">Elija cómo pagó el cliente</p> }
+  </fieldset>
+
+  @if (metodo() === 'efectivo') {
+    <div class="efectivo">
+      <div class="billetes" role="group" aria-label="Monto recibido">
+        @for (b of billetes; track b) {
+          <button type="button" class="billete" [attr.aria-pressed]="recibido() === b" (click)="recibido.set(b)">{{ b === total ? 'Exacto' : moneda(b) }}</button>
+        }
+      </div>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Recibido</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" inputmode="decimal" min="0" step="0.01" [value]="recibido() ?? ''" (input)="alEscribirRecibido($event)">
+        <mat-hint>Opcional: para calcular el cambio</mat-hint>
+      </mat-form-field>
+      @if (cambio() !== null) {
+        @if (cambio()! < 0) {
+          <p class="cambio cambio--falta" role="alert">Faltan {{ moneda(-cambio()!) }}</p>
+        } @else {
+          <p class="cambio" role="status">Cambio a devolver <strong>{{ moneda(cambio()!) }}</strong></p>
+        }
+      }
+    </div>
+  } @else if (metodo()) {
+    <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
+      <mat-label>{{ etiquetaReferencia() }} (opcional)</mat-label>
+      <input matInput [value]="referencia()" (input)="referencia.set($any($event.target).value)" autocomplete="off">
+      <mat-hint>Queda en el comprobante para conciliar</mat-hint>
+    </mat-form-field>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button type="button" (click)="cobrar()"><mat-icon>price_check</mat-icon> Cobrar {{ moneda(total) }}</button>
+</mat-dialog-actions>

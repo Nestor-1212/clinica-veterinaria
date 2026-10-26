@@ -1,17 +1,77 @@
-.perfil-card { margin-bottom: 20px; }
-.perfil-layout { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
-.mascota-foto {
-  width: 120px; height: 120px; border-radius: var(--vs-radius-lg); overflow: hidden; flex-shrink: 0;
+// Expediente de la mascota: cabecera con acciones por rol, línea de tiempo (lo más reciente
+// primero) y la ficha del paciente fija al lado (alergias, vacunas, última consulta, dueño).
+
+.volver { margin: 0 0 var(--vs-space-2) calc(-1 * var(--vs-space-3)); }
+
+.cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vs-space-4); margin-bottom: var(--vs-space-5); }
+.avatar {
+  flex-shrink: 0; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+  background: var(--vs-primary); color: var(--vs-on-primary);
   img { width: 100%; height: 100%; object-fit: cover; }
-  .foto-default { width: 100%; height: 100%; background: linear-gradient(160deg, var(--vs-chart-1), var(--vs-sidebar-bg)); display: flex; align-items: center; justify-content: center; mat-icon { color: white; font-size: 60px; width: 60px; height: 60px; } }
+  mat-icon { font-size: 32px; width: 32px; height: 32px; }
 }
-.mascota-data { flex: 1; min-width: 200px; h3 { margin: 0 0 4px; font-size: 22px; } }
-.tipo-badge { display: inline-block; background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); border: 0; padding: 2px 10px; border-radius: var(--vs-radius-full); font-size: 12px; font-weight: 600; margin: 0 0 12px; }
-.datos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; div { span { display: block; font-size: 12px; color: var(--vs-text-muted); } strong { font-size: 13px; } } }
-// Alergias = crítico: rojo (mismo trato que el dashboard), nunca el ámbar de atención
-.alergias-alert { display: flex; align-items: center; gap: 8px; background: var(--vs-danger-container); padding: 8px 12px; border-radius: var(--vs-radius-sm); color: var(--vs-on-danger-container); font-weight: 600; margin-top: 12px; font-size: 13px; }
-.propietario-info { display: flex; gap: 12px; align-items: flex-start; background: var(--vs-gradient-soft), var(--vs-surface-muted); padding: 12px 16px; border-radius: var(--vs-radius-md); mat-icon { color: var(--vs-primary); } strong { display: block; } p { margin: 2px 0; font-size: 12px; color: var(--vs-text-secondary); } }
-// Pestañas en píldora con el contenido en un panel blanco (.vs-tabs--panel, global)
-.tab-content { padding: var(--vs-space-5); @media (max-width: 600px) { padding: var(--vs-space-3); } }
-.consulta-detail { .detail-row { margin-bottom: 8px; font-size: 13px; } .tipo-chip { margin-top: 8px; } }
-.vacuna-item { border-bottom: 1px solid var(--vs-border); }
+.titulo { flex: 1; min-width: 220px;
+  h1 { margin: 0; font-size: 28px; font-weight: 700; color: var(--vs-text); }
+  p { margin: 2px 0 0; font-size: 15px; color: var(--vs-text-secondary); }
+  a { color: var(--vs-primary); font-weight: 600; text-underline-offset: 3px; } }
+.acciones { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); }
+// Atención inmediata: el ámbar de "requiere atención"
+.btn-urgente {
+  --mat-button-filled-container-color: var(--vs-attention-text);
+  --mat-button-filled-label-text-color: #fff;
+  --mat-button-filled-icon-color: #fff;
+}
+
+.perfil { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: var(--vs-space-6); align-items: start; }
+
+.expediente { padding: var(--vs-space-5) var(--vs-space-6); border-radius: var(--vs-radius-xl); background: var(--vs-surface); box-shadow: var(--vs-shadow-soft); min-width: 0; }
+.exp-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--vs-space-3); margin-bottom: var(--vs-space-4);
+  h2 { margin: 0; font-size: 18px; font-weight: 700; color: var(--vs-text); } }
+
+// Línea de tiempo: fecha | nodo por tipo | contenido
+.tiempo { margin: 0; padding: 0; list-style: none; }
+.evento {
+  position: relative; display: grid; grid-template-columns: 96px 32px minmax(0, 1fr); column-gap: var(--vs-space-3);
+  padding: var(--vs-space-3) 0;
+  &::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(96px + var(--vs-space-3) + 15px); width: 2px; background: var(--vs-border); }
+  &:first-child::before { top: 22px; }
+  &:last-child::before { bottom: calc(100% - 22px); }
+}
+.ev-fecha { display: grid; align-content: start; padding-top: 4px; font-variant-numeric: tabular-nums;
+  strong { font-size: 13px; color: var(--vs-text); }
+  small { font-size: 12px; color: var(--vs-text-muted); } }
+.ev-nodo {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--vs-primary-soft); color: var(--vs-primary); box-shadow: 0 0 0 4px var(--vs-surface);
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+.evento--consulta .ev-nodo { background: var(--vs-primary); color: var(--vs-on-primary); }
+.ev-cuerpo { min-width: 0; padding-top: 4px;
+  p { margin: 0; } }
+.ev-titulo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vs-space-2); font-size: 15px; font-weight: 600; color: var(--vs-text); }
+.ev-texto { margin-top: 2px !important; font-size: 14px; color: var(--vs-text-secondary); }
+.ev-meta { margin-top: 4px !important; font-size: 12.5px; color: var(--vs-text-muted);
+  a, .enlace { color: var(--vs-primary); font-weight: 600; text-underline-offset: 3px; }
+  .vs-status { margin-left: 6px; } }
+.enlace { padding: 0; border: 0; background: none; font: inherit; text-decoration: underline; cursor: pointer; }
+.meds { margin: 4px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--vs-text-secondary);
+  strong { color: var(--vs-text); font-weight: 600; } }
+.vacio { display: flex; align-items: center; gap: var(--vs-space-2); padding: var(--vs-space-5) 0; color: var(--vs-text-secondary);
+  mat-icon { color: var(--vs-primary); } }
+.ver-mas { width: 100%; margin-top: var(--vs-space-3); }
+
+@media (max-width: 1023px) {
+  .perfil { grid-template-columns: 1fr; }
+  .ficha { position: static; order: -1; }
+}
+@media (max-width: 599px) {
+  .cabecera { align-items: flex-start; }
+  .acciones { width: 100%;
+    button { flex: 1 1 auto; } }
+  .expediente { padding: var(--vs-space-4); }
+  .evento { grid-template-columns: 32px minmax(0, 1fr);
+    &::before { left: 15px; }
+    .ev-fecha { grid-column: 2; grid-row: 1; display: flex; gap: var(--vs-space-2); align-items: baseline; padding: 0 0 2px; }
+    .ev-nodo { grid-column: 1; grid-row: 1 / span 2; }
+    .ev-cuerpo { grid-column: 2; padding-top: 0; } }
+}

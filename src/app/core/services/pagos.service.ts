@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Pago } from '../models';
+import { MetodoPago, Pago } from '../models';
 import { StorageService } from './storage.service';
 
 const KEY = 'vet_pagos';
@@ -61,10 +61,19 @@ export class PagosService {
   }
 
   /** Cobra un pago pendiente. Devuelve false si no existe o no estaba pendiente. */
-  marcarPagado(id: string): boolean {
+  /** Cobra un pago pendiente; si se indica, con el método y la referencia con que pagó el cliente. */
+  marcarPagado(id: string, cobro?: { metodoPago: MetodoPago; referencia?: string }): boolean {
     const pago = this.getById(id);
     if (!pago || pago.estado !== 'pendiente') return false;
-    this.update(id, { estado: 'pagado', fechaPago: new Date() });
+    this.update(id, { estado: 'pagado', fechaPago: new Date(), ...(cobro ? { metodoPago: cobro.metodoPago, referencia: cobro.referencia?.trim() || undefined } : {}) });
+    return true;
+  }
+
+  /** Deshace un cobro recién hecho: vuelve a pendiente con el método y la referencia que tenía. */
+  deshacerCobro(id: string, anterior: Pick<Pago, 'metodoPago' | 'referencia'>): boolean {
+    const pago = this.getById(id);
+    if (!pago || pago.estado !== 'pagado') return false;
+    this.update(id, { estado: 'pendiente', fechaPago: undefined, metodoPago: anterior.metodoPago, referencia: anterior.referencia });
     return true;
   }
 

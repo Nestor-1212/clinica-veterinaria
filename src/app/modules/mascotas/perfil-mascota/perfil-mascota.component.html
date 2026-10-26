@@ -1,154 +1,102 @@
 @if (mascota) {
   <div class="page-container">
-    <div class="page-header">
-      <div>
-        <h1><mat-icon>pets</mat-icon> Historial Médico — {{ mascota.nombre }}</h1>
-        <p>Expediente clínico completo</p>
+    <a mat-button class="volver" routerLink="/mascotas"><mat-icon>arrow_back</mat-icon> Mascotas</a>
+
+    <header class="cabecera">
+      <span class="avatar" aria-hidden="true">
+        @if (mascota.foto) { <img [src]="mascota.foto" alt=""> } @else { <mat-icon>{{ especie() }}</mat-icon> }
+      </span>
+      <div class="titulo">
+        <h1>{{ mascota.nombre }}</h1>
+        <p>
+          {{ mascota.tipo }}@if (mascota.raza) { · {{ mascota.raza }} } · {{ mascota.sexo === 'macho' ? 'Macho' : 'Hembra' }}
+          @if (cliente) { · de <a [routerLink]="['/clientes', cliente.id]">{{ cliente.nombre }}</a> }
+        </p>
       </div>
-      <div class="header-actions">
-        <button mat-flat-button color="primary" (click)="nuevaConsulta()"><mat-icon>medical_services</mat-icon> Consulta</button>
-        <button mat-stroked-button (click)="nuevaVacuna()"><mat-icon>vaccines</mat-icon> Vacuna</button>
-        <button mat-stroked-button (click)="nuevoExamen()"><mat-icon>biotech</mat-icon> Examen</button>
-        <button mat-stroked-button routerLink="/mascotas"><mat-icon>arrow_back</mat-icon> Volver</button>
+      <div class="acciones">
+        @if (puede.cita) {
+          <button mat-flat-button type="button" class="btn-urgente" (click)="nuevaConsulta()"><mat-icon>bolt</mat-icon> Atención inmediata</button>
+          <button mat-stroked-button type="button" (click)="nuevaCita()"><mat-icon>event_available</mat-icon> Nueva cita</button>
+        }
+        <button mat-stroked-button type="button" [matMenuTriggerFor]="mas" aria-label="Más acciones para la mascota"><mat-icon>more_horiz</mat-icon> Más</button>
+        <mat-menu #mas="matMenu" xPosition="before">
+          @if (puede.vacuna) { <button mat-menu-item (click)="nuevaVacuna()"><mat-icon>vaccines</mat-icon>Registrar vacuna</button> }
+          @if (puede.examen) { <button mat-menu-item (click)="nuevoExamen()"><mat-icon>biotech</mat-icon>Nuevo examen</button> }
+          <button mat-menu-item (click)="editar()"><mat-icon>edit</mat-icon>Editar datos</button>
+        </mat-menu>
       </div>
-    </div>
-    <!-- Perfil -->
-    <mat-card class="perfil-card">
-      <mat-card-content>
-        <div class="perfil-layout">
-          <div class="mascota-foto">
-            @if (mascota.foto) {
-              <img [src]="mascota.foto" [alt]="mascota.nombre">
-            }
-            @if (!mascota.foto) {
-              <div class="foto-default">
-                <mat-icon>pets</mat-icon>
-              </div>
+    </header>
+
+    <div class="perfil">
+      <!-- Línea de tiempo del expediente -->
+      <section class="expediente" aria-labelledby="exp-titulo">
+        <div class="exp-cabecera">
+          <h2 id="exp-titulo">Expediente</h2>
+          <div class="vs-segmentado" role="group" aria-label="Filtrar el expediente">
+            @for (f of filtros; track f.valor) {
+              <button type="button" [attr.aria-pressed]="filtro === f.valor" (click)="elegirFiltro(f.valor)">{{ f.texto }} <span class="vs-cuenta">{{ conteos[f.valor] }}</span></button>
             }
           </div>
-          <div class="mascota-data">
-            <h3>{{ mascota.nombre }}</h3>
-            <p class="tipo-badge">{{ mascota.tipo }}</p>
-            <div class="datos-grid">
-              <div><span>Raza</span><strong>{{ mascota.raza }}</strong></div>
-              <div><span>Sexo</span><strong>{{ mascota.sexo | titlecase }}</strong></div>
-              <div><span>Edad</span><strong>{{ mascota.edad | edad }}</strong></div>
-              <div><span>Peso</span><strong>{{ mascota.peso }} kg</strong></div>
-              <div><span>Color</span><strong>{{ mascota.color }}</strong></div>
-              @if (mascota.fechaNacimiento) {
-                <div><span>Nacimiento</span><strong>{{ mascota.fechaNacimiento | date:'dd/MM/yyyy' }}</strong></div>
-              }
-            </div>
-            @if (mascota.alergias) {
-              <div class="alergias-alert">
-                <mat-icon>warning</mat-icon> Alergias: {{ mascota.alergias }}
-              </div>
-            }
-          </div>
-          @if (cliente) {
-            <div class="propietario-info">
-              <mat-icon>person</mat-icon>
-              <div>
-                <strong>{{ cliente.nombre }}</strong>
-                <p>{{ cliente.telefono }}</p>
-                <p>{{ cliente.correo }}</p>
-              </div>
-            </div>
-          }
         </div>
-      </mat-card-content>
-    </mat-card>
-    <!-- Historial en tabs -->
-    <mat-tab-group class="historial-tabs vs-tabs vs-tabs--panel" mat-stretch-tabs="false" mat-align-tabs="start">
-      <mat-tab label="Consultas ({{ consultas.length }})">
-        <div class="tab-content">
-          <mat-accordion>
-            @for (c of consultas; track c) {
-              <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>{{ c.fecha | date:'dd/MM/yyyy HH:mm' }}</mat-panel-title>
-                  <mat-panel-description>{{ c.diagnostico | slice:0:50 }}...</mat-panel-description>
-                </mat-expansion-panel-header>
-                <div class="consulta-detail">
-                  <div class="detail-row"><strong>Síntomas:</strong> {{ c.sintomas }}</div>
-                  <div class="detail-row"><strong>Temperatura:</strong> {{ c.temperatura }}°C</div>
-                  <div class="detail-row"><strong>Peso:</strong> {{ c.peso }} kg</div>
-                  <div class="detail-row"><strong>Diagnóstico:</strong> {{ c.diagnostico }}</div>
-                  <div class="detail-row"><strong>Tratamiento:</strong> {{ c.tratamiento }}</div>
-                  @if (c.observaciones) {
-                    <div class="detail-row"><strong>Observaciones:</strong> {{ c.observaciones }}</div>
+
+        <ol class="tiempo">
+          @for (e of visibles; track $index) {
+            <li class="evento" [class]="'evento evento--' + e.tipo">
+              <span class="ev-fecha">
+                <strong>{{ e.fecha | date: "d MMM y" }}</strong>
+                <small>{{ relativo(e.fecha) }}</small>
+              </span>
+              <span class="ev-nodo" aria-hidden="true">
+                <mat-icon>{{ e.tipo === 'consulta' ? 'medical_services' : e.tipo === 'vacuna' ? 'vaccines' : e.tipo === 'examen' ? 'biotech' : 'medication' }}</mat-icon>
+              </span>
+              <div class="ev-cuerpo">
+                @switch (e.tipo) {
+                  @case ('consulta') {
+                    @if (e.consulta; as c) {
+                      <p class="ev-titulo">{{ c.diagnostico }}@if (c.tipo === 'inmediata') { <span class="vs-status vs-status--warning">Sin cita</span> }</p>
+                      <p class="ev-texto">{{ c.tratamiento }}</p>
+                      <p class="ev-meta">{{ c.temperatura }} °C · {{ c.peso }} kg · {{ vet(c.veterinarioId) }}@if (c.sintomas) { · {{ c.sintomas }} }</p>
+                    }
                   }
-                  <div class="tipo-chip"><mat-chip [class]="'chip-' + c.tipo"><mat-icon class="chip-icon">{{ iconoTipoConsulta(c.tipo) }}</mat-icon>{{ c.tipo | titlecase }}</mat-chip></div>
-                </div>
-              </mat-expansion-panel>
-            }
-            @if (consultas.length === 0) {
-              <p class="vs-empty">No hay consultas registradas</p>
-            }
-          </mat-accordion>
-        </div>
-      </mat-tab>
-      <mat-tab label="Vacunas ({{ vacunas.length }})">
-        <div class="tab-content">
-          <mat-list>
-            @for (v of vacunas; track v) {
-              <mat-list-item class="vacuna-item">
-                <mat-icon matListItemIcon color="primary">vaccines</mat-icon>
-                <div matListItemTitle><strong>{{ v.nombre }}</strong></div>
-                <div matListItemLine>Aplicada: {{ v.fechaAplicacion | date:'dd/MM/yyyy' }} — Próxima: {{ v.proximaFecha | date:'dd/MM/yyyy' }}</div>
-                @if (v.lote) {
-                  <div matListItemLine>Lote: {{ v.lote }}</div>
+                  @case ('vacuna') {
+                    @if (e.vacuna; as v) {
+                      <p class="ev-titulo">Vacuna {{ v.nombre }}</p>
+                      <p class="ev-meta">Lote {{ v.lote }}@if (v.laboratorio) { · {{ v.laboratorio }} } · refuerzo {{ v.proximaFecha | date: "d MMM y" }}
+                        @if (vencida(v)) { <span class="vs-status vs-status--warning">Refuerzo vencido</span> }
+                      </p>
+                    }
+                  }
+                  @case ('examen') {
+                    @if (e.examen; as x) {
+                      <p class="ev-titulo">{{ x.tipo }}@if (pendiente(x)) { <span class="vs-status vs-status--warning">Pendiente de resultado</span> }</p>
+                      @if (x.resultado) { <p class="ev-texto">{{ x.resultado }}</p> }
+                      <p class="ev-meta">{{ x.descripcion }}
+                        @if (x.archivos?.length) { · <button type="button" class="enlace" (click)="verInforme(x)">Ver informe</button> }
+                      </p>
+                    }
+                  }
+                  @case ('receta') {
+                    @if (e.receta; as r) {
+                      <p class="ev-titulo">Receta · {{ r.items.length }} {{ r.items.length === 1 ? 'medicamento' : 'medicamentos' }}</p>
+                      <ul class="meds">
+                        @for (i of r.items; track $index) { <li><strong>{{ i.medicamento }}</strong> {{ i.dosis }}, {{ i.frecuencia.toLowerCase() }}, {{ i.duracion }}</li> }
+                      </ul>
+                      @if (puede.receta) { <p class="ev-meta"><a [routerLink]="['/recetas', r.id]">Ver receta</a></p> }
+                    }
+                  }
                 }
-              </mat-list-item>
-            }
-            @if (vacunas.length === 0) {
-              <p class="vs-empty">No hay vacunas registradas</p>
-            }
-          </mat-list>
-        </div>
-      </mat-tab>
-      <mat-tab label="Exámenes ({{ examenes.length }})">
-        <div class="tab-content">
-          <mat-list>
-            @for (e of examenes; track e) {
-              <mat-list-item>
-                <mat-icon matListItemIcon>biotech</mat-icon>
-                <div matListItemTitle><strong>{{ e.tipo }}</strong> — {{ e.fecha | date:'dd/MM/yyyy' }}</div>
-                <div matListItemLine>{{ e.resultado }}</div>
-              </mat-list-item>
-            }
-            @if (examenes.length === 0) {
-              <p class="vs-empty">No hay exámenes registrados</p>
-            }
-          </mat-list>
-        </div>
-      </mat-tab>
-      <mat-tab label="Recetas ({{ recetas.length }})">
-        <div class="tab-content">
-          <mat-accordion>
-            @for (r of recetas; track r) {
-              <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>{{ r.fecha | date:'dd/MM/yyyy' }}</mat-panel-title>
-                  <mat-panel-description>{{ r.items.length }} medicamento(s)</mat-panel-description>
-                </mat-expansion-panel-header>
-                <mat-list>
-                  @for (item of r.items; track item) {
-                    <mat-list-item>
-                      <mat-icon matListItemIcon>medication</mat-icon>
-                      <div matListItemTitle><strong>{{ item.medicamento }}</strong></div>
-                      <div matListItemLine>{{ item.dosis }} — {{ item.frecuencia }} — {{ item.duracion }}</div>
-                    </mat-list-item>
-                  }
-                </mat-list>
-              </mat-expansion-panel>
-            }
-            @if (recetas.length === 0) {
-              <p class="vs-empty">No hay recetas registradas</p>
-            }
-          </mat-accordion>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
+              </div>
+            </li>
+          } @empty {
+            <li class="vacio"><mat-icon aria-hidden="true">history</mat-icon>Todavía no hay registros en el expediente.</li>
+          }
+        </ol>
+        @if (restantes) {
+          <button mat-stroked-button type="button" class="ver-mas" (click)="verMas()">Mostrar más ({{ restantes }} anteriores)</button>
+        }
+      </section>
+
+      <app-ficha-paciente class="ficha" [ficha]="ficha" />
+    </div>
   </div>
 }

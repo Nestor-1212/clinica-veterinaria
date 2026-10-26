@@ -20,14 +20,14 @@ export interface DatosDashboard {
 }
 
 export function moneda(v: number): string {
-  return `$${formatNumber(v, 'es', '1.0-0')}`;
+  return `$${formatNumber(v, 'es-PA', '1.0-0')}`;
 }
 
 export function entero(v: number): string {
-  return formatNumber(v, 'es', '1.0-0');
+  return formatNumber(v, 'es-PA', '1.0-0');
 }
 
-const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const MESES_CORTOS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sept', 'oct', 'nov', 'dic'];
 
 /** "1–22 sep": el tramo del mes anterior con el que se compara el mes en curso. */
 export function tramoAnterior(hoy: Date): string {
@@ -41,7 +41,7 @@ export { ICONO_ESPECIE } from '../../core/utils/clientes';
 
 /** "1 cita" / "3 citas" (plural regular o indicado). */
 export function plural(n: number, singular: string, pluralForma = singular + 's'): string {
-  return `${formatNumber(n, 'es', '1.0-0')} ${n === 1 ? singular : pluralForma}`;
+  return `${formatNumber(n, 'es-PA', '1.0-0')} ${n === 1 ? singular : pluralForma}`;
 }
 
 /** "hoy", "mañana", "en 5 días", "hace 3 días". */

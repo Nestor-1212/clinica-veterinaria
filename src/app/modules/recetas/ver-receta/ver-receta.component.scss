@@ -31,6 +31,14 @@
   dt { color: var(--vs-text-secondary); }
   dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 }
+// Alergias: lo primero que debe ver quien despacha el medicamento
+.alergias {
+  display: flex; align-items: flex-start; gap: 8px; margin: 0 0 16px; padding: 10px 14px; border-radius: var(--vs-radius-md);
+  background: var(--vs-danger-container); color: var(--vs-on-danger-container); font-size: 14px;
+  mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.alergias--sin-dato { background: var(--vs-surface-muted); color: var(--vs-text-secondary); }
 .receta-rx { margin: 16px 0; }
 .rx-symbol { font-size: 24px; font-style: italic; color: var(--vs-text); margin-bottom: 8px; }
 .rx-table { width: 100%; border: 1px solid var(--vs-border); }

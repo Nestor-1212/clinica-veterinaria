@@ -1,9 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
+import { CobrarService } from '../../pagos/cobro-dialog/cobrar.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
 import { CitasService } from '../../../core/services/citas.service';
 import { PagosService } from '../../../core/services/pagos.service';
@@ -15,7 +15,6 @@ import { enlaceWhatsApp, momentoCita } from '../../../core/utils/metricas';
 import {
   EstadoVacunas, EventoHistorial, ICONO_ESPECIE, ResumenExpediente, TipoEvento, estadoVacunas, historialCliente, resumenExpediente, tiempoRelativo
 } from '../../../core/utils/clientes';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatAnchor } from '@angular/material/button';
 import { DecimalPipe, DatePipe, NgTemplateOutlet } from '@angular/common';
@@ -56,7 +55,6 @@ const PASO_HISTORIAL = 12;
 export class DetalleClienteComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   private auth = inject(AuthService);
   private clientesService = inject(ClientesService);
@@ -65,6 +63,7 @@ export class DetalleClienteComponent implements OnInit {
   private citasService = inject(CitasService);
   private pagosService = inject(PagosService);
   private vacunasService = inject(VacunasService);
+  private cobrarService = inject(CobrarService);
 
   /** Dinero (pagos, saldo, cobrar) solo para quien cobra: admin y recepción. */
   readonly verPagos = puedeAcceder(this.auth.currentUser?.rol, 'pagos');
@@ -163,21 +162,11 @@ export class DetalleClienteComponent implements OnInit {
     return p.items.map(i => i.descripcion).filter(Boolean).join(', ') || 'Cobro';
   }
 
-  /** Mismo flujo que en Pagos: confirmación y PagosService.marcarPagado. */
+  /** Mismo flujo que en Pagos: panel de cobro con método, referencia, cambio y deshacer. */
   cobrar(pago: Pago): void {
-    const data: ConfirmDialogData = {
-      title: 'Registrar cobro',
-      message: `¿Marcar como pagado el cobro de $${pago.total.toFixed(2)} de ${this.cliente.nombre}?`,
-      confirmText: 'Marcar pagado',
-      color: 'primary'
-    };
-    this.dialog.open(ConfirmDialogComponent, { data }).afterClosed().subscribe(ok => {
-      if (!ok) return;
-      if (this.pagosService.marcarPagado(pago.id)) {
-        this.cargar();
-        this.snack.open('Pago registrado como pagado', 'OK', { duration: 2000 });
-      }
-    });
+    const mascota = this.mascotas.find(m => m.id === pago.mascotaId)?.nombre ?? '';
+    this.cobrarService.cobrar(pago, this.cliente.nombre, mascota, () => this.cargar())
+      .subscribe(ok => { if (ok) this.cargar(); });
   }
 
   nuevaMascota(): void {

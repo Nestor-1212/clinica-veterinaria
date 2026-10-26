@@ -17,8 +17,7 @@ export class PdfService {
     doc.text('CLÍNICA VETERINARIA', pageW / 2, 14, { align: 'center' });
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('Tel: (507) 000-0000 | info@clinica.com', pageW / 2, 22, { align: 'center' });
-    doc.text('Ciudad de Panamá', pageW / 2, 29, { align: 'center' });
+    doc.text('Ciudad de Panamá', pageW / 2, 25, { align: 'center' });
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
@@ -50,6 +49,19 @@ export class PdfService {
     y += 5;
     doc.text(`Fecha: ${new Date(receta.fecha).toLocaleDateString('es-PA')}`, 10, y);
     y += 6;
+
+    // Alergias: dato crítico para quien despacha el medicamento (en rojo si las hay)
+    const alergias = (mascota.alergias || '').trim();
+    const lineasAlergia = doc.splitTextToSize(alergias ? `ALERGIAS: ${alergias}` : 'Alergias: no indicadas en el expediente', pageW - 30) as string[];
+    const altoAlergia = lineasAlergia.length * 5 + 4;
+    if (alergias) doc.setFillColor(255, 218, 214); else doc.setFillColor(240, 244, 242);
+    doc.roundedRect(10, y - 1, pageW - 20, altoAlergia, 1.5, 1.5, 'F');
+    doc.setFont('helvetica', 'bold');
+    if (alergias) doc.setTextColor(147, 0, 10); else doc.setTextColor(85, 101, 95);
+    doc.text(lineasAlergia, 15, y + 4);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'normal');
+    y += altoAlergia + 3;
 
     doc.line(10, y, pageW - 10, y);
     y += 6;
@@ -106,7 +118,7 @@ export class PdfService {
     const doc = new jsPDF();
     const pageW = doc.internal.pageSize.getWidth();
 
-    doc.setFillColor(21, 101, 192);
+    doc.setFillColor(12, 56, 51);
     doc.rect(0, 0, pageW, 35, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
@@ -114,20 +126,24 @@ export class PdfService {
     doc.text('CLÍNICA VETERINARIA', pageW / 2, 14, { align: 'center' });
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('RUC: 000-000-0000 | Tel: (507) 000-0000', pageW / 2, 22, { align: 'center' });
-    doc.text('Ciudad de Panamá', pageW / 2, 29, { align: 'center' });
+    doc.text('VetSystem · Ciudad de Panamá', pageW / 2, 22, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text('Comprobante interno: no es una factura fiscal', pageW / 2, 29, { align: 'center' });
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('FACTURA', pageW / 2, 45, { align: 'center' });
+    doc.text('COMPROBANTE DE PAGO', pageW / 2, 45, { align: 'center' });
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     let y = 55;
 
     doc.text(`Fecha: ${new Date(pago.fecha).toLocaleDateString('es-PA')}`, 10, y);
-    doc.text(`No. ${pago.id.toUpperCase()}`, pageW - 10, y, { align: 'right' });
+    const estado = pago.estado === 'pagado' ? 'PAGADO' : pago.estado === 'pendiente' ? 'PENDIENTE DE PAGO' : 'ANULADO';
+    doc.setFont('helvetica', 'bold');
+    doc.text(estado, pageW - 10, y, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
     y += 6;
     doc.text(`Cliente: ${cliente.nombre}`, 10, y);
     doc.text(`Cédula: ${cliente.cedula}`, pageW - 10, y, { align: 'right' });
@@ -135,7 +151,7 @@ export class PdfService {
     doc.text(`Mascota: ${mascota.nombre} (${mascota.tipo})`, 10, y);
     y += 8;
 
-    doc.setFillColor(21, 101, 192);
+    doc.setFillColor(0, 107, 94);
     doc.rect(10, y, pageW - 20, 7, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
@@ -149,7 +165,7 @@ export class PdfService {
     doc.setFont('helvetica', 'normal');
     pago.items.forEach((item: ItemPago, idx: number) => {
       if (idx % 2 === 0) {
-        doc.setFillColor(240, 248, 255);
+        doc.setFillColor(240, 246, 244);
         doc.rect(10, y - 3, pageW - 20, 7, 'F');
       }
       doc.text(item.descripcion, 13, y + 2);
@@ -173,8 +189,13 @@ export class PdfService {
     doc.text(`$${pago.total.toFixed(2)}`, pageW - 10, y, { align: 'right' });
     y += 6;
     doc.setFont('helvetica', 'normal');
-    doc.text(`Método de pago: ${pago.metodoPago.toUpperCase()}`, pageW - 60, y);
+    const metodos: Record<string, string> = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', yappy: 'Yappy', transferencia: 'Transferencia' };
+    doc.text(`Método de pago: ${metodos[pago.metodoPago] ?? pago.metodoPago}${pago.referencia ? ' · Ref. ' + pago.referencia : ''}`, pageW - 10, y, { align: 'right' });
+    if (pago.fechaPago) {
+      y += 5;
+      doc.text(`Cobrado el ${new Date(pago.fechaPago).toLocaleDateString('es-PA')}`, pageW - 10, y, { align: 'right' });
+    }
 
-    doc.save(`factura_${pago.id}.pdf`);
+    doc.save(`comprobante_${cliente.nombre.split(' ')[0].toLowerCase()}_${new Date(pago.fecha).toLocaleDateString('es-PA').replace(/\//g, '-')}.pdf`);
   }
 }

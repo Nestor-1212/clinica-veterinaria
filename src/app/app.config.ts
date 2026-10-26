@@ -2,14 +2,15 @@ import { ApplicationConfig, LOCALE_ID, inject, provideBrowserGlobalErrorListener
 import { provideRouter, TitleStrategy, withViewTransitions } from '@angular/router';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
-import localeEs from '@angular/common/locales/es';
+import localeEsPA from '@angular/common/locales/es-PA';
 import { routes } from './app.routes';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { TituloPaginaStrategy } from './core/i18n/titulo-pagina.strategy';
 import { PaginatorEs } from './core/i18n/paginator-es';
 import { TransicionEntradaService, prefiereMenosMovimiento } from './core/ui/transicion-entrada.service';
 
-registerLocaleData(localeEs, 'es');
+// Panamá: $2,102.00 (coma de miles, punto decimal), igual que toLocaleString('es-PA') en pagos y reportes
+registerLocaleData(localeEsPA, 'es-PA');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,7 +26,7 @@ export const appConfig: ApplicationConfig = {
       }
     })),
     provideNativeDateAdapter(),
-    { provide: LOCALE_ID, useValue: 'es' },
+    { provide: LOCALE_ID, useValue: 'es-PA' },
     { provide: TitleStrategy, useClass: TituloPaginaStrategy },
     { provide: MatPaginatorIntl, useClass: PaginatorEs }
   ]

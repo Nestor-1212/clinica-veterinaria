@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { PagosService } from '../../../core/services/pagos.service';
+import { CobrarService } from '../cobro-dialog/cobrar.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
@@ -42,6 +43,7 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   private auth = inject(AuthService);
+  private cobrarService = inject(CobrarService);
 
   readonly METODO_TEXTO = METODO_TEXTO;
   readonly METODO_ICONO = METODO_ICONO;
@@ -122,21 +124,10 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
 
   elegirFiltro(f: FiltroPagos): void { this.filtro = f; this.cargar(); }
 
-  /** B3: cobra un pago pendiente, previa confirmación. */
+  /** B3: cobra un pago pendiente con el panel de cobro (método, referencia, cambio y deshacer). */
   marcarPagado(pago: Pago): void {
-    const data: ConfirmDialogData = {
-      title: 'Registrar cobro',
-      message: `¿Marcar como pagado el cobro de $${pago.total.toFixed(2)} de ${this.getCliente(pago.clienteId)}?`,
-      confirmText: 'Marcar pagado',
-      color: 'primary'
-    };
-    this.dialog.open(ConfirmDialogComponent, { data }).afterClosed().subscribe(ok => {
-      if (!ok) return;
-      if (this.pagosService.marcarPagado(pago.id)) {
-        this.cargar();
-        this.avisar(`Cobro registrado: ${this.moneda(pago.total)} de ${this.getCliente(pago.clienteId)}`);
-      }
-    });
+    this.cobrarService.cobrar(pago, this.getCliente(pago.clienteId), this.getMascota(pago.mascotaId), () => this.cargar())
+      .subscribe(ok => { if (ok) this.cargar(); });
   }
 
   /** B3: anula un pago pendiente o pagado, pidiendo el motivo. */
