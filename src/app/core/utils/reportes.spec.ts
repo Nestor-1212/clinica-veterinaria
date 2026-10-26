@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Cliente, Consulta, Mascota, Pago, Usuario } from '../models';
-import { aCsv, atencionesPorEspecie, comparar, diagnosticosTop, indicadores, rangoPeriodo, rendimientoVeterinarios, serviciosTop } from './reportes';
+import { atencionesPorEspecie, comparar, diagnosticosTop, indicadores, rangoPeriodo, rendimientoVeterinarios, serviciosTop } from './reportes';
 
 const HOY = new Date(2026, 9, 23, 15);
 const pago = (total: number, fecha: Date, descripcion = 'Consulta', consultaId?: string, estado: Pago['estado'] = 'pagado'): Pago => ({
@@ -43,12 +43,5 @@ describe('reportes por período', () => {
     expect(atencionesPorEspecie(consultas, mascotas, r).map(e => [e.nombre, e.cantidad, e.porcentaje])).toEqual([['Perro', 2, 67], ['Gato', 1, 33]]);
     const usuarios = [{ id: 'v1', nombre: 'Ana', apellido: 'R', rol: 'veterinario' }, { id: 'v2', nombre: 'Luis', apellido: 'M', rol: 'veterinario' }] as Usuario[];
     expect(rendimientoVeterinarios(usuarios, consultas, pagos, r).map(v => [v.nombre, v.atenciones, v.ingresos])).toEqual([['Ana R', 2, 120], ['Luis M', 1, 20]]);
-  });
-
-  it('CSV con BOM y comillas donde hace falta', () => {
-    const csv = aCsv(['Servicio', 'Total'], [['Consulta, general', 25], ['Dice "hola"', 3]]);
-    expect(csv.startsWith('﻿Servicio,Total\r\n')).toBe(true);
-    expect(csv).toContain('"Consulta, general",25');
-    expect(csv).toContain('"Dice ""hola""",3');
   });
 });

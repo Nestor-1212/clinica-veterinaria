@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ClientesService } from '../../core/services/clientes.service';
 import { MascotasService } from '../../core/services/mascotas.service';
 import { ConsultasService } from '../../core/services/consultas.service';
@@ -11,13 +11,13 @@ import { EstadoRecordatorio, estadoRecordatorio, porProximaFecha } from '../../c
 import { inicioMes, ingresosPorMes } from '../../core/utils/metricas';
 import {
   Comparado, FilaConteo, FilaMetodoPeriodo, FilaServicio, FilaVet, Indicadores, Periodo, RangoPeriodo,
-  aCsv, atencionesPorEspecie, comparar, diagnosticosTop, indicadores, metodosPeriodo, rangoPeriodo, rendimientoVeterinarios, serviciosTop
+  atencionesPorEspecie, comparar, diagnosticosTop, indicadores, metodosPeriodo, rangoPeriodo, rendimientoVeterinarios, serviciosTop
 } from '../../core/utils/reportes';
+import { ReportePdfService, SeccionReporte } from '../../core/services/reporte-pdf.service';
 import { KpiComponent } from '../../shared/components/kpi/kpi.component';
 import { Columna, GraficoColumnasComponent } from '../../shared/components/graficos/grafico-columnas.component';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
 
 interface ReporteMes { mes: string; consultas: number; ingresos: number; }
 
@@ -25,7 +25,7 @@ interface ReporteMes { mes: string; consultas: number; ingresos: number; }
     selector: 'app-reportes',
     templateUrl: './reportes.component.html',
     styleUrls: ['./reportes.component.scss'],
-    imports: [MatIcon, MatButton, MatIconButton, MatTooltip, KpiComponent, GraficoColumnasComponent]
+    imports: [MatIcon, MatButton, KpiComponent, GraficoColumnasComponent]
 })
 export class ReportesComponent implements OnInit {
   private clientesService = inject(ClientesService);
@@ -35,6 +35,9 @@ export class ReportesComponent implements OnInit {
   private pagosService = inject(PagosService);
   private citasService = inject(CitasService);
   private usuariosService = inject(UsuariosService);
+  private reportePdf = inject(ReportePdfService);
+  /** Qué se está generando (signal: se refresca aunque termine después de un await). */
+  readonly generando = signal<SeccionReporte | 'todo' | null>(null);
 
   readonly periodos: { valor: Periodo; texto: string }[] = [
     { valor: 'mes', texto: 'Este mes' }, { valor: 'mesAnterior', texto: 'Mes anterior' },
@@ -105,17 +108,22 @@ export class ReportesComponent implements OnInit {
   get maxServicio(): number { return Math.max(...this.servicios.map(s => s.total), 1); }
   get maxVet(): number { return Math.max(...this.veterinarios.map(v => v.ingresos), 1); }
 
-  // ---------- Exportar ----------
-  exportar(tabla: 'servicios' | 'veterinarios' | 'diagnosticos' | 'especies' | 'metodos'): void {
-    const p = this.rango.etiqueta;
-    const csv = {
-      servicios: () => aCsv(['Servicio', 'Cantidad', 'Total cobrado', '% del total'], this.servicios.map(s => [s.servicio, s.cantidad, s.total.toFixed(2), s.porcentaje])),
-      veterinarios: () => aCsv(['Veterinario', 'Especialidad', 'Atenciones', 'Sin cita', 'Ingresos'], this.veterinarios.map(v => [v.nombre, v.especialidad, v.atenciones, v.inmediatas, v.ingresos.toFixed(2)])),
-      diagnosticos: () => aCsv(['Diagnóstico', 'Casos', '%'], this.diagnosticos.map(d => [d.nombre, d.cantidad, d.porcentaje])),
-      especies: () => aCsv(['Especie', 'Atenciones', '%'], this.especies.map(e => [e.nombre, e.cantidad, e.porcentaje])),
-      metodos: () => aCsv(['Método', 'Cobros', 'Total', '%'], this.metodos.map(m => [m.metodo, m.cobros, m.total.toFixed(2), m.porcentaje]))
-    }[tabla]();
-    descargar(csv, `vetsystem-${tabla}-${p.replace(/[^\p{L}\d]+/gu, '-').toLowerCase()}.csv`);
+  // ---------- Descargar en PDF ----------
+  /** Informe completo del período o solo una sección, con el mismo diseño. */
+  async descargarPdf(seccion?: SeccionReporte): Promise<void> {
+    if (this.generando()) return;
+    this.generando.set(seccion ?? 'todo');
+    try {
+      await this.reportePdf.descargar({
+        rango: this.rango, cifras: this.cifras,
+        vacunasVencidas: this.vacunasVencidas, vacunasProximas: this.vacunasPendientesList.length - this.vacunasVencidas,
+        ingresosMes: this.columnasIngresos.map(c => ({ etiqueta: c.etiqueta, valor: c.valor, parcial: c.parcial })),
+        atencionesMes: this.columnasConsultas.map(c => ({ etiqueta: c.etiqueta, valor: c.valor, parcial: c.parcial })),
+        servicios: this.servicios, veterinarios: this.veterinarios, diagnosticos: this.diagnosticos, especies: this.especies, metodos: this.metodos
+      }, seccion ? [seccion] : undefined);
+    } finally {
+      this.generando.set(null);
+    }
   }
 
   imprimir(): void { window.print(); }
@@ -138,13 +146,4 @@ export class ReportesComponent implements OnInit {
   get resumenIngresos(): string {
     return 'Ingresos por mes en dólares: ' + this.reporteMensual.map(r => r.mes + ' ' + Math.round(r.ingresos)).join(', ');
   }
-}
-
-function descargar(contenido: string, nombre: string): void {
-  const url = URL.createObjectURL(new Blob([contenido], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nombre;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

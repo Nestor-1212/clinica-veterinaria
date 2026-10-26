@@ -4,7 +4,12 @@
       <h1><mat-icon>bar_chart</mat-icon> Reportes</h1>
       <p>{{ rango.etiqueta.charAt(0).toUpperCase() + rango.etiqueta.slice(1) }} · comparado con {{ rango.anterior.etiqueta }}</p>
     </div>
-    <button mat-stroked-button type="button" class="no-imprimir" (click)="imprimir()"><mat-icon>print</mat-icon> Imprimir</button>
+    <div class="header-actions no-imprimir">
+      <button mat-stroked-button type="button" (click)="imprimir()"><mat-icon>print</mat-icon> Imprimir</button>
+      <button mat-flat-button type="button" (click)="descargarPdf()" [disabled]="generando() !== null">
+        <mat-icon>picture_as_pdf</mat-icon> {{ generando() === 'todo' ? 'Generando…' : 'Descargar informe PDF' }}
+      </button>
+    </div>
   </div>
 
   <div class="vs-segmentado periodos no-imprimir" role="group" aria-label="Período del reporte">
@@ -51,7 +56,7 @@
     <div class="panel">
       <div class="panel-cabecera">
         <div><h2>Servicios más vendidos</h2><p class="panel-sub">Por ingreso cobrado en el período</p></div>
-        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('servicios')" matTooltip="Descargar CSV" aria-label="Descargar servicios en CSV"><mat-icon>download</mat-icon></button>
+        <button mat-stroked-button type="button" class="pdf no-imprimir" (click)="descargarPdf('servicios')" [disabled]="generando() !== null" aria-label="Descargar servicios en PDF"><mat-icon>picture_as_pdf</mat-icon>PDF</button>
       </div>
       @if (servicios.length) {
         <table class="tabla">
@@ -75,7 +80,7 @@
     <div class="panel">
       <div class="panel-cabecera">
         <div><h2>Rendimiento por veterinario</h2><p class="panel-sub">Atenciones e ingresos de sus consultas</p></div>
-        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('veterinarios')" matTooltip="Descargar CSV" aria-label="Descargar veterinarios en CSV"><mat-icon>download</mat-icon></button>
+        <button mat-stroked-button type="button" class="pdf no-imprimir" (click)="descargarPdf('veterinarios')" [disabled]="generando() !== null" aria-label="Descargar veterinarios en PDF"><mat-icon>picture_as_pdf</mat-icon>PDF</button>
       </div>
       @if (veterinarios.length) {
         <table class="tabla">
@@ -102,7 +107,7 @@
     <div class="panel">
       <div class="panel-cabecera">
         <div><h2>Diagnósticos frecuentes</h2><p class="panel-sub">Casos en el período</p></div>
-        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('diagnosticos')" matTooltip="Descargar CSV" aria-label="Descargar diagnósticos en CSV"><mat-icon>download</mat-icon></button>
+        <button mat-stroked-button type="button" class="pdf no-imprimir" (click)="descargarPdf('diagnosticos')" [disabled]="generando() !== null" aria-label="Descargar diagnósticos en PDF"><mat-icon>picture_as_pdf</mat-icon>PDF</button>
       </div>
       <ol class="ranking">
         @for (d of diagnosticos; track d.nombre) {
@@ -114,7 +119,7 @@
     <div class="panel">
       <div class="panel-cabecera">
         <div><h2>Especies atendidas</h2><p class="panel-sub">Atenciones por especie</p></div>
-        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('especies')" matTooltip="Descargar CSV" aria-label="Descargar especies en CSV"><mat-icon>download</mat-icon></button>
+        <button mat-stroked-button type="button" class="pdf no-imprimir" (click)="descargarPdf('especies')" [disabled]="generando() !== null" aria-label="Descargar especies en PDF"><mat-icon>picture_as_pdf</mat-icon>PDF</button>
       </div>
       <ul class="barras">
         @for (e of especies; track e.nombre) {
@@ -129,7 +134,7 @@
     <div class="panel">
       <div class="panel-cabecera">
         <div><h2>Métodos de pago</h2><p class="panel-sub">Cobrado en el período</p></div>
-        <button mat-icon-button type="button" class="no-imprimir" (click)="exportar('metodos')" matTooltip="Descargar CSV" aria-label="Descargar métodos de pago en CSV"><mat-icon>download</mat-icon></button>
+        <button mat-stroked-button type="button" class="pdf no-imprimir" (click)="descargarPdf('metodos')" [disabled]="generando() !== null" aria-label="Descargar métodos de pago en PDF"><mat-icon>picture_as_pdf</mat-icon>PDF</button>
       </div>
       <ul class="barras">
         @for (m of metodos; track m.metodo) {

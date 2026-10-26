@@ -24,9 +24,16 @@ test('vacunas: aplicar refuerzo desde la lista registra una nueva dosis con la m
 
 test('laboratorio: al cargar el resultado se adjunta el PDF del laboratorio y queda guardado', async ({ page }) => {
   await login(page, 'veterinario');
-  await page.goto('/examenes');
+  // Examen pendiente propio de la prueba (no depender de lo que genere la semilla según la fecha)
+  await page.goto('/examenes/nuevo');
+  await page.locator('#selector-paciente').fill('max');
+  await page.getByRole('option').first().click();
+  await page.getByRole('button', { name: 'Urianálisis', exact: true }).click();
+  await page.locator('textarea[formControlName="descripcion"]').fill('E2E muestra de orina');
+  await page.getByRole('button', { name: /Guardar como pendiente$/ }).click();
+  await expect(page).toHaveURL(/\/examenes$/);
   await page.getByRole('button', { name: /^Pendientes de resultado/ }).click();
-  await page.getByRole('button', { name: /^Cargar resultado de/ }).first().click();
+  await page.getByRole('button', { name: /^Cargar resultado de Urianálisis/ }).first().click();
   await expect(page).toHaveURL(/\/examenes\/editar\//);
 
   const pdf = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF');

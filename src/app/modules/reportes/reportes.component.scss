@@ -19,8 +19,11 @@
   h2 { margin: 0; font-size: 17px; font-weight: 700; color: var(--vs-text); }
 }
 .panel-sub { margin: 2px 0 var(--vs-space-4); font-size: 13px; color: var(--vs-text-secondary); }
-.panel-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vs-space-2);
-  button { margin: -8px -8px 0 0; } }
+.panel-cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--vs-space-2); }
+.header-actions { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); }
+// Descarga de una sección: botón compacto con la etiqueta PDF a la vista
+.pdf { flex-shrink: 0; min-height: 32px; padding: 0 12px; font-size: 13px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--vs-danger); } }
 
 // Tablas con barra de magnitud (un solo tono: es magnitud, no categoría)
 .tabla { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums;

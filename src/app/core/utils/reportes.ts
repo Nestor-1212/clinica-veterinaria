@@ -14,6 +14,7 @@ export interface RangoPeriodo extends Rango { anterior: Rango; }
 
 const MES = (d: Date) => d.toLocaleDateString('es-PA', { month: 'long', year: 'numeric' });
 const CORTO = (d: Date) => d.toLocaleDateString('es-PA', { day: 'numeric', month: 'short' }).replace('.', '');
+const CON_ANIO = (d: Date) => `${CORTO(d)} ${d.getFullYear()}`;
 
 export function rangoPeriodo(p: Periodo, hoy: Date): RangoPeriodo {
   switch (p) {
@@ -32,8 +33,8 @@ export function rangoPeriodo(p: Periodo, hoy: Date): RangoPeriodo {
       antDesde.setDate(antDesde.getDate() - dias);
       const antHasta = new Date(desde.getTime() - 1);
       return {
-        desde, hasta: hoy, etiqueta: `${CORTO(desde)} – ${CORTO(hoy)}`,
-        anterior: { desde: antDesde, hasta: antHasta, etiqueta: `${CORTO(antDesde)} – ${CORTO(antHasta)}` }
+        desde, hasta: hoy, etiqueta: `${CON_ANIO(desde)} – ${CON_ANIO(hoy)}`,
+        anterior: { desde: antDesde, hasta: antHasta, etiqueta: `${CON_ANIO(antDesde)} – ${CON_ANIO(antHasta)}` }
       };
     }
     default: {
@@ -164,13 +165,4 @@ export function metodosPeriodo(pagos: Pago[], r: Rango): FilaMetodoPeriodo[] {
     })
     .filter(f => f.cobros)
     .sort((a, b) => b.total - a.total);
-}
-
-/** CSV con BOM (Excel reconoce las tildes); celdas entre comillas si hace falta. */
-export function aCsv(encabezados: string[], filas: (string | number)[][]): string {
-  const celda = (v: string | number) => {
-    const t = String(v);
-    return /[",\n;]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
-  };
-  return '﻿' + [encabezados, ...filas].map(f => f.map(celda).join(',')).join('\r\n');
 }
