@@ -1,6 +1,7 @@
 import { ApplicationConfig, LOCALE_ID, inject, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, TitleStrategy, withViewTransitions } from '@angular/router';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { FechaAdapter } from './core/i18n/fecha-adapter';
 import { registerLocaleData } from '@angular/common';
 import localeEsPA from '@angular/common/locales/es-PA';
 import { routes } from './app.routes';
@@ -26,6 +27,9 @@ export const appConfig: ApplicationConfig = {
       }
     })),
     provideNativeDateAdapter(),
+    // Fechas de los campos en día/mes/año (es-PA usaría mes/día: "03/04" sería ambiguo en un refuerzo de vacuna)
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: DateAdapter, useClass: FechaAdapter },
     { provide: LOCALE_ID, useValue: 'es-PA' },
     { provide: TitleStrategy, useClass: TituloPaginaStrategy },
     { provide: MatPaginatorIntl, useClass: PaginatorEs }
