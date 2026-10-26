@@ -52,7 +52,7 @@ export class ListaMascotasComponent implements OnInit, AfterViewInit {
   readonly displayedColumns = ['paciente', 'propietario', 'vacunas', 'ultimaConsulta', 'proximaCita', 'acciones'];
   readonly segmentos: OpcionSegmento[] = [
     { valor: 'todos', texto: 'Todas' },
-    { valor: 'vacunas', texto: 'Vacunas vencidas' },
+    { valor: 'vacunas', texto: 'Con vacuna vencida' },
     { valor: 'alergias', texto: 'Con alergias' },
     { valor: 'cita', texto: 'Con cita próxima' }
   ];
@@ -143,13 +143,13 @@ export class ListaMascotasComponent implements OnInit, AfterViewInit {
 
   eliminar(m: Mascota): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
-      data: { title: 'Eliminar mascota', message: `¿Eliminar a ${m.nombre}?`, confirmText: 'Eliminar', color: 'warn' }
+      data: { title: 'Desactivar mascota', message: `¿Desactivar a ${m.nombre}? Deja de aparecer en las listas, pero su historial clínico se conserva.`, confirmText: 'Desactivar', color: 'warn' }
     });
     ref.afterClosed().subscribe(ok => {
       if (ok) {
         this.mascotasService.delete(m.id);
         this.cargar();
-        this.snack.open('Mascota eliminada', 'OK', { duration: 2000 });
+        this.snack.open('Mascota desactivada', 'OK', { duration: 2000 });
       }
     });
   }

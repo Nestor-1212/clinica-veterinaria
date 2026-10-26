@@ -4,7 +4,7 @@ import { FormPagoComponent } from './form-pago/form-pago.component';
 
 const routes: Routes = [
   { path: '', component: ListaPagosComponent, title: 'Pagos' },
-  { path: 'nuevo', component: FormPagoComponent, title: 'Registrar pago' }
+  { path: 'nuevo', component: FormPagoComponent, title: 'Nuevo cobro' }
 ];
 
 export default routes;

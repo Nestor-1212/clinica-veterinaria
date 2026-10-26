@@ -1,61 +1,72 @@
 import { Component, OnInit, inject, ElementRef } from '@angular/core';
-import { habilitarSi, validarYEnfocar } from '../../../shared/utils/formulario';
+import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
-import { descuentoValido, subtotalLineas, totalPago } from '../../../core/utils/pagos';
+import { CATEGORIA_TEXTO, METODO_ICONO, METODO_TEXTO, ServicioFrecuente, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from '../../../core/utils/pagos';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PagosService } from '../../../core/services/pagos.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
-import { PdfService } from '../../../core/services/pdf.service';
+import { ConsultasService } from '../../../core/services/consultas.service';
+import { VacunasService } from '../../../core/services/vacunas.service';
 import { Cliente, ItemPago, Mascota, MetodoPago } from '../../../core/models';
+import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatError, MatSuffix, MatInput, MatPrefix } from '@angular/material/input';
+import { MatFormField, MatLabel, MatError, MatInput, MatHint } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
-import { MatDivider } from '@angular/material/list';
 import { MatTooltip } from '@angular/material/tooltip';
-import { DecimalPipe, TitleCasePipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
+import { SelectorPacienteComponent } from '../../../shared/components/selector-paciente/selector-paciente.component';
+import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
+
+/** Cobrar ahora (con el método con que paga) o dejarlo pendiente: se elige siempre, no hay valor por defecto. */
+export type ModoCobro = 'cobrar' | 'pendiente';
 
 @Component({
-    selector: 'app-form-pago',
-    templateUrl: './form-pago.component.html',
-    styleUrls: ['./form-pago.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, MatCard, MatCardContent, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatSuffix, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatDivider, MatPrefix, MatIconButton, MatTooltip, DecimalPipe, TitleCasePipe]
+  selector: 'app-form-pago',
+  templateUrl: './form-pago.component.html',
+  styleUrls: ['./form-pago.component.scss'],
+  imports: [MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatHint, MatTooltip, DecimalPipe, SelectorPacienteComponent, FichaPacienteComponent]
 })
 export class FormPagoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private pagosService = inject(PagosService);
   private clientesService = inject(ClientesService);
   private mascotasService = inject(MascotasService);
-  private pdfService = inject(PdfService);
+  private consultasService = inject(ConsultasService);
+  private vacunasService = inject(VacunasService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
+  private host = inject(ElementRef, { optional: true });
 
   form: FormGroup;
   /** Evita el doble envío: true desde que se acepta el envío hasta navegar. */
   enviando = false;
-  private host = inject(ElementRef, { optional: true });
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
-  cliente: Cliente | null = null;
-  metodosPago: MetodoPago[] = ['efectivo', 'tarjeta', 'yappy', 'transferencia'];
-  categorias = ['consulta', 'medicamento', 'vacuna', 'cirugia', 'examen', 'otro'];
+  mascota: Mascota | null = null;
+  ficha: FichaPaciente | null = null;
+  frecuentes: ServicioFrecuente[] = [];
+  volverA: unknown[] = ['/pagos'];
+
+  readonly metodosPago = Object.keys(METODO_TEXTO) as MetodoPago[];
+  readonly METODO_TEXTO = METODO_TEXTO;
+  readonly METODO_ICONO = METODO_ICONO;
+  readonly CATEGORIA_TEXTO = CATEGORIA_TEXTO;
+  readonly categorias = Object.keys(CATEGORIA_TEXTO) as ItemPago['categoria'][];
 
   constructor() {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
-      // Se habilita al elegir propietario (onClienteChange); antes era [disabled] en la plantilla
-      mascotaId: [{ value: '', disabled: true }, Validators.required],
+      mascotaId: ['', Validators.required],
       consultaId: [''],
-      fecha: [new Date()],
       items: this.fb.array([this.crearItem()]),
       descuento: [0, [Validators.min(0), (c: AbstractControl) => this.validarDescuento(c)]],
-      metodoPago: ['efectivo', Validators.required],
-      estado: ['pagado'],
+      modo: [null as ModoCobro | null, Validators.required],
+      // Obligatorio solo al cobrar ahora (ver elegirModo)
+      metodoPago: [null as MetodoPago | null],
       referencia: [''],
       notas: ['']
     });
@@ -65,21 +76,43 @@ export class FormPagoComponent implements OnInit {
 
   ngOnInit(): void {
     this.clientes = this.clientesService.getAll().filter(c => c.activo);
+    const activos = new Set(this.clientes.map(c => c.id));
+    this.mascotas = this.mascotasService.getAll().filter(m => m.activo !== false && activos.has(m.clienteId));
+    this.frecuentes = serviciosFrecuentes(this.pagosService.getAll());
+
     const params = this.route.snapshot.queryParams;
-    if (params.clienteId) {
+    if (params.mascotaId) {
+      this.onMascotaChange(params.mascotaId);
+      this.volverA = ['/mascotas', params.mascotaId];
+    } else if (params.clienteId) {
+      // Desde la ficha del cliente: si tiene una sola mascota, ya queda elegida
+      const suyas = this.mascotas.filter(m => m.clienteId === params.clienteId);
       this.form.patchValue({ clienteId: params.clienteId });
-      this.onClienteChange(params.clienteId);
+      if (suyas.length === 1) this.onMascotaChange(suyas[0].id);
+      this.volverA = ['/clientes', params.clienteId];
     }
-    if (params.mascotaId) this.form.patchValue({ mascotaId: params.mascotaId });
     if (params.consultaId) this.form.patchValue({ consultaId: params.consultaId });
   }
 
-  onClienteChange(id: string): void {
-    habilitarSi(this.form.get('mascotaId'), !!id);
-    this.mascotas = this.mascotasService.getByCliente(id);
-    this.cliente = this.clientesService.getById(id) || null;
-    if (this.mascotas.length === 1) this.form.patchValue({ mascotaId: this.mascotas[0].id });
+  onMascotaChange(id: string): void {
+    this.mascota = id ? this.mascotasService.getById(id) || null : null;
+    const cliente = this.mascota ? this.clientesService.getById(this.mascota.clienteId) : undefined;
+    this.form.patchValue({ mascotaId: id, clienteId: this.mascota?.clienteId ?? '' });
+    this.ficha = this.mascota
+      ? fichaPaciente(this.mascota, cliente, this.consultasService.getAll(), this.vacunasService.getAll(), new Date())
+      : null;
   }
+
+  get nombreCliente(): string {
+    return this.clientes.find(c => c.id === this.form.value.clienteId)?.nombre ?? '';
+  }
+
+  get pacienteInvalido(): boolean {
+    const c = this.form.get('mascotaId')!;
+    return c.invalid && c.touched;
+  }
+
+  // ---------- Servicios ----------
 
   get items(): FormArray { return this.form.get('items') as FormArray; }
 
@@ -88,15 +121,27 @@ export class FormPagoComponent implements OnInit {
       descripcion: [data?.descripcion || '', Validators.required],
       categoria: [data?.categoria || 'consulta', Validators.required],
       cantidad: [data?.cantidad || 1, [Validators.required, Validators.min(1)]],
-      precioUnitario: [data?.precioUnitario || 0, [Validators.required, Validators.min(0)]],
-      subtotal: [{ value: data?.subtotal || 0, disabled: true }]
+      precioUnitario: [data?.precioUnitario ?? null, [Validators.required, Validators.min(0)]]
     });
   }
 
   agregarItem(): void { this.items.push(this.crearItem()); }
+
+  /** Un toque agrega el servicio con su precio habitual (o llena la primera línea si está vacía). */
+  agregarFrecuente(s: ServicioFrecuente): void {
+    const datos = { descripcion: s.descripcion, categoria: s.categoria, cantidad: 1, precioUnitario: s.precio };
+    const vacia = this.items.controls.find(c => !c.value.descripcion && !c.value.precioUnitario);
+    if (vacia) vacia.patchValue(datos); else this.items.push(this.crearItem(datos));
+  }
+
   removerItem(i: number): void {
     if (this.items.length > 1) this.items.removeAt(i);
     this.revalidarDescuento();
+  }
+
+  subtotalDe(i: number): number {
+    const v = this.items.at(i).value;
+    return (Number(v.cantidad) || 0) * (Number(v.precioUnitario) || 0);
   }
 
   /** B10: el descuento no puede superar el subtotal de los ítems. */
@@ -106,14 +151,7 @@ export class FormPagoComponent implements OnInit {
   }
 
   private revalidarDescuento(): void {
-    this.form.get('descuento')?.updateValueAndValidity();
-  }
-
-  calcularSubtotal(i: number): void {
-    const item = this.items.at(i);
-    const sub = (item.get('cantidad')?.value || 0) * (item.get('precioUnitario')?.value || 0);
-    item.patchValue({ subtotal: sub });
-    this.revalidarDescuento();
+    this.form.get('descuento')?.updateValueAndValidity({ emitEvent: false });
   }
 
   get subtotal(): number {
@@ -121,26 +159,92 @@ export class FormPagoComponent implements OnInit {
   }
 
   /** Total mostrado en pantalla (nunca negativo mientras el descuento es inválido). */
-  get total(): number { return Math.max(0, this.subtotal - (this.form.get('descuento')?.value || 0)); }
+  get total(): number { return Math.max(0, this.subtotal - (Number(this.form.get('descuento')?.value) || 0)); }
+
+  // ---------- Pago ----------
+
+  get modo(): ModoCobro | null { return this.form.value.modo; }
+
+  elegirModo(m: ModoCobro): void {
+    this.form.patchValue({ modo: m });
+    const metodo = this.form.get('metodoPago')!;
+    metodo.setValidators(m === 'cobrar' ? Validators.required : null);
+    if (m === 'pendiente') this.form.patchValue({ metodoPago: null, referencia: '' });
+    metodo.updateValueAndValidity();
+  }
+
+  /** Los dos modos como grupo de radio: las flechas cambian la elección. */
+  navegarModo(ev: KeyboardEvent): void {
+    if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(ev.key)) return;
+    ev.preventDefault();
+    const sig: ModoCobro = this.modo === 'cobrar' ? 'pendiente' : 'cobrar';
+    this.elegirModo(sig);
+    (ev.currentTarget as HTMLElement).parentElement?.querySelector<HTMLElement>(`[data-modo="${sig}"]`)?.focus();
+  }
+
+  elegirMetodo(m: MetodoPago): void { this.form.patchValue({ metodoPago: m }); }
+
+  /** Métodos como grupo de radio: flechas para moverse, como en el panel de cobro. */
+  navegarMetodos(ev: KeyboardEvent, actual: MetodoPago): void {
+    const paso = ({ ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 } as Record<string, number>)[ev.key];
+    if (!paso) return;
+    ev.preventDefault();
+    const n = this.metodosPago.length;
+    const sig = this.metodosPago[(this.metodosPago.indexOf(actual) + paso + n) % n];
+    this.elegirMetodo(sig);
+    (ev.currentTarget as HTMLElement).parentElement?.querySelector<HTMLElement>(`[data-metodo="${sig}"]`)?.focus();
+  }
+
+  get etiquetaReferencia(): string {
+    return ({ yappy: 'Confirmación de Yappy (opcional)', transferencia: 'Número de la transferencia (opcional)', tarjeta: 'Últimos 4 dígitos o voucher (opcional)', efectivo: '' } as Record<MetodoPago, string>)[this.form.value.metodoPago as MetodoPago] ?? '';
+  }
+
+  get textoBoton(): string {
+    const monto = '$' + this.total.toLocaleString('es-PA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return this.modo === 'pendiente' ? `Dejar pendiente ${monto}` : this.modo === 'cobrar' ? `Cobrar ${monto}` : 'Registrar cobro';
+  }
 
   onSubmit(): void {
     this.revalidarDescuento();
     if (this.enviando) return;
-    if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
+    if (this.form.get('mascotaId')!.invalid) {
+      this.form.markAllAsTouched();
+      this.host?.nativeElement.querySelector('#selector-paciente')?.focus();
+      return;
+    }
+    if (!validarYEnfocar(this.form, this.host?.nativeElement)) {
+      // Los grupos de botones no son campos: llevar el foco a la elección que falta
+      const falta = this.form.get('modo')!.invalid ? '.modo' : this.form.get('metodoPago')!.invalid ? '.metodo' : '';
+      if (falta && !this.items.invalid && !this.form.get('descuento')!.invalid) this.host?.nativeElement.querySelector(falta)?.focus();
+      return;
+    }
     this.enviando = true;
-    const rawItems = this.items.controls.map(c => ({
-      ...c.value,
-      subtotal: (c.get('cantidad')?.value || 0) * (c.get('precioUnitario')?.value || 0)
+    const v = this.form.value;
+    const items: ItemPago[] = this.items.controls.map(c => ({
+      descripcion: c.value.descripcion.trim(),
+      categoria: c.value.categoria,
+      cantidad: Number(c.value.cantidad),
+      precioUnitario: Number(c.value.precioUnitario),
+      subtotal: (Number(c.value.cantidad) || 0) * (Number(c.value.precioUnitario) || 0)
     }));
-    const data = {
-      ...this.form.value,
-      items: rawItems,
-      descuento: Number(this.form.value.descuento) || 0,
+    const cobrar = v.modo === 'cobrar';
+    const ahora = new Date();
+    this.pagosService.create({
+      clienteId: v.clienteId,
+      mascotaId: v.mascotaId,
+      consultaId: v.consultaId || undefined,
+      fecha: ahora,
+      items,
+      descuento: Number(v.descuento) || 0,
       subtotal: this.subtotal,
-      total: totalPago(this.subtotal, this.form.value.descuento)
-    };
-    this.pagosService.create(data);
-    this.snack.open('Pago registrado', 'OK', { duration: 2000 });
+      total: totalPago(this.subtotal, v.descuento),
+      // Pendiente: el método real se elige al cobrar (la lista muestra "—" mientras tanto)
+      metodoPago: cobrar ? v.metodoPago : 'efectivo',
+      estado: cobrar ? 'pagado' : 'pendiente',
+      ...(cobrar ? { fechaPago: ahora, referencia: v.referencia?.trim() || undefined } : {}),
+      notas: v.notas?.trim() || undefined
+    });
+    this.snack.open(cobrar ? `Cobro registrado: ${this.textoBoton.replace('Cobrar ', '')}` : 'Cobro pendiente registrado', undefined, { duration: 2500, panelClass: 'snack-centro' });
     this.router.navigate(['/pagos']);
   }
 }

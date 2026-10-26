@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>people</mat-icon> Clientes</h1>
-      <p>{{ conteos.todos }} {{ conteos.todos === 1 ? 'cliente activo' : 'clientes activos' }} con sus mascotas, visitas y citas</p>
+      <p>{{ conteos.todos }} {{ conteos.todos === 1 ? 'cliente registrado' : 'clientes registrados' }} con sus mascotas, visitas y citas</p>
     </div>
     <button mat-flat-button color="primary" routerLink="/clientes/nuevo">
       <mat-icon>person_add</mat-icon> Nuevo cliente
@@ -131,7 +131,7 @@
               <mat-menu #menu="matMenu" xPosition="before">
                 <button mat-menu-item (click)="nuevaCita(f.cliente)"><mat-icon>event</mat-icon>Nueva cita</button>
                 <button mat-menu-item (click)="editar(f.cliente)"><mat-icon>edit</mat-icon>Editar datos</button>
-                <button mat-menu-item class="menu-peligro" (click)="eliminar(f.cliente)"><mat-icon>delete</mat-icon>Eliminar cliente</button>
+                <button mat-menu-item class="menu-peligro" (click)="eliminar(f.cliente)"><mat-icon>person_off</mat-icon>Desactivar cliente</button>
               </mat-menu>
             </td>
           </ng-container>

@@ -1,10 +1,86 @@
-.items-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; h3 { margin: 0; } }
-.item-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 4px; flex-wrap: wrap; }
-.desc { flex: 2; min-width: 180px; } .cat { flex: 1; min-width: 130px; } .num { width: 90px; min-width: 80px; }
-.subtotal-cell { min-width: 80px; text-align: right; padding-top: 12px; font-weight: 600; }
-.totales { background: var(--vs-surface-muted); padding: 12px 16px; border-radius: var(--vs-radius-md); margin: 16px 0; }
-.total-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 15px; }
-.total-final { font-weight: 700; font-size: 18px; color: var(--vs-primary); border-top: 1px solid var(--vs-border); padding-top: 8px; margin-top: 4px; }
-.section-divider { margin: 16px 0; }
-.descuento-field { width: 120px; }
-.notas-field { margin-top: 8px; }
+// Nuevo cobro: esqueleto en src/styles/_registro.scss; buscador y ficha de paciente compartidos.
+
+.h1-paciente { font-weight: 500; color: var(--vs-text-secondary); }
+.ayuda { margin: 0 0 var(--vs-space-2); font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }
+.error-texto { margin: var(--vs-space-2) 0 0; color: var(--vs-danger); font-size: 13px; }
+
+// Servicios frecuentes: un toque agrega la línea con su precio habitual
+.chips { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); margin-bottom: var(--vs-space-4); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 var(--vs-space-4);
+  border: 1px solid var(--vs-border); border-radius: var(--vs-radius-full); background: var(--vs-surface);
+  color: var(--vs-text); font: 500 14px var(--vs-font); cursor: pointer;
+  transition: background var(--vs-dur-fast) var(--vs-ease), border-color var(--vs-dur-fast) var(--vs-ease);
+  &:hover { background: var(--vs-row-hover); border-color: var(--vs-border-strong); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+}
+.chip-precio { color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
+
+// Líneas del cobro
+.lineas { display: grid; gap: 0; }
+.linea {
+  display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(150px, 1fr) 88px 112px 80px 40px; gap: 0 var(--vs-space-3); align-items: start;
+}
+.l-sub { padding-top: 26px; text-align: right; font-weight: 600; color: var(--vs-text); font-variant-numeric: tabular-nums; }
+.l-quitar { margin-top: 14px; }
+.agregar { margin: -4px 0 var(--vs-space-3); }
+
+.totales {
+  display: grid; gap: var(--vs-space-2); margin: 0 0 var(--vs-space-4); margin-left: auto; max-width: 340px;
+  padding-top: var(--vs-space-3); border-top: 1px solid var(--vs-border);
+  > div { display: flex; align-items: center; justify-content: space-between; gap: var(--vs-space-4); }
+  dt { font-size: 14px; color: var(--vs-text-secondary); }
+  dd { margin: 0; font-variant-numeric: tabular-nums; color: var(--vs-text); }
+  .total { padding-top: var(--vs-space-2); border-top: 1px solid var(--vs-border);
+    dt { font-weight: 600; color: var(--vs-text); } dd { font-size: 24px; font-weight: 700; } }
+}
+.descuento-field { width: 140px; margin-top: 0 !important; }
+
+// Cobrar ahora / dejar pendiente
+.modos { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vs-space-3); }
+.modo {
+  display: flex; align-items: center; gap: var(--vs-space-3); min-height: 64px; padding: var(--vs-space-3) var(--vs-space-4);
+  border: 1.5px solid var(--vs-border); border-radius: var(--vs-radius-lg); background: var(--vs-surface);
+  color: var(--vs-text); font: 14px var(--vs-font); text-align: left; cursor: pointer;
+  mat-icon { flex: none; color: var(--vs-text-muted); }
+  span { display: grid; gap: 2px; }
+  small { font-size: 13px; color: var(--vs-text-secondary); }
+  &:hover { border-color: var(--vs-border-strong); background: var(--vs-row-hover); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-checked='true'] { border-color: var(--vs-primary); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft);
+    mat-icon { color: var(--vs-primary); } small { color: var(--vs-on-primary-soft); } }
+}
+.modos.error .modo { border-color: var(--vs-danger); }
+
+.metodos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--vs-space-2); }
+.ayuda + .metodos, .modos + .ayuda, .error-texto + .ayuda { margin-top: 0; }
+.modos + .ayuda, .error-texto + .ayuda { padding-top: var(--vs-space-4); }
+.metodo {
+  display: grid; justify-items: center; gap: 4px; min-height: 64px; padding: var(--vs-space-2);
+  border: 1.5px solid var(--vs-border); border-radius: var(--vs-radius-lg); background: var(--vs-surface);
+  color: var(--vs-text); font: 500 13px var(--vs-font); cursor: pointer;
+  mat-icon { color: var(--vs-primary); }
+  &:hover { border-color: var(--vs-border-strong); background: var(--vs-row-hover); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
+  &[aria-checked='true'] { border-color: var(--vs-primary); background: var(--vs-primary-soft); color: var(--vs-on-primary-soft); font-weight: 600; }
+}
+.referencia { display: block; max-width: 360px; }
+.notas { display: block; width: 100%; margin-top: var(--vs-space-4) !important; }
+
+@media (max-width: 1023px) {
+  .ficha { position: static; order: -1; }
+  // Sin paciente elegido, la ficha vacía solo empujaría el formulario hacia abajo
+  .ficha.sin-ficha { display: none; }
+}
+@media (max-width: 899px) {
+  .linea { grid-template-columns: minmax(0, 1fr) 96px 120px 40px;
+    .l-desc { grid-column: 1 / -1; } .l-cat { grid-column: 1 / -1; } .l-sub { display: none; } }
+  .linea + .linea { padding-top: var(--vs-space-3); border-top: 1px dashed var(--vs-border); }
+}
+@media (max-width: 599px) {
+  .linea { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; }
+  .modos { grid-template-columns: 1fr; }
+  .metodos { grid-template-columns: 1fr 1fr; }
+  .totales { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }

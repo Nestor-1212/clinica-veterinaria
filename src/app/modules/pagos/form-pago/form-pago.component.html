@@ -1,138 +1,145 @@
 <div class="page-container">
   <div class="page-header">
-    <div><h1><mat-icon>payments</mat-icon> Registrar Pago / Factura</h1><p>Cobro de servicios veterinarios</p></div>
-    <button mat-stroked-button routerLink="/pagos"><mat-icon>arrow_back</mat-icon> Volver</button>
+    <div>
+      <h1><mat-icon>point_of_sale</mat-icon> Nuevo cobro@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
+      <p>Paciente, servicios y cómo paga el cliente</p>
+    </div>
+    <button mat-button type="button" [routerLink]="volverA"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>
 
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Cliente</mat-label>
-            <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-              @for (c of clientes; track c) {
-                <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
-              }
-            </mat-select>
-            <mat-error>Seleccione el cliente</mat-error>
-          </mat-form-field>
+  <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="vs-registro-secciones">
+      <section class="vs-seccion" aria-labelledby="s-paciente">
+        <h2 id="s-paciente"><mat-icon aria-hidden="true">pets</mat-icon>Paciente</h2>
+        <app-selector-paciente [mascotas]="mascotas" [clientes]="clientes" [seleccion]="form.value.mascotaId"
+          [invalido]="pacienteInvalido" (elegir)="onMascotaChange($event)" />
+      </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Mascota</mat-label>
-            <mat-select formControlName="mascotaId">
-              @for (m of mascotas; track m) {
-                <mat-option [value]="m.id">{{ m.nombre }}</mat-option>
-              }
-            </mat-select>
-            <mat-error>Seleccione la mascota</mat-error>
-          </mat-form-field>
+      <section class="vs-seccion" aria-labelledby="s-servicios">
+        <h2 id="s-servicios"><mat-icon aria-hidden="true">medical_services</mat-icon>Servicios</h2>
+        @if (frecuentes.length) {
+          <p class="ayuda" id="ayuda-frecuentes">Toque un servicio para agregarlo con su precio habitual</p>
+          <div class="chips" role="group" aria-labelledby="ayuda-frecuentes">
+            @for (s of frecuentes; track s.descripcion) {
+              <button type="button" class="chip" (click)="agregarFrecuente(s)"
+                [attr.aria-label]="'Agregar ' + s.descripcion + ', $' + (s.precio | number: '1.2-2')">
+                {{ s.descripcion }} <span class="chip-precio">${{ s.precio | number: '1.2-2' }}</span>
+              </button>
+            }
+          </div>
+        }
 
-          <mat-form-field appearance="outline">
-            <mat-label>Método de Pago</mat-label>
-            <mat-select formControlName="metodoPago">
-              @for (m of metodosPago; track m) {
-                <mat-option [value]="m">{{ m | titlecase }}</mat-option>
-              }
-            </mat-select>
-            <mat-icon matSuffix>payment</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Estado</mat-label>
-            <mat-select formControlName="estado">
-              <mat-option value="pagado">Pagado</mat-option>
-              <mat-option value="pendiente">Pendiente</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Referencia / No. Transacción</mat-label>
-            <input matInput formControlName="referencia">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="dp" formControlName="fecha">
-            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-            <mat-datepicker #dp></mat-datepicker>
-          </mat-form-field>
-        </div>
-
-        <mat-divider class="section-divider"></mat-divider>
-
-        <!-- Items -->
-        <div class="items-header">
-          <h3>Servicios / Productos</h3>
-          <button mat-stroked-button color="primary" type="button" (click)="agregarItem()">
-            <mat-icon>add</mat-icon> Agregar ítem
-          </button>
-        </div>
-
-        <div formArrayName="items">
+        <div formArrayName="items" class="lineas">
           @for (item of items.controls; track item; let i = $index) {
-            <div [formGroupName]="i" class="item-row">
-              <mat-form-field appearance="outline" class="desc">
-                <mat-label>Descripción</mat-label>
-                <input matInput formControlName="descripcion" placeholder="Ej: Consulta general">
-                <mat-error>Requerido</mat-error>
+            <div [formGroupName]="i" class="linea">
+              <mat-form-field appearance="outline" class="l-desc">
+                <mat-label>Servicio o producto</mat-label>
+                <input matInput formControlName="descripcion" placeholder="Ej: Consulta veterinaria" autocomplete="off">
+                <mat-error>Indique qué se cobra</mat-error>
               </mat-form-field>
-              <mat-form-field appearance="outline" class="cat">
-                <mat-label>Categoría</mat-label>
+              <mat-form-field appearance="outline" class="l-cat">
+                <mat-label>Tipo</mat-label>
                 <mat-select formControlName="categoria">
-                  @for (c of categorias; track c) {
-                    <mat-option [value]="c">{{ c | titlecase }}</mat-option>
-                  }
+                  @for (c of categorias; track c) { <mat-option [value]="c">{{ CATEGORIA_TEXTO[c] }}</mat-option> }
                 </mat-select>
               </mat-form-field>
-              <mat-form-field appearance="outline" class="num">
-                <mat-label>Cant.</mat-label>
-                <input matInput type="number" formControlName="cantidad" min="1" (input)="calcularSubtotal(i)">
+              <mat-form-field appearance="outline" class="l-num">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" formControlName="cantidad" min="1" inputmode="numeric">
+                <mat-error>Mínimo 1</mat-error>
               </mat-form-field>
-              <mat-form-field appearance="outline" class="num">
+              <mat-form-field appearance="outline" class="l-precio">
                 <mat-label>Precio</mat-label>
-                <input matInput type="number" formControlName="precioUnitario" min="0" step="0.01" (input)="calcularSubtotal(i)">
                 <span matTextPrefix>$&nbsp;</span>
+                <input matInput type="number" formControlName="precioUnitario" min="0" step="0.01" inputmode="decimal">
+                <mat-error>Indique el precio</mat-error>
               </mat-form-field>
-              <div class="subtotal-cell">${{ (item.get('cantidad')?.value * item.get('precioUnitario')?.value) | number:'1.2-2' }}</div>
-              <button mat-icon-button color="warn" type="button" (click)="removerItem(i)" [disabled]="items.length === 1" [attr.aria-label]="'Eliminar ítem ' + (i + 1)" matTooltip="Eliminar ítem">
-                <mat-icon>delete</mat-icon>
+              <div class="l-sub" [attr.aria-label]="'Subtotal de la línea ' + (i + 1)">${{ subtotalDe(i) | number: '1.2-2' }}</div>
+              <button mat-icon-button type="button" class="l-quitar" (click)="removerItem(i)" [disabled]="items.length === 1"
+                [attr.aria-label]="'Quitar línea ' + (i + 1)" matTooltip="Quitar línea">
+                <mat-icon>close</mat-icon>
               </button>
             </div>
           }
         </div>
+        <button mat-button type="button" class="agregar" (click)="agregarItem()"><mat-icon>add</mat-icon> Agregar otra línea</button>
 
-        <!-- Totales -->
-        <div class="totales">
-          <div class="total-row"><span>Subtotal:</span><span>${{ subtotal | number:'1.2-2' }}</span></div>
-          <div class="total-row">
-            <span>Descuento:</span>
-            <mat-form-field appearance="outline" class="descuento-field">
-              <input matInput type="number" formControlName="descuento" min="0" step="0.01">
-              <span matTextPrefix>$&nbsp;</span>
-              @if (form.get('descuento')?.hasError('descuentoMayorQueSubtotal')) {
-                <mat-error>No puede superar el subtotal</mat-error>
-              }
-              @if (form.get('descuento')?.hasError('min')) {
-                <mat-error>No puede ser negativo</mat-error>
-              }
-            </mat-form-field>
+        <dl class="totales">
+          <div><dt>Subtotal</dt><dd>${{ subtotal | number: '1.2-2' }}</dd></div>
+          <div class="descuento">
+            <dt><label for="descuento">Descuento</label></dt>
+            <dd>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="descuento-field">
+                <span matTextPrefix>$&nbsp;</span>
+                <input matInput id="descuento" type="number" formControlName="descuento" min="0" step="0.01" inputmode="decimal">
+                @if (form.get('descuento')?.hasError('descuentoMayorQueSubtotal')) {
+                  <mat-error>No puede superar el subtotal</mat-error>
+                } @else if (form.get('descuento')?.hasError('min')) {
+                  <mat-error>No puede ser negativo</mat-error>
+                }
+              </mat-form-field>
+            </dd>
           </div>
-          <div class="total-row total-final"><span>TOTAL:</span><span>${{ total | number:'1.2-2' }}</span></div>
-        </div>
+          <div class="total"><dt>Total</dt><dd>${{ total | number: '1.2-2' }}</dd></div>
+        </dl>
+      </section>
 
-        <mat-form-field appearance="outline" class="full-width notas-field">
-          <mat-label>Notas</mat-label>
-          <textarea matInput formControlName="notas" rows="2"></textarea>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/pagos">Cancelar</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="enviando">
-            <mat-icon>receipt</mat-icon> Registrar Pago
+      <section class="vs-seccion" aria-labelledby="s-pago">
+        <h2 id="s-pago"><mat-icon aria-hidden="true">payments</mat-icon>Pago</h2>
+        <div class="modos" role="radiogroup" aria-labelledby="s-pago" [class.error]="form.get('modo')!.invalid && form.get('modo')!.touched">
+          <button type="button" class="modo" role="radio" data-modo="cobrar" [attr.aria-checked]="modo === 'cobrar'"
+            [attr.tabindex]="modo === 'pendiente' ? -1 : 0" (click)="elegirModo('cobrar')" (keydown)="navegarModo($event)">
+            <mat-icon aria-hidden="true">check_circle</mat-icon>
+            <span><strong>Cobrar ahora</strong><small>El cliente paga en este momento</small></span>
+          </button>
+          <button type="button" class="modo" role="radio" data-modo="pendiente" [attr.aria-checked]="modo === 'pendiente'"
+            [attr.tabindex]="modo === 'pendiente' ? 0 : -1" (click)="elegirModo('pendiente')" (keydown)="navegarModo($event)">
+            <mat-icon aria-hidden="true">schedule</mat-icon>
+            <span><strong>Dejar pendiente</strong><small>Se cobra después desde Pagos</small></span>
           </button>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+        @if (form.get('modo')!.invalid && form.get('modo')!.touched) {
+          <p class="error-texto" role="alert">Elija si cobra ahora o lo deja pendiente</p>
+        }
+
+        @if (modo === 'cobrar') {
+          <p class="ayuda" id="ayuda-metodo">¿Con qué paga el cliente?</p>
+          <div class="metodos" role="radiogroup" aria-labelledby="ayuda-metodo">
+            @for (m of metodosPago; track m; let i = $index) {
+              <button type="button" class="metodo" role="radio" [attr.data-metodo]="m"
+                [attr.aria-checked]="form.value.metodoPago === m"
+                [attr.tabindex]="(form.value.metodoPago ? form.value.metodoPago === m : i === 0) ? 0 : -1"
+                (click)="elegirMetodo(m)" (keydown)="navegarMetodos($event, m)">
+                <mat-icon aria-hidden="true">{{ METODO_ICONO[m] }}</mat-icon>{{ METODO_TEXTO[m] }}
+              </button>
+            }
+          </div>
+          @if (form.get('metodoPago')!.invalid && form.get('metodoPago')!.touched) {
+            <p class="error-texto" role="alert">Elija el método de pago</p>
+          }
+          @if (etiquetaReferencia) {
+            <mat-form-field appearance="outline" class="referencia">
+              <mat-label>{{ etiquetaReferencia }}</mat-label>
+              <input matInput formControlName="referencia" autocomplete="off">
+            </mat-form-field>
+          }
+        }
+
+        <mat-form-field appearance="outline" class="notas">
+          <mat-label>Notas (opcional)</mat-label>
+          <textarea matInput formControlName="notas" rows="2"></textarea>
+          @if (modo === 'pendiente') { <mat-hint>Por ejemplo, cuándo acordó pagar el cliente</mat-hint> }
+        </mat-form-field>
+      </section>
+
+      <div class="vs-acciones">
+        <button mat-stroked-button type="button" [routerLink]="volverA">Cancelar</button>
+        <button mat-flat-button type="submit" [disabled]="enviando">
+          <mat-icon>{{ modo === 'pendiente' ? 'schedule' : 'point_of_sale' }}</mat-icon> {{ textoBoton }}
+        </button>
+      </div>
+    </div>
+
+    <app-ficha-paciente class="ficha" [class.sin-ficha]="!ficha" [ficha]="ficha" textoVacio="Busque al paciente para ver su ficha y la última consulta." />
+  </form>
 </div>

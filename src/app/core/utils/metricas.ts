@@ -256,7 +256,10 @@ export interface ClienteSinVolver {
 }
 
 export interface ResumenClientes {
+  /** Con alguna visita en los últimos 90 días. */
   activos: number;
+  /** Clientes registrados (activos en el sistema). */
+  registrados: number;
   nuevosMes: number;
   nuevosMesAnterior: number;
   /** Clientes cuya última visita fue hace más de 90 días y sin cita futura. */
@@ -283,6 +286,7 @@ export function resumenClientes(clientes: Cliente[], mascotas: Mascota[], consul
     .sort((a, b) => new Date(b.fechaRegistro).getTime() - new Date(a.fechaRegistro).getTime());
   return {
     activos: activos.filter(c => ultima.has(c.id) && diasDesde(ultima.get(c.id)!, hoy) <= 90).length,
+    registrados: activos.length,
     nuevosMes: nuevos.length,
     nuevosMesAnterior: activos.filter(c => { const f = new Date(c.fechaRegistro); return f >= iniAnt && f < ini; }).length,
     sinVolver, nuevos

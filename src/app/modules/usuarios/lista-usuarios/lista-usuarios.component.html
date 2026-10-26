@@ -30,7 +30,7 @@
         <div class="p-cabecera">
           <span class="avatar" aria-hidden="true">{{ iniciales(u) }}</span>
           <div class="p-nombre">
-            <h2>{{ u.nombre }} {{ u.apellido }}@if (u.id === yo) { <span class="tu">Tú</span> }</h2>
+            <h2>{{ u.nombre }} {{ u.apellido }}@if (u.id === yo) { <span class="tu">Usted</span> }</h2>
             <span class="rol"><mat-icon aria-hidden="true">{{ iconoRol(u.rol) }}</mat-icon>{{ getRolLabel(u.rol) }}@if (u.especialidad) { · {{ u.especialidad }} }</span>
           </div>
           <button mat-icon-button [matMenuTriggerFor]="menu" matTooltip="Más acciones" [attr.aria-label]="'Más acciones para ' + u.nombre + ' ' + u.apellido"><mat-icon>more_vert</mat-icon></button>

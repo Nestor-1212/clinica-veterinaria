@@ -20,7 +20,7 @@ export class CobrarService {
   /** @param alDeshacer se llama si el usuario deshace el cobro desde el aviso (para refrescar la vista). */
   cobrar(pago: Pago, cliente: string, mascota: string, alDeshacer?: () => void): Observable<boolean> {
     const datos: DatosCobro = { pago, cliente, mascota };
-    return this.dialog.open<CobroDialogComponent, DatosCobro, ResultadoCobro | boolean>(CobroDialogComponent, { data: datos, width: '520px', maxWidth: '94vw', autoFocus: 'dialog' })
+    return this.dialog.open<CobroDialogComponent, DatosCobro, ResultadoCobro | boolean>(CobroDialogComponent, { data: datos, width: '520px', maxWidth: '94vw', autoFocus: '.metodo' })
       .afterClosed()
       .pipe(
         map(r => {

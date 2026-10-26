@@ -44,31 +44,34 @@
       </div>
 
       <!-- Escritorio: tablero por veterinario -->
-      <div class="tablero" role="table" [attr.aria-label]="'Agenda del ' + (dia | date: 'd MMMM')" [style.--vets]="veterinarios.length">
+      <p id="ayuda-tablero" class="sr-only">Use las flechas para moverse por la agenda: arriba y abajo dentro de un veterinario, izquierda y derecha entre veterinarios.</p>
+      <div class="tablero" role="table" [attr.aria-label]="'Agenda del ' + (dia | date: 'd MMMM')" aria-describedby="ayuda-tablero"
+        [style.--vets]="veterinarios.length" (keydown)="navegarTablero($event)">
         <div class="fila fila--cabecera" role="row">
           <span class="esquina" role="columnheader"><span class="sr-only">Hora</span></span>
           @for (v of veterinarios; track v.id) {
             <div class="vet" role="columnheader" [class.vet--yo]="v.id === yo">
               <span class="vet-avatar" aria-hidden="true">{{ v.nombre.charAt(0) }}</span>
               <span class="vet-texto">
-                <strong>{{ v.nombre }} {{ v.apellido }}@if (v.id === yo) { <span class="tu">Tú</span> }</strong>
+                <strong>{{ v.nombre }} {{ v.apellido }}@if (v.id === yo) { <span class="tu">Usted</span> }</strong>
                 <small>{{ v.especialidad || 'Medicina general' }} · {{ citasPorVet[v.id] || 0 }} {{ citasPorVet[v.id] === 1 ? 'cita' : 'citas' }}</small>
               </span>
             </div>
           }
         </div>
-        @for (t of tramos; track t) {
+        @for (t of tramos; track t; let ti = $index) {
           @if (t === tramoAhora) {
             <div class="ahora" role="presentation"><span>Ahora · {{ horaAhora }}</span></div>
           }
           <div class="fila" role="row" [class.fila--hora]="t.endsWith(':00')">
             <span class="tramo" role="rowheader">{{ t }}</span>
-            @for (v of veterinarios; track v.id) {
+            @for (v of veterinarios; track v.id; let vi = $index) {
               <div class="hueco" role="cell">
-                @for (c of citasEn(v.id, t); track c.id) {
+                @for (c of citasEn(v.id, t); track c.id; let k = $index) {
                   <button type="button" class="bloque" [class]="'bloque bloque--' + c.estado" [class.bloque--falta]="noLlego(c)"
                     [matMenuTriggerFor]="menuCita" [matMenuTriggerData]="{ c: c }"
-                    [attr.aria-label]="c.hora + ', ' + getMascota(c.mascotaId) + ' de ' + getCliente(c.clienteId) + ', ' + textoEstado(c)">
+                    [attr.data-celda]="ti + ',' + vi + ',' + k" [attr.tabindex]="esEntrada(ti, vi, k) ? 0 : -1"
+                    [attr.aria-label]="c.hora + ', ' + getMascota(c.mascotaId) + (mascota(c.mascotaId)?.alergias ? ', tiene alergias' : '') + ', de ' + getCliente(c.clienteId) + ', ' + c.motivo + ', ' + textoEstado(c)">
                     <span class="bloque-linea">
                       <span class="bloque-hora">{{ c.hora }}</span>
                       <mat-icon class="bloque-especie" aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>
@@ -80,7 +83,8 @@
                   </button>
                 } @empty {
                   @if (puedeAgendar(t)) {
-                    <button type="button" class="libre" (click)="agendarEn(v, t)" [attr.aria-label]="'Agendar con ' + v.nombre + ' a las ' + t">
+                    <button type="button" class="libre" (click)="agendarEn(v, t)" [attr.aria-label]="'Hueco libre: agendar con ' + v.nombre + ' a las ' + t"
+                      [attr.data-celda]="ti + ',' + vi + ',0'" [attr.tabindex]="esEntrada(ti, vi, 0) ? 0 : -1">
                       <mat-icon aria-hidden="true">add</mat-icon>{{ t }}
                     </button>
                   }
@@ -90,6 +94,23 @@
           </div>
         }
       </div>
+
+      <!-- Móvil: próximos huecos libres por veterinario (agendar sin tablero) -->
+      @if (proximosHuecos.length) {
+        <section class="huecos-movil" aria-labelledby="huecos-titulo">
+          <h3 id="huecos-titulo">Próximos huecos libres</h3>
+          @for (h of proximosHuecos; track h.vet.id) {
+            <div class="hm-fila">
+              <span class="hm-vet">{{ h.vet.nombre }} {{ h.vet.apellido.charAt(0) }}.</span>
+              <span class="hm-horas">
+                @for (t of h.tramos; track t) {
+                  <button type="button" class="hm-hora" (click)="agendarEn(h.vet, t)" [attr.aria-label]="'Agendar con ' + h.vet.nombre + ' a las ' + t">{{ t }}</button>
+                }
+              </span>
+            </div>
+          }
+        </section>
+      }
 
       <!-- Móvil: lista del día -->
       <ol class="lista-dia" aria-label="Citas del día">

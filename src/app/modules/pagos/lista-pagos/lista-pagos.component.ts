@@ -159,8 +159,9 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   getCliente(id: string): string { return this.clientes.get(id)?.nombre ?? this.clientesService.getById(id)?.nombre ?? '-'; }
   getMascota(id: string): string { return this.mascotas.get(id)?.nombre ?? this.mascotasService.getById(id)?.nombre ?? '-'; }
   concepto(p: Pago): string { return conceptoPago(p); }
-  textoMetodo(p: Pago): string { return METODO_TEXTO[p.metodoPago]; }
-  iconoMetodo(p: Pago): string { return METODO_ICONO[p.metodoPago]; }
+  /** Un pendiente aún no tiene método real: se elige al cobrar. */
+  textoMetodo(p: Pago): string { return p.estado === 'pendiente' ? '—' : METODO_TEXTO[p.metodoPago]; }
+  iconoMetodo(p: Pago): string { return p.estado === 'pendiente' ? '' : METODO_ICONO[p.metodoPago]; }
   relativo(fecha: Date | string): string { return tiempoRelativo(fecha, this.hoy); }
   diasPendiente(p: Pago): number { return diasDesde(p.fecha, this.hoy); }
 
@@ -170,6 +171,8 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   }
 
   moneda(n: number): string { return '$' + n.toLocaleString('es-PA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  /** Cifras agregadas (indicadores): en dólares enteros, como en el Dashboard y Reportes. Cada pago lleva centavos. */
+  cifra(n: number): string { return '$' + Math.round(n).toLocaleString('es-PA'); }
 
   /** "1–23 sep": tramo del mes anterior con el que se compara. */
   get contra(): string {

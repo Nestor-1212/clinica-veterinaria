@@ -5,7 +5,7 @@ export interface LineaCobro {
   precioUnitario?: number | null;
 }
 
-import { MetodoPago, Pago } from '../models';
+import { ItemPago, MetodoPago, Pago } from '../models';
 
 /** Redondea a centavos para evitar arrastre de decimales binarios (0.1 + 0.2). */
 export function redondearCentavos(valor: number): number {
@@ -70,4 +70,33 @@ export function conceptoPago(p: Pago): string {
 export function mensajeCobro(p: Pago, nombreCliente: string, nombreMascota: string): string {
   const nombre = nombreCliente.split(' ')[0];
   return `Hola ${nombre}, le escribimos de la clínica veterinaria: tiene un saldo pendiente de $${p.total.toFixed(2)} por la atención de ${nombreMascota}. Puede pagar por Yappy, transferencia o en la clínica. ¡Gracias!`;
+}
+
+// ---------- Nuevo cobro ----------
+
+export const CATEGORIA_TEXTO: Record<ItemPago['categoria'], string> = {
+  consulta: 'Consulta', vacuna: 'Vacuna', examen: 'Examen', medicamento: 'Medicamento', cirugia: 'Cirugía', otro: 'Otro'
+};
+
+export interface ServicioFrecuente { descripcion: string; categoria: ItemPago['categoria']; precio: number; veces: number; }
+
+/** Servicios más cobrados (sin anulados), con el último precio usado como sugerencia. */
+export function serviciosFrecuentes(pagos: Pago[], limite = 8): ServicioFrecuente[] {
+  const mapa = new Map<string, ServicioFrecuente & { fecha: number }>();
+  for (const p of pagos) {
+    if (p.estado === 'anulado') continue;
+    const fecha = new Date(p.fecha).getTime();
+    for (const i of p.items) {
+      const clave = i.descripcion.trim().toLowerCase();
+      if (!clave) continue;
+      const previo = mapa.get(clave);
+      if (!previo) { mapa.set(clave, { descripcion: i.descripcion.trim(), categoria: i.categoria, precio: i.precioUnitario, veces: 1, fecha }); continue; }
+      previo.veces++;
+      if (fecha > previo.fecha) Object.assign(previo, { precio: i.precioUnitario, categoria: i.categoria, fecha });
+    }
+  }
+  return [...mapa.values()]
+    .sort((a, b) => b.veces - a.veces || a.descripcion.localeCompare(b.descripcion, 'es'))
+    .slice(0, limite)
+    .map(({ descripcion, categoria, precio, veces }) => ({ descripcion, categoria, precio, veces }));
 }

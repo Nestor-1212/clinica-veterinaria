@@ -102,7 +102,8 @@ export class ReportesComponent implements OnInit {
     return c.variacion === null ? null : { porcentaje: c.variacion, contra: 'vs. ' + this.rango.anterior.etiqueta, subirEsBueno };
   }
 
-  readonly moneda = (v: number) => '$' + v.toLocaleString('es-PA', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  /** Cifras agregadas en dólares enteros (igual que Dashboard y los indicadores de Pagos). */
+  readonly moneda = (v: number) => '$' + Math.round(v).toLocaleString('es-PA');
   readonly entero = (v: number) => v.toLocaleString('es-PA');
 
   get maxServicio(): number { return Math.max(...this.servicios.map(s => s.total), 1); }

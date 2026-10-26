@@ -18,9 +18,10 @@
   <!-- Con qué paga -->
   <fieldset class="metodos" [class.metodos--error]="intentado() && !metodo()">
     <legend>¿Con qué paga el cliente?</legend>
-    <div class="metodos-rejilla" role="radiogroup">
-      @for (m of metodos; track m) {
-        <button type="button" class="metodo" role="radio" [attr.aria-checked]="metodo() === m" (click)="elegir(m)">
+    <div class="metodos-rejilla" role="radiogroup" aria-label="Método de pago">
+      @for (m of metodos; track m; let i = $index) {
+        <button type="button" class="metodo" role="radio" [attr.data-metodo]="m" [attr.aria-checked]="metodo() === m"
+          [attr.tabindex]="(metodo() ? metodo() === m : i === 0) ? 0 : -1" (click)="elegir(m)" (keydown)="navegar($event, m)">
           <mat-icon aria-hidden="true">{{ METODO_ICONO[m] }}</mat-icon>{{ METODO_TEXTO[m] }}
         </button>
       }

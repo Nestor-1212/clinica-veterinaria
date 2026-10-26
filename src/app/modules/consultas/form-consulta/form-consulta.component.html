@@ -11,10 +11,10 @@
     <div class="sin-paciente">
       <mat-icon aria-hidden="true">pets</mat-icon>
       <h2>Elija primero al paciente</h2>
-      <p>Las consultas se inician desde una cita de hoy o desde una atención sin cita.</p>
+      <p>Las consultas se inician desde una cita de hoy o desde una atención inmediata.</p>
       <div class="sin-paciente-acciones">
         <a mat-stroked-button routerLink="/consultas"><mat-icon>list</mat-icon>Pacientes por atender</a>
-        <a mat-flat-button routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }"><mat-icon>add</mat-icon>Atender sin cita</a>
+        <a mat-flat-button routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }"><mat-icon>bolt</mat-icon>Atención inmediata</a>
       </div>
     </div>
   } @else {
@@ -26,10 +26,14 @@
           <div class="dos">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Temperatura</mat-label>
-              <input matInput type="number" inputmode="decimal" formControlName="temperatura" step="0.1" placeholder="38.5">
+              <input matInput type="number" inputmode="decimal" formControlName="temperatura" step="0.1">
               <span matTextSuffix>°C</span>
               <mat-hint>{{ rangoTexto }}</mat-hint>
-              <mat-error>Temperatura entre 30 y 45 °C</mat-error>
+              @if (form.get('temperatura')?.hasError('required')) {
+                <mat-error>Indique la temperatura</mat-error>
+              } @else {
+                <mat-error>Revise el valor: debe estar entre 30 y 45 °C</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Peso actual</mat-label>

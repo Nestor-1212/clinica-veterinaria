@@ -10,8 +10,8 @@
           <mat-icon>{{ soloMias ? 'person' : 'groups' }}</mat-icon> {{ soloMias ? 'Viendo: solo mías' : 'Viendo: toda la clínica' }}
         </button>
       }
-      <button mat-flat-button routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }">
-        <mat-icon>add</mat-icon> Atender sin cita
+      <button mat-stroked-button class="vs-btn-urgent" routerLink="/citas/nueva" [queryParams]="{ tipo: 'inmediata' }">
+        <mat-icon>bolt</mat-icon> Atención inmediata
       </button>
     </div>
   </div>
@@ -43,7 +43,7 @@
         }
       </ul>
     } @else {
-      <p class="espera-vacia"><mat-icon aria-hidden="true">task_alt</mat-icon>No hay pacientes esperando. Las atenciones sin cita y las citas de hoy aparecerán aquí.</p>
+      <p class="espera-vacia"><mat-icon aria-hidden="true">task_alt</mat-icon>No hay pacientes esperando. Las atenciones inmediatas y las citas de hoy aparecerán aquí.</p>
     }
   </section>
 

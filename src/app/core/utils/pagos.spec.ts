@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, subtotalLineas, totalPago } from './pagos';
+import { cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from './pagos';
 import { Pago } from '../models';
 
 describe('Cálculo de pagos (B10)', () => {
@@ -49,5 +49,22 @@ describe('lista de pagos', () => {
     const p = pago(10, 'efectivo', 'pagado', HOY);
     expect(conceptoPago(p)).toBe('Consulta');
     expect(conceptoPago({ ...p, items: [...p.items, ...p.items] })).toBe('Consulta + 1 más');
+  });
+});
+
+describe('serviciosFrecuentes', () => {
+  const pago = (fecha: string, items: [string, number][], estado: Pago['estado'] = 'pagado'): Pago => ({
+    id: fecha + items[0][0], clienteId: 'c', mascotaId: 'm', fecha, estado, metodoPago: 'efectivo', descuento: 0, subtotal: 0, total: 0,
+    items: items.map(([descripcion, precio]) => ({ descripcion, categoria: 'consulta', cantidad: 1, precioUnitario: precio, subtotal: precio }))
+  });
+
+  it('ordena por veces cobrado y sugiere el último precio usado', () => {
+    const r = serviciosFrecuentes([
+      pago('2026-01-01', [['Consulta veterinaria', 20], ['Desparasitación', 8]]),
+      pago('2026-03-01', [['Consulta veterinaria', 25]]),
+      pago('2026-02-01', [['consulta veterinaria ', 22]]),
+      pago('2026-03-02', [['Desparasitación', 99]], 'anulado')
+    ]);
+    expect(r.map(s => [s.descripcion, s.veces, s.precio])).toEqual([['Consulta veterinaria', 3, 25], ['Desparasitación', 1, 8]]);
   });
 });

@@ -144,9 +144,9 @@ export class ListaClientesComponent implements OnInit, AfterViewInit {
   eliminar(cliente: Cliente): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Eliminar cliente',
-        message: `¿Desea eliminar a ${cliente.nombre}? Sus datos serán desactivados.`,
-        confirmText: 'Eliminar',
+        title: 'Desactivar cliente',
+        message: `¿Desactivar a ${cliente.nombre}? Deja de aparecer en las listas, pero su historial, mascotas y pagos se conservan.`,
+        confirmText: 'Desactivar',
         color: 'warn'
       }
     });
@@ -154,7 +154,7 @@ export class ListaClientesComponent implements OnInit, AfterViewInit {
       if (result) {
         this.clientesService.delete(cliente.id);
         this.cargarClientes();
-        this.snack.open('Cliente eliminado', 'OK', { duration: 2000 });
+        this.snack.open('Cliente desactivado', 'OK', { duration: 2000 });
       }
     });
   }

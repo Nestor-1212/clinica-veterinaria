@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, AfterViewInit, ElementRef } from '@angular/core';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
@@ -58,6 +58,7 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
   readonly yo = this.auth.currentUser?.id;
 
   vista: VistaCitas = 'agenda';
+  private host = inject(ElementRef, { optional: true });
   dia = inicioDia(new Date());
   ahora = new Date();
   veterinarios: Usuario[] = [];
@@ -100,7 +101,17 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     this.cargar();
   }
 
-  ngAfterViewInit(): void { this.dataSource.paginator = this.paginator; this.dataSource.sort = this.sort; }
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+    this.irAAhora();
+  }
+
+  /** Hoy, la agenda abre desplazada a la línea "Ahora" (no a las 07:00 ya pasadas). */
+  private irAAhora(): void {
+    if (this.vista !== 'agenda' || !this.esHoy || typeof document === 'undefined') return;
+    setTimeout(() => this.host?.nativeElement.querySelector('.tablero .ahora')?.scrollIntoView({ block: 'center' }));
+  }
 
   cargar(): void {
     this.ahora = new Date();
@@ -130,12 +141,64 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     this.resumen = resumenDelDia(this.citas, this.dia, this.ahora);
     this.delDia = this.citas.filter(c => c.estado !== 'cancelada' && mismoDia(c.fecha, this.dia)).sort((a, b) => a.hora.localeCompare(b.hora));
     this.citasPorVet = Object.fromEntries(this.veterinarios.map(v => [v.id, this.delDia.filter(c => c.veterinarioId === v.id).length]));
+    this.calcularEntrada();
+    this.proximosHuecos = this.veterinarios.map(v => ({
+      vet: v,
+      tramos: this.tramos.filter(t => this.puedeAgendar(t) && !this.citasEn(v.id, t).length).slice(0, 4)
+    })).filter(x => x.tramos.length);
+  }
+
+  // ---------- Teclado en el tablero (un solo Tab entra; las flechas recorren) ----------
+  /** Elemento del tablero que recibe el Tab: "tramo,vet,orden". */
+  entrada = '';
+  /** Próximos huecos libres por veterinario (móvil, donde no hay tablero). */
+  proximosHuecos: { vet: Usuario; tramos: string[] }[] = [];
+
+  private calcularEntrada(): void {
+    const desde = Math.max(0, this.tramoAhora ? this.tramos.indexOf(this.tramoAhora) : 0);
+    const buscar = (ini: number, fin: number) => {
+      for (let ti = ini; ti < fin; ti++) {
+        for (let vi = 0; vi < this.veterinarios.length; vi++) {
+          const t = this.tramos[ti];
+          if (this.citasEn(this.veterinarios[vi].id, t).length || this.puedeAgendar(t)) return `${ti},${vi},0`;
+        }
+      }
+      return '';
+    };
+    this.entrada = buscar(desde, this.tramos.length) || buscar(0, desde);
+  }
+
+  esEntrada(ti: number, vi: number, k: number): boolean { return this.entrada === `${ti},${vi},${k}`; }
+
+  navegarTablero(ev: KeyboardEvent): void {
+    const flechas = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const actual = (ev.target as HTMLElement).closest<HTMLElement>('[data-celda]');
+    if (!flechas.includes(ev.key) || !actual) return;
+    ev.preventDefault();
+    const pos = (el: HTMLElement) => el.dataset['celda']!.split(',').map(Number);
+    const [ti, vi] = pos(actual);
+    const todos = Array.from((ev.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('[data-celda]')).map(el => ({ el, p: pos(el) }));
+    const orden = (a: number[], b: number[]) => a[0] - b[0] || a[2] - b[2];
+    let destino: HTMLElement | undefined;
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+      const columna = todos.filter(x => x.p[1] === vi).sort((a, b) => orden(a.p, b.p));
+      const i = columna.findIndex(x => x.el === actual);
+      destino = columna[ev.key === 'ArrowDown' ? i + 1 : i - 1]?.el;
+    } else {
+      const otra = vi + (ev.key === 'ArrowRight' ? 1 : -1);
+      const columna = todos.filter(x => x.p[1] === otra).sort((a, b) => orden(a.p, b.p));
+      destino = (columna.find(x => x.p[0] >= ti) ?? columna[columna.length - 1])?.el;
+    }
+    if (!destino) return;
+    this.entrada = destino.dataset['celda']!;
+    destino.focus();
   }
 
   // ---------- Vista y día ----------
   elegirVista(v: VistaCitas): void {
     this.vista = v;
     this.sincronizarUrl();
+    this.irAAhora();
   }
 
   moverDia(dias: number): void {
@@ -149,6 +212,7 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     this.dia = inicioDia(fecha);
     this.actualizarDia();
     this.sincronizarUrl();
+    this.irAAhora();
   }
 
   get esHoy(): boolean { return mismoDia(this.dia, this.ahora); }

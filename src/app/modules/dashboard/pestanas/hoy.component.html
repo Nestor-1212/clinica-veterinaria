@@ -3,7 +3,7 @@
   <app-kpi etiqueta="Atenciones inmediatas" [valor]="entero(resumen().inmediatas)" [tono]="resumen().inmediatas ? 'atencion' : null"
     [ayuda]="resumen().inmediatas ? 'Esperando atención ahora' : 'Ninguna en espera'"></app-kpi>
   @if (!esVet()) {
-    <app-kpi etiqueta="Por confirmar" [valor]="entero(porConfirmar().length)"
+    <app-kpi [etiqueta]="'Por confirmar ' + cuandoManana()" [valor]="entero(porConfirmar().length)"
       [ayuda]="'Citas del ' + (manana() | date: 'EEEE d')"></app-kpi>
     <app-kpi etiqueta="Vacunas por avisar" [valor]="entero(avisos().length)" enlace="/vacunas"
       ayuda="Vencidas o vencen en 7 días"></app-kpi>
@@ -163,7 +163,7 @@
       <section class="seccion manana" aria-labelledby="titulo-manana">
         <header class="cabecera">
           <div>
-            <h2 id="titulo-manana">{{ cuandoManana() === 'mañana' ? 'Tus citas de mañana' : 'Tus citas d' + cuandoManana() }}</h2>
+            <h2 id="titulo-manana">{{ cuandoManana() === 'mañana' ? 'Sus citas de mañana' : 'Sus citas d' + cuandoManana() }}</h2>
             <p>{{ manana() | date: "EEEE d 'de' MMMM" }} · {{ plural(mananaMias().length, 'cita') }}</p>
           </div>
         </header>

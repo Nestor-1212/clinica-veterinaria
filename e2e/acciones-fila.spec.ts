@@ -9,12 +9,12 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
     await expect(page).toHaveURL(/\/citas\/nueva\?clienteId=/);
   });
 
-  test('"Eliminar" abre la confirmación sin navegar al expediente', async ({ page }) => {
+  test('"Desactivar" abre la confirmación sin navegar al expediente', async ({ page }) => {
     await login(page, 'admin');
     await page.goto('/clientes');
-    // Eliminar vive en el menú "Más acciones" de la fila
+    // Desactivar vive en el menú "Más acciones" de la fila
     await page.getByRole('button', { name: /^Más acciones para / }).first().click();
-    await page.getByRole('menuitem', { name: /Eliminar cliente/ }).click();
+    await page.getByRole('menuitem', { name: /Desactivar cliente/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page).toHaveURL(/\/clientes$/);
     await page.getByRole('button', { name: 'Cancelar' }).click();

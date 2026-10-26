@@ -49,6 +49,17 @@ export class CobroDialogComponent {
     this.recibido.set(null);
   }
 
+  /** Grupo de radio: las flechas eligen el método anterior o siguiente (un solo Tab entra al grupo). */
+  navegar(ev: KeyboardEvent, actual: MetodoPago): void {
+    const paso = ({ ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 } as Record<string, number>)[ev.key];
+    if (!paso) return;
+    ev.preventDefault();
+    const n = this.metodos.length;
+    const sig = this.metodos[(this.metodos.indexOf(actual) + paso + n) % n];
+    this.elegir(sig);
+    (ev.currentTarget as HTMLElement).parentElement?.querySelector<HTMLElement>(`[data-metodo="${sig}"]`)?.focus();
+  }
+
   /** Billetes habituales para el efectivo: el total exacto y los siguientes redondos. */
   get billetes(): number[] {
     const t = this.total;

@@ -11,26 +11,26 @@
   @if (ingresos && cobrar) {
     <section class="resumen" aria-label="Resumen de cobros">
       <div class="resumen-cifras">
-        <app-kpi hero etiqueta="Cobrado este mes" [valor]="moneda(ingresos.mes)"
+        <app-kpi hero etiqueta="Cobrado este mes" [valor]="cifra(ingresos.mes)"
           [delta]="ingresos.variacion === null ? null : { porcentaje: ingresos.variacion, contra: contra, subirEsBueno: true }"
-          [ayuda]="ingresos.cobros + ' cobros · mes anterior completo: ' + moneda(ingresos.mesAnterior)"></app-kpi>
+          [ayuda]="ingresos.cobros + ' cobros · mes anterior completo: ' + cifra(ingresos.mesAnterior)"></app-kpi>
         <div class="resumen-secundarias">
-          <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar.total)" [tono]="atrasado ? 'atencion' : null"
-            [ayuda]="cobrar.cantidad + (cobrar.cantidad === 1 ? ' pendiente' : ' pendientes') + (atrasado ? ' · ' + moneda(atrasado) + ' con más de 30 días' : '')"></app-kpi>
-          <app-kpi etiqueta="Cobrado hoy" [valor]="moneda(hoyCobrado.total)" [ayuda]="hoyCobrado.cantidad + (hoyCobrado.cantidad === 1 ? ' cobro' : ' cobros')"></app-kpi>
-          <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos.ticketPromedio)"
+          <app-kpi etiqueta="Por cobrar" [valor]="cifra(cobrar.total)" [tono]="atrasado ? 'atencion' : null"
+            [ayuda]="cobrar.cantidad + (cobrar.cantidad === 1 ? ' pendiente' : ' pendientes') + (atrasado ? ' · ' + cifra(atrasado) + ' con más de 30 días' : '')"></app-kpi>
+          <app-kpi etiqueta="Cobrado hoy" [valor]="cifra(hoyCobrado.total)" [ayuda]="hoyCobrado.cantidad + (hoyCobrado.cantidad === 1 ? ' cobro' : ' cobros')"></app-kpi>
+          <app-kpi class="kpi-ticket" etiqueta="Ticket promedio" [valor]="cifra(ingresos.ticketPromedio)"
             [delta]="ingresos.variacionTicket === null ? null : { porcentaje: ingresos.variacionTicket, contra: contra, subirEsBueno: true }"></app-kpi>
         </div>
       </div>
       @if (metodos.length) {
-        <div class="metodos">
+        <div class="metodos metodos-escritorio">
           <h2>Cobrado por método este mes</h2>
           <ul>
             @for (m of metodos; track m.metodo) {
               <li>
                 <span class="m-nombre"><mat-icon aria-hidden="true">{{ METODO_ICONO[m.metodo] }}</mat-icon>{{ METODO_TEXTO[m.metodo] }}</span>
                 <span class="m-barra" aria-hidden="true"><span [style.width.%]="m.porcentaje"></span></span>
-                <span class="m-valor">{{ moneda(m.total) }} <small>{{ m.porcentaje }} %</small></span>
+                <span class="m-valor">{{ cifra(m.total) }} <small>{{ m.porcentaje }} %</small></span>
               </li>
             }
           </ul>
@@ -85,7 +85,7 @@
           <ng-container matColumnDef="metodo">
             <th mat-header-cell *matHeaderCellDef class="hide-sm">Método</th>
             <td mat-cell *matCellDef="let p" class="hide-sm c-metodo">
-              <span class="metodo"><mat-icon aria-hidden="true">{{ iconoMetodo(p) }}</mat-icon>{{ textoMetodo(p) }}</span>
+              <span class="metodo">@if (iconoMetodo(p); as icono) { <mat-icon aria-hidden="true">{{ icono }}</mat-icon> }<span [attr.aria-label]="p.estado === 'pendiente' ? 'Sin método todavía' : null">{{ textoMetodo(p) }}</span></span>
             </td>
           </ng-container>
 
@@ -114,7 +114,7 @@
             <th mat-header-cell *matHeaderCellDef><span class="sr-only">Acciones</span></th>
             <td mat-cell *matCellDef="let p" class="cell-actions c-acciones">
               @if (p.estado === 'pendiente') {
-                <button mat-stroked-button type="button" class="cobrar" (click)="marcarPagado(p)" [attr.aria-label]="'Marcar pagado el cobro de ' + getCliente(p.clienteId)">
+                <button mat-stroked-button type="button" class="cobrar" (click)="marcarPagado(p)" [attr.aria-label]="'Cobrar ' + moneda(p.total) + ' a ' + getCliente(p.clienteId)">
                   <mat-icon>price_check</mat-icon> Cobrar
                 </button>
               }

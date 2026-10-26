@@ -102,7 +102,7 @@ export class LoginComponent {
       }
     } else {
       this.loading = false;
-      this.snack.open('El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.', 'Cerrar', { duration: 6000, panelClass: 'snack-error' });
+      this.snack.open('El correo o la contraseña no son correctos. Revíselos e inténtelo de nuevo.', 'Cerrar', { duration: 6000, panelClass: 'snack-error' });
       // Se conserva lo escrito y queda seleccionado para reescribirlo de una vez
       queueMicrotask(() => {
         const input = this.host?.nativeElement?.querySelector('input[formControlName="password"]') as HTMLInputElement | null;

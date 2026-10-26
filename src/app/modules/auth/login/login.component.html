@@ -11,17 +11,17 @@
   </header>
 
   <main class="hoja" aria-labelledby="titulo-login">
-    <h1 id="titulo-login">Inicia sesión</h1>
-    <p class="hoja-sub">Entra con tu correo de la clínica.</p>
+    <h1 id="titulo-login">Iniciar sesión</h1>
+    <p class="hoja-sub">Ingrese con su correo de la clínica.</p>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <mat-form-field appearance="outline" class="campo">
         <mat-label>Correo electrónico</mat-label>
         <input matInput type="email" formControlName="correo" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
         @if (form.get('correo')?.hasError('required')) {
-          <mat-error>Escribe tu correo</mat-error>
+          <mat-error>Escriba su correo</mat-error>
         } @else if (form.get('correo')?.hasError('email')) {
-          <mat-error>Revisa el formato, por ejemplo nombre&#64;clinica.com</mat-error>
+          <mat-error>Revise el formato, por ejemplo nombre&#64;clinica.com</mat-error>
         }
       </mat-form-field>
 
@@ -37,7 +37,7 @@
           <mat-hint class="aviso-mayus"><mat-icon aria-hidden="true">keyboard_capslock</mat-icon>Bloq Mayús está activado</mat-hint>
         }
         @if (form.get('password')?.hasError('required')) {
-          <mat-error>Escribe tu contraseña</mat-error>
+          <mat-error>Escriba su contraseña</mat-error>
         }
       </mat-form-field>
       <span class="sr-only" aria-live="polite">{{ bloqMayus ? 'Bloq Mayús está activado' : '' }}</span>
@@ -45,12 +45,12 @@
       <div class="fila-ayudas">
         <mat-checkbox formControlName="recordar">Recordar mi correo</mat-checkbox>
         <button type="button" class="enlace" (click)="mostrarAyudaPassword = !mostrarAyudaPassword"
-          [attr.aria-expanded]="mostrarAyudaPassword" aria-controls="ayuda-password">¿Olvidaste tu contraseña?</button>
+          [attr.aria-expanded]="mostrarAyudaPassword" aria-controls="ayuda-password">¿Olvidó su contraseña?</button>
       </div>
       @if (mostrarAyudaPassword) {
         <p id="ayuda-password" class="ayuda">
           <mat-icon aria-hidden="true">info</mat-icon>
-          <span>Pide al administrador de la clínica que la restablezca desde <strong>Usuarios</strong>. Después entra con la contraseña nueva.</span>
+          <span>Pida al administrador de la clínica que la restablezca desde <strong>Usuarios</strong>. Después ingrese con la contraseña nueva.</span>
         </p>
       }
 

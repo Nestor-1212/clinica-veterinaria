@@ -15,7 +15,7 @@
       </div>
       <div class="acciones">
         @if (puede.cita) {
-          <button mat-flat-button type="button" class="btn-urgente" (click)="nuevaConsulta()"><mat-icon>bolt</mat-icon> Atención inmediata</button>
+          <button mat-stroked-button type="button" class="vs-btn-urgent" (click)="nuevaConsulta()"><mat-icon>bolt</mat-icon> Atención inmediata</button>
           <button mat-stroked-button type="button" (click)="nuevaCita()"><mat-icon>event_available</mat-icon> Nueva cita</button>
         }
         <button mat-stroked-button type="button" [matMenuTriggerFor]="mas" aria-label="Más acciones para la mascota"><mat-icon>more_horiz</mat-icon> Más</button>

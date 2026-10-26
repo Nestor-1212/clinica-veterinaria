@@ -1,8 +1,8 @@
 <div class="banda">
   <app-kpi hero etiqueta="Clientes para recuperar" [valor]="entero(resumen().sinVolver.length)"
     ayuda="Más de 90 días sin venir y sin cita"></app-kpi>
-  <app-kpi etiqueta="Clientes activos" [valor]="entero(resumen().activos)" enlace="/clientes"
-    ayuda="Con alguna visita en los últimos 90 días"></app-kpi>
+  <app-kpi etiqueta="Con visita en 90 días" [valor]="entero(resumen().activos)" enlace="/clientes"
+    [ayuda]="'De ' + entero(resumen().registrados) + ' clientes registrados'"></app-kpi>
   <app-kpi etiqueta="Clientes nuevos" [valor]="entero(resumen().nuevosMes)"
     [delta]="variacionNuevos() === null ? null : { porcentaje: variacionNuevos()!, contra: 'vs. mes anterior', subirEsBueno: true }"
     [ayuda]="comparacionNuevos()"></app-kpi>

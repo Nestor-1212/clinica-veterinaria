@@ -9,7 +9,12 @@ export type EstadoRecordatorio = 'vencida' | 'proxima';
  * Mismo criterio que usaba el dashboard (proximaFecha < hoy).
  */
 export function estadoRecordatorio(v: Pick<Vacuna, 'proximaFecha'>, hoy: Date = new Date()): EstadoRecordatorio {
-  return new Date(v.proximaFecha) < hoy ? 'vencida' : 'proxima';
+  // Por día, no por hora: una vacuna que vence hoy todavía no está vencida (mismo criterio que filasVacunas)
+  const proxima = new Date(v.proximaFecha);
+  proxima.setHours(0, 0, 0, 0);
+  const inicioHoy = new Date(hoy);
+  inicioHoy.setHours(0, 0, 0, 0);
+  return proxima < inicioHoy ? 'vencida' : 'proxima';
 }
 
 /** Ordena por próxima fecha ascendente (las vencidas primero). */
