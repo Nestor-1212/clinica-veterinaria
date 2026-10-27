@@ -36,8 +36,8 @@
               </span>
               <small>{{ getCliente(c.clienteId) }} · {{ c.motivo }}@if (!soloMias) { · {{ vetCorto(c.veterinarioId) }} }</small>
             </span>
-            <button mat-flat-button type="button" [class.btn-urgente]="c.estado === 'inmediata'" (click)="atender(c)" [attr.aria-label]="'Atender a ' + getMascota(c.mascotaId)">
-              <mat-icon>medical_services</mat-icon> Atender
+            <button mat-flat-button type="button" [class.btn-urgente]="c.estado === 'inmediata'" (click)="atender(c)" [attr.aria-label]="'Iniciar consulta de ' + getMascota(c.mascotaId)">
+              <mat-icon>medical_services</mat-icon> Iniciar consulta
             </button>
           </li>
         }
@@ -117,7 +117,7 @@
               @if (recetaDe(c)) {
                 <a mat-button class="receta-ver" [routerLink]="verRecetas ? ['/recetas', recetaDe(c)] : null" [attr.aria-label]="'Ver receta de ' + getMascota(c.mascotaId)"><mat-icon>description</mat-icon>Ver</a>
               } @else if (verRecetas) {
-                <button mat-button type="button" class="receta-crear" (click)="receta(c)" [attr.aria-label]="'Crear receta para ' + getMascota(c.mascotaId)"><mat-icon>add</mat-icon>Crear</button>
+                <button mat-button type="button" class="receta-crear" (click)="receta(c)" [attr.aria-label]="'Crear receta para ' + getMascota(c.mascotaId)"><mat-icon>add</mat-icon>Receta</button>
               } @else {
                 <span class="tenue">—</span>
               }

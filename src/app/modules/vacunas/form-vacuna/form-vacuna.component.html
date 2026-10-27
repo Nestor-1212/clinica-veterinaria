@@ -9,6 +9,7 @@
 
   <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="vs-registro-secciones">
+      <app-resumen-errores />
       <section class="vs-seccion" aria-labelledby="s-paciente">
         <h2 id="s-paciente"><mat-icon aria-hidden="true">pets</mat-icon>Paciente</h2>
         <app-selector-paciente [mascotas]="mascotas" [clientes]="clientes" [seleccion]="form.value.mascotaId"

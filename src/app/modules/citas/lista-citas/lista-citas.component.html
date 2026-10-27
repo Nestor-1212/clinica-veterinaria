@@ -17,7 +17,7 @@
   <div class="vs-segmentado vistas" role="group" aria-label="Vista de citas">
     <button type="button" [attr.aria-pressed]="vista === 'agenda'" (click)="elegirVista('agenda')"><mat-icon aria-hidden="true">view_week</mat-icon>Agenda</button>
     <button type="button" [attr.aria-pressed]="vista === 'confirmar'" (click)="elegirVista('confirmar')"><mat-icon aria-hidden="true">mark_chat_read</mat-icon>Por confirmar <span class="vs-cuenta">{{ totalPorConfirmar }}</span></button>
-    <button type="button" [attr.aria-pressed]="vista === 'historial'" (click)="elegirVista('historial')"><mat-icon aria-hidden="true">history</mat-icon>Historial</button>
+    <button type="button" [attr.aria-pressed]="vista === 'historial'" (click)="elegirVista('historial')"><mat-icon aria-hidden="true">list</mat-icon>Todas las citas</button>
   </div>
 
   <!-- ===== Agenda del día ===== -->
@@ -253,7 +253,7 @@
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas del historial"></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de todas las citas"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

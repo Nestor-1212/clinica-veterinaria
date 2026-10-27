@@ -7,7 +7,7 @@ import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna
  * Versión de los datos de demostración. Al subirla, los navegadores en modo demo
  * regeneran los datos una vez (se reemplazan las colecciones clínicas; los usuarios se conservan).
  */
-export const VERSION_DATOS_DEMO = 7;
+export const VERSION_DATOS_DEMO = 8;
 const CLAVE_VERSION = 'vet_demo_version';
 const COLECCIONES_CLINICAS = ['vet_clientes', 'vet_mascotas', 'vet_citas', 'vet_consultas', 'vet_examenes', 'vet_recetas', 'vet_pagos', 'vet_vacunas'];
 
@@ -188,7 +188,7 @@ export class DemoSeedService {
     ];
     const mascotas: Mascota[] = conocidas.map(([ci, nombre, tipo, raza, sexo, edad, peso, color, alergias]) => ({
       id: id(), clienteId: clientes[ci].id, nombre, tipo, raza, sexo, edad, peso, color,
-      fechaNacimiento: addDays(hoy, -Math.round(edad * 365)), activo: true, ...(alergias ? { alergias } : {})
+      fechaNacimiento: addDays(hoy, -Math.round(edad * 365)), activo: true, ...(alergias ? { alergias } : { sinAlergiasConocidas: true })
     }));
     for (const cliente of clientes.slice(6)) {
       const cuantas = azar.pesado([[1, 70], [2, 30]] as const);
@@ -200,7 +200,8 @@ export class DemoSeedService {
           id: id(), clienteId: cliente.id, nombre: azar.uno(NOMBRES_MASCOTA), tipo, raza: azar.uno(RAZAS[tipo]),
           sexo: azar.prob(0.5) ? 'macho' : 'hembra', edad, peso, color: azar.uno(COLORES),
           fechaNacimiento: addDays(hoy, -edad * 365 - azar.entero(0, 300)), activo: true,
-          ...(azar.prob(0.08) ? { alergias: azar.uno(['Alergia al pollo', 'Sensibilidad a la penicilina', 'Alergia a pulgas']) } : {})
+          // Sin alergias: en dos de cada tres se preguntó y quedó registrado; el resto queda "sin registrar"
+          ...(azar.prob(0.08) ? { alergias: azar.uno(['Alergia al pollo', 'Sensibilidad a la penicilina', 'Alergia a pulgas']) } : mascotas.length % 3 !== 2 ? { sinAlergiasConocidas: true } : {})
         });
       }
     }

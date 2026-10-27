@@ -62,7 +62,7 @@ export interface FilaVacuna {
  * Una fila por mascota activa y vacuna (su última dosis), con el estado del refuerzo:
  * vencida, próxima (dentro de `horizonte` días) o al día. Ordenadas por próxima fecha.
  */
-export function filasVacunas(vacunas: Vacuna[], mascotas: Mascota[], clientes: Cliente[], hoy: Date, horizonte = 30): FilaVacuna[] {
+export function filasVacunas(vacunas: Vacuna[], mascotas: Mascota[], clientes: Cliente[], hoy: Date, horizonte = DIAS_AVISO_VACUNA): FilaVacuna[] {
   const mascota = new Map(mascotas.filter(m => m.activo).map(m => [m.id, m]));
   const cliente = new Map(clientes.map(c => [c.id, c]));
   const inicio = new Date(hoy);
@@ -80,9 +80,15 @@ export function filasVacunas(vacunas: Vacuna[], mascotas: Mascota[], clientes: C
     .sort((a, b) => a.dias - b.dias);
 }
 
+/** Una sola ventana de aviso de refuerzos en todo el sistema (Dashboard, Vacunas, Clientes, Reportes). */
+export const DIAS_AVISO_VACUNA = 30;
+
 /** "vencida hace 12 días", "vence hoy", "en 5 días", "en 3 meses". */
 export function textoVencimiento(dias: number): string {
   if (dias === 0) return 'vence hoy';
+  // Igual que en el Dashboard: "ayer" y "mañana", no "hace 1 día"
+  if (dias === -1) return 'vencida ayer';
+  if (dias === 1) return 'mañana';
   const n = Math.abs(dias);
   const meses = Math.round(n / 30);
   const anios = Math.round(n / 365);

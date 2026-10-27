@@ -19,6 +19,8 @@
   </dl>
   @if (f.mascota.alergias) {
     <p class="ficha-alergia" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ f.mascota.alergias }}</span></p>
+  } @else if (f.mascota.sinAlergiasConocidas) {
+    <p class="ficha-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias conocidas</p>
   } @else {
     <p class="ficha-linea ficha-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias sin registrar: pregunte al dueño</p>
   }

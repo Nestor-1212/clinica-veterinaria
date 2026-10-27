@@ -19,12 +19,13 @@ import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatError, MatHint, MatInput, MatSuffix } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-consulta',
     templateUrl: './form-consulta.component.html',
     styleUrls: ['./form-consulta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, FichaPacienteComponent]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, FichaPacienteComponent]
 })
 export class FormConsultaComponent implements OnInit {
   private fb = inject(FormBuilder);

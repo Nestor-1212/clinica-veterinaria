@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Cita, Cliente, Consulta, Mascota, Vacuna } from '../models';
-import { conteoSegmentosMascotas, edadEnAnios, enSegmentoMascotas, filasMascotas, sugerirRazas } from './mascotas';
+import { conteoSegmentosMascotas, edadEnAnios, enSegmentoMascotas, estadoAlergias, filasMascotas, sugerirRazas } from './mascotas';
 
 const HOY = new Date(2026, 9, 22, 12, 0);
 const dias = (n: number, h = 10) => new Date(2026, 9, 22 + n, h, 0);
@@ -57,5 +57,13 @@ describe('registro de mascotas', () => {
     expect(edadEnAnios(new Date(2026, 5, 1), HOY)).toBe(0);
     expect(edadEnAnios(new Date(2027, 0, 1), HOY)).toBeNull();
     expect(edadEnAnios('', HOY)).toBeNull();
+  });
+});
+
+describe('estadoAlergias', () => {
+  it('distingue alergias, "sin alergias conocidas" y no preguntado', () => {
+    expect(estadoAlergias({ alergias: 'Penicilina' })).toBe('tiene');
+    expect(estadoAlergias({ alergias: '  ', sinAlergiasConocidas: true })).toBe('ninguna');
+    expect(estadoAlergias({})).toBe('sin-registrar');
   });
 });

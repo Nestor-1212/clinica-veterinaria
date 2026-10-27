@@ -9,6 +9,7 @@
 
   <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="vs-registro-secciones">
+      <app-resumen-errores />
       <section class="vs-seccion" aria-labelledby="s-persona">
         <h2 id="s-persona"><mat-icon aria-hidden="true">badge</mat-icon>Persona</h2>
         <div class="dos">

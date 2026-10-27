@@ -23,12 +23,13 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatError, MatHint, MatInput, MatSuffix } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-examen',
     templateUrl: './form-examen.component.html',
     styleUrls: ['./form-examen.component.scss'],
-    imports: [MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, FichaPacienteComponent, SelectorPacienteComponent]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, FichaPacienteComponent, SelectorPacienteComponent]
 })
 export class FormExamenComponent implements OnInit {
   private fb = inject(FormBuilder);

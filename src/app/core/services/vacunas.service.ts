@@ -1,3 +1,4 @@
+import { DIAS_AVISO_VACUNA } from '../utils/vacunas';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Mascota, Vacuna } from '../models';
@@ -51,16 +52,16 @@ export class VacunasService {
   }
 
   /**
-   * B5: vacunas vencidas o que vencen en los próximos 7 días.
+   * B5: vacunas vencidas o que vencen dentro de la ventana de aviso (DIAS_AVISO_VACUNA).
    * Solo cuenta la dosis más reciente de cada vacuna por mascota (una dosis posterior
    * reemplaza a la anterior) y excluye mascotas inactivas.
    */
   getPendientes(hoy: Date = new Date()): Vacuna[] {
-    const en7dias = new Date(hoy.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const limite = new Date(hoy.getTime() + DIAS_AVISO_VACUNA * 24 * 60 * 60 * 1000);
     const activas = new Set(this.storage.get<Mascota>(MASCOTAS_KEY).filter(m => m.activo).map(m => m.id));
     return ultimasDosis(this.getAll())
       .filter(v => activas.has(v.mascotaId))
-      .filter(v => new Date(v.proximaFecha) <= en7dias);
+      .filter(v => new Date(v.proximaFecha) <= limite);
   }
 
   create(data: Omit<Vacuna, 'id'>): Vacuna {

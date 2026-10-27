@@ -35,8 +35,10 @@
       </dl>
       @if (mascota?.alergias) {
         <p class="alergias" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ mascota?.alergias }}</span></p>
+      } @else if (mascota?.sinAlergiasConocidas) {
+        <p class="alergias alergias--sin-dato"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias conocidas</p>
       } @else {
-        <p class="alergias alergias--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias: no indicadas en el expediente</p>
+        <p class="alergias alergias--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias sin registrar en el expediente</p>
       }
       <div class="receta-rx">
         <div class="rx-symbol">Rp/</div>

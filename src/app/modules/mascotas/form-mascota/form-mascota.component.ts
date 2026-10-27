@@ -13,15 +13,17 @@ import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatSuffix, MatError, MatHint, MatInput } from '@angular/material/input';
-import { MatSelect, MatOption } from '@angular/material/select';
+import { MatOption } from '@angular/material/select';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { SelectorClienteComponent } from '../../../shared/components/selector-cliente/selector-cliente.component';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-mascota',
     templateUrl: './form-mascota.component.html',
     styleUrls: ['./form-mascota.component.scss'],
-    imports: [MatIcon, MatButton, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatHint, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, EdadPipe]
+    imports: [ResumenErroresComponent, SelectorClienteComponent, MatIcon, MatButton, ReactiveFormsModule, MatFormField, MatLabel, MatOption, MatSuffix, MatError, MatHint, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, EdadPipe]
 })
 export class FormMascotaComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -62,6 +64,7 @@ export class FormMascotaComponent implements OnInit {
       color: ['', Validators.required],
       fechaNacimiento: [''],
       alergias: [''],
+      sinAlergiasConocidas: [false],
       foto: ['']
     });
     const ctrl = (n: string) => this.form.get(n)!;
@@ -96,6 +99,16 @@ export class FormMascotaComponent implements OnInit {
     }
   }
 
+  elegirDueno(id: string): void {
+    this.form.patchValue({ clienteId: id });
+    this.form.get('clienteId')!.markAsTouched();
+  }
+
+  get duenoInvalido(): boolean {
+    const c = this.form.get('clienteId')!;
+    return c.invalid && c.touched;
+  }
+
   get dueno(): Cliente | undefined {
     const id = this.form.get('clienteId')?.value;
     return id ? this.clientes.find(c => c.id === id) : undefined;
@@ -126,8 +139,18 @@ export class FormMascotaComponent implements OnInit {
     this.form.patchValue({ foto: '' });
   }
 
+  /** "Sin alergias conocidas" y una lista de alergias se excluyen: marcar uno borra el otro. */
+  alMarcarSinAlergias(): void {
+    if (this.v('sinAlergiasConocidas')) this.form.patchValue({ alergias: '' });
+  }
+
   onSubmit(): void {
     if (this.enviando) return;
+    if (this.form.get('clienteId')!.invalid) {
+      this.form.markAllAsTouched();
+      this.host?.nativeElement.querySelector('#selector-cliente')?.focus();
+      return;
+    }
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.enviando = true;
     const data = this.form.value;

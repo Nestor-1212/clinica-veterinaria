@@ -1,0 +1,34 @@
+@if (elegido(); as c) {
+  <div class="elegida">
+    <span class="icono" aria-hidden="true"><mat-icon>person</mat-icon></span>
+    <span class="texto">
+      <strong>{{ c.nombre }}</strong>
+      <small>Cédula {{ c.cedula }} · {{ c.telefono }}</small>
+    </span>
+    <button mat-button type="button" (click)="cambiar()" [attr.aria-label]="'Cambiar de propietario (ahora ' + c.nombre + ')'">Cambiar</button>
+  </div>
+} @else {
+  <!-- El aviso va encima: debajo lo taparía la lista de sugerencias, que se abre al recibir el foco -->
+  @if (invalido()) { <p class="error-arriba" id="selector-cliente-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>Elija el propietario</p> }
+  <mat-form-field appearance="outline" class="buscar" subscriptSizing="dynamic" [class.mat-form-field-invalid]="invalido()">
+    <mat-label>Propietario</mat-label>
+    <input matInput id="selector-cliente" [value]="texto()" (input)="alEscribir($event)" [matAutocomplete]="auto"
+      placeholder="Nombre, cédula o teléfono" autocomplete="off" required [attr.aria-invalid]="invalido()"
+      [attr.aria-describedby]="invalido() ? 'selector-cliente-error' : null">
+    <mat-icon matSuffix>search</mat-icon>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="alElegir($event)">
+      @for (c of filtrados(); track c.id) {
+        <mat-option [value]="c.id">
+          <span class="opcion">
+            <mat-icon aria-hidden="true">person</mat-icon>
+            <strong>{{ c.nombre }}</strong>
+            <small>{{ c.cedula }} · {{ c.telefono }}</small>
+          </span>
+        </mat-option>
+      } @empty {
+        <mat-option disabled>Ningún cliente coincide</mat-option>
+      }
+    </mat-autocomplete>
+    <mat-hint>Busque por nombre, cédula o teléfono</mat-hint>
+  </mat-form-field>
+}

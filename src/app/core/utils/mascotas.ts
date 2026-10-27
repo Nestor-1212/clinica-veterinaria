@@ -77,3 +77,11 @@ export function edadEnAnios(nacimiento: Date | string | null | undefined, hoy: D
   if (hoy.getMonth() < n.getMonth() || (hoy.getMonth() === n.getMonth() && hoy.getDate() < n.getDate())) anios--;
   return anios;
 }
+
+/** Tiene alergias, se confirmó que no tiene, o nadie lo ha preguntado todavía. */
+export type EstadoAlergias = 'tiene' | 'ninguna' | 'sin-registrar';
+
+export function estadoAlergias(m: Pick<Mascota, 'alergias' | 'sinAlergiasConocidas'> | null | undefined): EstadoAlergias {
+  if (m?.alergias?.trim()) return 'tiene';
+  return m?.sinAlergiasConocidas ? 'ninguna' : 'sin-registrar';
+}

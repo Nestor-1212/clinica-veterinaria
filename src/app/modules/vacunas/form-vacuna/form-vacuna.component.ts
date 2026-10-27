@@ -24,12 +24,13 @@ import { MatSelect, MatOption } from '@angular/material/select';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 import { DatePipe } from '@angular/common';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-vacuna',
     templateUrl: './form-vacuna.component.html',
     styleUrls: ['./form-vacuna.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, DatePipe, FichaPacienteComponent, SelectorPacienteComponent]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatHint, MatInput, MatAutocomplete, MatAutocompleteTrigger, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, DatePipe, FichaPacienteComponent, SelectorPacienteComponent]
 })
 export class FormVacunaComponent implements OnInit {
   private fb = inject(FormBuilder);

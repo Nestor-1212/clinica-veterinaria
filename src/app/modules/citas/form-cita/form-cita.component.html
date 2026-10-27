@@ -16,6 +16,7 @@
 
   <form class="triage" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="triage-pasos">
+      <app-resumen-errores />
       <!-- Paciente -->
       <section class="paso" aria-labelledby="paso-paciente">
         <h2 id="paso-paciente"><span class="paso-num" aria-hidden="true">1</span>Paciente</h2>

@@ -9,6 +9,7 @@
 
   <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="vs-registro-secciones">
+      <app-resumen-errores />
       <section class="vs-seccion" aria-labelledby="s-rx">
         <div class="rx-cabecera">
           <h2 id="s-rx"><span class="rx" aria-hidden="true">Rp/</span>Medicamentos <span class="vs-cuenta">{{ items.length }}</span></h2>

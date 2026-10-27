@@ -12,12 +12,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatInput, MatError, MatHint, MatSuffix } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-usuario',
     templateUrl: './form-usuario.component.html',
     styleUrls: ['./form-usuario.component.scss'],
-    imports: [MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatHint, MatSuffix, MatSlideToggle]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatHint, MatSuffix, MatSlideToggle]
 })
 export class FormUsuarioComponent implements OnInit {
   private fb = inject(FormBuilder);

@@ -22,12 +22,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatFormField, MatLabel, MatInput, MatError } from '@angular/material/input';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-receta',
     templateUrl: './form-receta.component.html',
     styleUrls: ['./form-receta.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatIconButton, MatTooltip, MatFormField, MatLabel, MatInput, MatError, MatAutocomplete, MatAutocompleteTrigger, MatOption, FichaPacienteComponent]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatIconButton, MatTooltip, MatFormField, MatLabel, MatInput, MatError, MatAutocomplete, MatAutocompleteTrigger, MatOption, FichaPacienteComponent]
 })
 export class FormRecetaComponent implements OnInit {
   private fb = inject(FormBuilder);

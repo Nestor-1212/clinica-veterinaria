@@ -1,0 +1,13 @@
+@if (errores().length) {
+  <div class="resumen" role="alert" aria-labelledby="resumen-errores-titulo">
+    <p id="resumen-errores-titulo" class="titulo">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ errores().length === 1 ? 'Falta corregir 1 dato antes de guardar' : 'Faltan corregir ' + errores().length + ' datos antes de guardar' }}
+    </p>
+    <ul>
+      @for (e of errores(); track e.texto) {
+        <li><a href="#" (click)="ir(e, $event)">{{ e.texto }}</a></li>
+      }
+    </ul>
+  </div>
+}

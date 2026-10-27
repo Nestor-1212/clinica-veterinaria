@@ -32,13 +32,13 @@ describe('VacunasService.getPendientes (B5)', () => {
     expect(ids).toEqual([]);
   });
 
-  it('la última dosis vencida o por vencer en 7 días sí es pendiente', () => {
+  it('la última dosis vencida o por vencer en la ventana de aviso (30 días) sí es pendiente', () => {
     sembrar({
       vet_mascotas: MASCOTAS,
       vet_vacunas: [
         vacuna({ id: 'vencida', proximaFecha: dias(-3) }),
         vacuna({ id: 'pronto', mascotaId: 'm2', proximaFecha: dias(5) }),
-        vacuna({ id: 'lejos', mascotaId: 'm2', nombre: 'Triple', proximaFecha: dias(30) })
+        vacuna({ id: 'lejos', mascotaId: 'm2', nombre: 'Triple', proximaFecha: dias(45) })
       ]
     });
     const ids = TestBed.inject(VacunasService).getPendientes(HOY).map(v => v.id).sort();

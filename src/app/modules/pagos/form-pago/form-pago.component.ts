@@ -19,6 +19,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { DecimalPipe } from '@angular/common';
 import { SelectorPacienteComponent } from '../../../shared/components/selector-paciente/selector-paciente.component';
 import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 /** Cobrar ahora (con el método con que paga) o dejarlo pendiente: se elige siempre, no hay valor por defecto. */
 export type ModoCobro = 'cobrar' | 'pendiente';
@@ -27,7 +28,7 @@ export type ModoCobro = 'cobrar' | 'pendiente';
   selector: 'app-form-pago',
   templateUrl: './form-pago.component.html',
   styleUrls: ['./form-pago.component.scss'],
-  imports: [MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatHint, MatTooltip, DecimalPipe, SelectorPacienteComponent, FichaPacienteComponent]
+  imports: [ResumenErroresComponent, MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatHint, MatTooltip, DecimalPipe, SelectorPacienteComponent, FichaPacienteComponent]
 })
 export class FormPagoComponent implements OnInit {
   private fb = inject(FormBuilder);

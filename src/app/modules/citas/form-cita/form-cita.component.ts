@@ -24,12 +24,13 @@ import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatError, MatInput } from '@angular/material/input';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { MatCalendar } from '@angular/material/datepicker';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-cita',
     templateUrl: './form-cita.component.html',
     styleUrls: ['./form-cita.component.scss', './atencion-inmediata.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe, FichaPacienteComponent, SelectorPacienteComponent]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe, FichaPacienteComponent, SelectorPacienteComponent]
 })
 export class FormCitaComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
@@ -230,7 +231,7 @@ export class FormCitaComponent implements OnInit, AfterViewInit {
       });
     } else {
       // Recepción no tiene acceso a Consultas: el veterinario la iniciará desde Citas.
-      this.snack.open('Atención inmediata registrada. El veterinario iniciará la consulta desde Citas.', 'OK', { duration: 4000 });
+      this.snack.open('Atención inmediata registrada. El paciente ya aparece en la sala de espera de Consultas.', 'OK', { duration: 4000 });
       this.router.navigate(['/citas']);
     }
   }

@@ -1,3 +1,4 @@
+import { DIAS_AVISO_VACUNA } from '../../../core/utils/vacunas';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -39,7 +40,7 @@ export class ClientesComponent {
   });
   readonly vacunas = computed(() => {
     const d = this.datos();
-    return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, 30, 0).filter(r => r.dias >= 0);
+    return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, DIAS_AVISO_VACUNA, 0).filter(r => r.dias >= 0);
   });
   readonly mascotasActivas = computed(() => this.datos().mascotas.filter(m => m.activo).length);
 

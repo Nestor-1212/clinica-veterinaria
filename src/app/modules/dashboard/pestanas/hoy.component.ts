@@ -1,3 +1,4 @@
+import { DIAS_AVISO_VACUNA } from '../../../core/utils/vacunas';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
@@ -22,6 +23,7 @@ import { DatosDashboard, ICONO_ESPECIE, enDias, entero, moneda, plural } from '.
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HoyComponent {
+  readonly diasAviso = DIAS_AVISO_VACUNA;
   private router = inject(Router);
   private citasService = inject(CitasService);
   private snack = inject(MatSnackBar);
@@ -95,7 +97,7 @@ export class HoyComponent {
   /** Vacunas vencidas (hasta 60 días) o que vencen en los próximos 7: a quién llamar hoy. */
   readonly avisos = computed(() => {
     const d = this.datos();
-    return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, 7, 60);
+    return recordatoriosVacuna(d.vacunas, d.mascotas, d.clientes, d.hoy, DIAS_AVISO_VACUNA, 60);
   });
 
   readonly proximo = computed(() => {

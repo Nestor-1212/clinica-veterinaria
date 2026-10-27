@@ -1,3 +1,4 @@
+import { DIAS_AVISO_VACUNA } from '../utils/vacunas';
 import { Injectable } from '@angular/core';
 import type { jsPDF } from 'jspdf';
 import { Comparado, FilaConteo, FilaMetodoPeriodo, FilaServicio, FilaVet, Indicadores, RangoPeriodo } from '../utils/reportes';
@@ -160,7 +161,7 @@ export class ReportePdfService {
       { etiqueta: 'Ticket promedio', valor: mon(c.ticket.actual), delta: c.ticket.variacion, ayuda: `antes ${mon(c.ticket.anterior)}` },
       { etiqueta: 'Clientes nuevos', valor: ent(c.clientesNuevos.actual), delta: c.clientesNuevos.variacion, ayuda: `antes ${ent(c.clientesNuevos.anterior)}` },
       { etiqueta: 'No asistieron', valor: `${c.inasistencia.actual} %`, delta: c.inasistencia.variacion, subirEsMalo: true, ayuda: 'de las citas que ya pasaron', atencion: c.inasistencia.actual >= 15 },
-      { etiqueta: 'Refuerzos vencidos', valor: ent(dt.vacunasVencidas), ayuda: `${dt.vacunasProximas} vencen en 7 días`, atencion: dt.vacunasVencidas > 0 }
+      { etiqueta: 'Refuerzos vencidos', valor: ent(dt.vacunasVencidas), ayuda: `${dt.vacunasProximas} vencen en ${DIAS_AVISO_VACUNA} días`, atencion: dt.vacunasVencidas > 0 }
     ];
     this.titulo(TITULO_SECCION.resumen, `Cifras del período comparadas ${contra}`);
     const d = this.doc;

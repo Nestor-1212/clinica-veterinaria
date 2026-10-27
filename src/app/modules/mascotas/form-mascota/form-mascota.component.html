@@ -12,18 +12,12 @@
 
   <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="vs-registro-secciones">
+      <app-resumen-errores />
       <!-- Dueño -->
       <section class="vs-seccion" aria-labelledby="s-dueno">
         <h2 id="s-dueno"><mat-icon aria-hidden="true">person</mat-icon>Dueño</h2>
-        <mat-form-field appearance="outline" class="ancho">
-          <mat-label>Propietario</mat-label>
-          <mat-select formControlName="clienteId">
-            @for (c of clientes; track c.id) {
-              <mat-option [value]="c.id">{{ c.nombre }} — {{ c.cedula }}</mat-option>
-            }
-          </mat-select>
-          <mat-error>Seleccione el propietario</mat-error>
-        </mat-form-field>
+        <app-selector-cliente [clientes]="clientes" [seleccion]="form.get('clienteId')?.value || ''"
+          [invalido]="duenoInvalido" (elegir)="elegirDueno($event)" />
       </section>
 
       <!-- Identificación -->
@@ -111,11 +105,18 @@
       <!-- Salud -->
       <section class="vs-seccion" aria-labelledby="s-salud">
         <h2 id="s-salud"><mat-icon aria-hidden="true">health_and_safety</mat-icon>Salud</h2>
-        <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
-          <mat-label>Alergias conocidas</mat-label>
-          <textarea matInput formControlName="alergias" rows="2" placeholder="Ej: penicilina, pollo. Déjelo vacío si no tiene"></textarea>
-          <mat-hint>Se mostrará en rojo cada vez que se atienda</mat-hint>
-        </mat-form-field>
+        <label class="sin-alergias" [class.marcado]="v('sinAlergiasConocidas')">
+          <input type="checkbox" formControlName="sinAlergiasConocidas" (change)="alMarcarSinAlergias()">
+          <mat-icon aria-hidden="true">{{ v('sinAlergiasConocidas') ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span><strong>Sin alergias conocidas</strong><small>Márquelo solo si lo confirmó con el dueño</small></span>
+        </label>
+        @if (!v('sinAlergiasConocidas')) {
+          <mat-form-field appearance="outline" class="ancho" subscriptSizing="dynamic">
+            <mat-label>Alergias conocidas</mat-label>
+            <textarea matInput formControlName="alergias" rows="2" placeholder="Ej: penicilina, pollo"></textarea>
+            <mat-hint>Se mostrará en rojo cada vez que se atienda. Si no sabe, déjelo vacío y pregunte en la próxima visita</mat-hint>
+          </mat-form-field>
+        }
       </section>
 
       <div class="vs-acciones">
@@ -151,6 +152,8 @@
       </dl>
       @if (v('alergias')?.trim()) {
         <p class="previa-alergia"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ v('alergias') }}</span></p>
+      } @else if (v('sinAlergiasConocidas')) {
+        <p class="previa-linea"><mat-icon aria-hidden="true">check_circle</mat-icon>Sin alergias conocidas</p>
       } @else {
         <p class="previa-linea previa-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias sin registrar</p>
       }

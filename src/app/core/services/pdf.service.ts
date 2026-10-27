@@ -52,7 +52,7 @@ export class PdfService {
 
     // Alergias: dato crítico para quien despacha el medicamento (en rojo si las hay)
     const alergias = (mascota.alergias || '').trim();
-    const lineasAlergia = doc.splitTextToSize(alergias ? `ALERGIAS: ${alergias}` : 'Alergias: no indicadas en el expediente', pageW - 30) as string[];
+    const lineasAlergia = doc.splitTextToSize(alergias ? `ALERGIAS: ${alergias}` : mascota.sinAlergiasConocidas ? 'Sin alergias conocidas' : 'Alergias sin registrar en el expediente', pageW - 30) as string[];
     const altoAlergia = lineasAlergia.length * 5 + 4;
     if (alergias) doc.setFillColor(255, 218, 214); else doc.setFillColor(240, 244, 242);
     doc.roundedRect(10, y - 1, pageW - 20, altoAlergia, 1.5, 1.5, 'F');

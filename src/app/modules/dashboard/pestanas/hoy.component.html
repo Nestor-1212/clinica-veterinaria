@@ -78,10 +78,10 @@
                   <!-- La acción fuerte solo en la siguiente cita; en las demás filas, botón de texto -->
                   @if (c.id === siguiente()?.id) {
                     <button mat-flat-button type="button" class="cita-accion" (click)="iniciarConsulta(c)"
-                      [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Atender</button>
+                      [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Iniciar consulta</button>
                   } @else {
                     <button mat-button type="button" class="cita-accion" (click)="iniciarConsulta(c)"
-                      [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Atender</button>
+                      [attr.aria-label]="'Iniciar consulta de ' + nombreMascota(c.mascotaId)">Iniciar consulta</button>
                   }
                 }
               </div>
@@ -189,7 +189,7 @@
         <header class="cabecera">
           <div>
             <h2 id="titulo-avisos">Llamar hoy por vacunas</h2>
-            <p>Vencidas o que vencen en 7 días · las más atrasadas primero</p>
+            <p>Vencidas o que vencen en {{ diasAviso }} días · las más atrasadas primero</p>
           </div>
         </header>
         @if (avisos().length === 0) {

@@ -12,12 +12,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatInput, MatError, MatHint } from '@angular/material/input';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
 
 @Component({
     selector: 'app-form-cliente',
     templateUrl: './form-cliente.component.html',
     styleUrls: ['./form-cliente.component.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatHint, MatProgressSpinner]
+    imports: [ResumenErroresComponent, MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatError, MatHint, MatProgressSpinner]
 })
 export class FormClienteComponent implements OnInit {
   private fb = inject(FormBuilder);

@@ -14,5 +14,7 @@ export interface Mascota {
   fechaNacimiento: Date | string;
   foto?: string;
   alergias?: string;
+  /** Se preguntó al dueño y no tiene alergias conocidas (distinto de no haberlo preguntado). */
+  sinAlergiasConocidas?: boolean;
   activo: boolean;
 }

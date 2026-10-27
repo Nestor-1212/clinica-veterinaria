@@ -20,6 +20,7 @@
   } @else {
     <form class="vs-registro" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="vs-registro-secciones">
+        <app-resumen-errores />
         <!-- Signos vitales -->
         <section class="vs-seccion" aria-labelledby="s-signos">
           <h2 id="s-signos"><mat-icon aria-hidden="true">monitor_heart</mat-icon>Signos vitales</h2>
