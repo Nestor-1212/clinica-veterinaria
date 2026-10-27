@@ -74,3 +74,6 @@
     .c-concepto, .c-metodo { display: none !important; }
   }
 }
+
+.header-actions { display: flex; flex-wrap: wrap; gap: var(--vs-space-2); }
+.exportar { flex: none; }

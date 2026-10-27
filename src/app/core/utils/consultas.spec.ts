@@ -43,3 +43,16 @@ describe('consultas', () => {
     expect(enPeriodo(consulta(400), 'todas', AHORA)).toBe(true);
   });
 });
+
+describe('salaDeEspera con llegada', () => {
+  it('quien ya llegó va antes que las citas por llegar, por orden de llegada', () => {
+    const base = { clienteId: 'c', mascotaId: 'm', veterinarioId: 'v', motivo: 'x', createdAt: AHORA };
+    const citas: Cita[] = [
+      { ...base, id: 'sin-llegar', fecha: AHORA, hora: '08:00', estado: 'confirmada' },
+      { ...base, id: 'llego-tarde', fecha: AHORA, hora: '09:00', estado: 'pendiente', llegada: new Date(AHORA.getTime() - 5 * 60000) },
+      { ...base, id: 'llego-antes', fecha: AHORA, hora: '11:00', estado: 'confirmada', llegada: new Date(AHORA.getTime() - 30 * 60000) },
+      { ...base, id: 'urg', fecha: AHORA, hora: '10:40', estado: 'inmediata' }
+    ];
+    expect(salaDeEspera(citas, AHORA).map(c => c.id)).toEqual(['urg', 'llego-antes', 'llego-tarde', 'sin-llegar']);
+  });
+});

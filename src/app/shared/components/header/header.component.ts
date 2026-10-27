@@ -8,12 +8,13 @@ import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/list';
+import { BusquedaGlobalComponent } from '../busqueda-global/busqueda-global.component';
 
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
-    imports: [MatToolbar, MatIconButton, MatIcon, MatMenuTrigger, MatMenu, MatMenuItem, MatDivider]
+    imports: [MatToolbar, MatIconButton, MatIcon, MatMenuTrigger, MatMenu, MatMenuItem, MatDivider, BusquedaGlobalComponent]
 })
 export class HeaderComponent {
   private auth = inject(AuthService);

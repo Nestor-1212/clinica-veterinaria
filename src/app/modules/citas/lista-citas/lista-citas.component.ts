@@ -143,11 +143,63 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     this.citasPorVet = Object.fromEntries(this.veterinarios.map(v => [v.id, this.delDia.filter(c => c.veterinarioId === v.id).length]));
     this.calcularEntrada();
     this.calcularPasadas();
+    this.calcularRachas();
     this.proximosHuecos = this.veterinarios.map(v => ({
       vet: v,
       tramos: this.tramos.filter(t => this.puedeAgendar(t) && !this.citasEn(v.id, t).length).slice(0, 4)
     })).filter(x => x.tramos.length);
   }
+
+  // ---------- Confirmar varias a la vez ----------
+  elegidas = new Set<string>();
+
+  alternar(id: string): void { if (!this.elegidas.delete(id)) this.elegidas.add(id); }
+  private idsPorConfirmar(): string[] { return this.porConfirmar.flatMap(g => g.citas.map(c => c.id)); }
+  todasElegidas(): boolean { const ids = this.idsPorConfirmar(); return ids.length > 0 && ids.every(id => this.elegidas.has(id)); }
+  elegirTodas(): void {
+    if (this.todasElegidas()) this.elegidas.clear(); else this.idsPorConfirmar().forEach(id => this.elegidas.add(id));
+  }
+  diaElegido(g: GrupoDia): boolean { return g.citas.every(c => this.elegidas.has(c.id)); }
+  elegirDia(g: GrupoDia): void {
+    const todas = this.diaElegido(g);
+    g.citas.forEach(c => (todas ? this.elegidas.delete(c.id) : this.elegidas.add(c.id)));
+  }
+
+  confirmarElegidas(): void {
+    const ids = [...this.elegidas];
+    ids.forEach(id => this.citasService.update(id, { estado: 'confirmada' }));
+    this.elegidas.clear();
+    this.cargar();
+    const aviso = this.snack.open(ids.length === 1 ? '1 cita confirmada' : `${ids.length} citas confirmadas`, 'Deshacer', { duration: 5000 });
+    aviso.onAction().subscribe(() => { ids.forEach(id => this.citasService.update(id, { estado: 'pendiente' })); this.cargar(); });
+  }
+
+  // ---------- Huecos libres como rangos ----------
+  /**
+   * Por veterinario, cada racha de medias horas libres se muestra como un solo bloque
+   * "Libre 12:00–14:00" en su primera media hora; las demás quedan discretas (visibles al
+   * pasar el ratón o con el foco) para que el tablero muestre las citas, no decenas de "+".
+   */
+  rachas = new Map<string, string>();
+
+  private calcularRachas(): void {
+    this.rachas = new Map();
+    const libre = (vetId: string, t: string) => this.puedeAgendar(t) && !this.citasEn(vetId, t).length;
+    for (const v of this.veterinarios) {
+      let inicio: string | null = null;
+      this.tramos.forEach((t, i) => {
+        if (libre(v.id, t)) { inicio ??= t; } else { inicio = null; }
+        const sigue = i + 1 < this.tramos.length && libre(v.id, this.tramos[i + 1]);
+        if (inicio && !sigue) {
+          this.rachas.set(celda(v.id, inicio), finDeTramo(t));
+          inicio = null;
+        }
+      });
+    }
+  }
+
+  /** Hora final de la racha libre que empieza en este tramo ('' si el tramo no abre una racha). */
+  finRacha(vetId: string, tramo: string): string { return this.rachas.get(celda(vetId, tramo)) ?? ''; }
 
   // ---------- Horas pasadas sin citas (hoy) ----------
   /** Tramos de hoy ya pasados y sin ninguna cita: se pliegan en una línea para que el tablero empiece en lo que importa. */
@@ -268,11 +320,37 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
   }
 
   noLlego(c: Cita): boolean {
-    return (c.estado === 'pendiente' || c.estado === 'confirmada') && momentoCita(c) < this.ahora;
+    return (c.estado === 'pendiente' || c.estado === 'confirmada') && !c.llegada && momentoCita(c) < this.ahora;
   }
 
-  textoEstado(c: Cita): string { return this.noLlego(c) ? 'No llegó' : ESTADO_TEXTO[c.estado]; }
-  claseEstado(c: Cita): string { return this.noLlego(c) ? 'vs-status--warning' : ESTADO_CLASE[c.estado]; }
+  /** Cita de hoy, aún sin atender, a la que se le puede marcar la llegada. */
+  puedeMarcarLlegada(c: Cita): boolean {
+    return (c.estado === 'pendiente' || c.estado === 'confirmada') && !c.llegada && mismoDia(c.fecha, this.ahora);
+  }
+
+  enEspera(c: Cita): boolean { return !!c.llegada && (c.estado === 'pendiente' || c.estado === 'confirmada'); }
+  horaLlegada(c: Cita): string { return c.llegada ? new Date(c.llegada).toTimeString().slice(0, 5) : ''; }
+
+  textoEstado(c: Cita): string {
+    if (this.enEspera(c)) return `Llegó ${this.horaLlegada(c)}`;
+    return this.noLlego(c) ? 'No llegó' : ESTADO_TEXTO[c.estado];
+  }
+  claseEstado(c: Cita): string {
+    if (this.enEspera(c)) return 'vs-status--accent vs-status--pill';
+    return this.noLlego(c) ? 'vs-status--warning' : ESTADO_CLASE[c.estado];
+  }
+
+  marcarLlegada(c: Cita): void {
+    this.citasService.marcarLlegada(c.id);
+    this.cargar();
+    const aviso = this.snack.open(`${this.getMascota(c.mascotaId)} llegó: ya está en la sala de espera`, 'Deshacer', { duration: 5000 });
+    aviso.onAction().subscribe(() => { this.citasService.deshacerLlegada(c.id); this.cargar(); });
+  }
+
+  deshacerLlegada(c: Cita): void {
+    this.citasService.deshacerLlegada(c.id);
+    this.cargar();
+  }
 
   // ---------- Datos ----------
   getCliente(id: string): string { return this.clientes.get(id)?.nombre ?? this.clientesService.getById(id)?.nombre ?? '-'; }
@@ -346,4 +424,11 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
 /** "2026-10-23" en hora local. */
 function fechaIso(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** "13:30" → "14:00": fin de un tramo de media hora. */
+function finDeTramo(tramo: string): string {
+  const [h, m] = tramo.split(':').map(Number);
+  const total = h * 60 + m + 30;
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }

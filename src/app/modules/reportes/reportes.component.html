@@ -6,6 +6,7 @@
     </div>
     <div class="header-actions no-imprimir">
       <button mat-stroked-button type="button" (click)="imprimir()"><mat-icon>print</mat-icon> Imprimir</button>
+      <button mat-stroked-button type="button" (click)="exportarCsv()"><mat-icon>download</mat-icon> Cobros en CSV</button>
       <button mat-flat-button type="button" (click)="descargarPdf()" [disabled]="generando() !== null">
         <mat-icon>picture_as_pdf</mat-icon> {{ generando() === 'todo' ? 'Generando…' : 'Descargar informe PDF' }}
       </button>

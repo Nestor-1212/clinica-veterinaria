@@ -94,10 +94,18 @@
                   </button>
                 } @empty {
                   @if (puedeAgendar(t)) {
-                    <button type="button" class="libre" (click)="agendarEn(v, t)" [attr.aria-label]="'Hueco libre: agendar con ' + v.nombre + ' a las ' + t"
-                      [attr.data-celda]="ti + ',' + vi + ',0'" [attr.tabindex]="esEntrada(ti, vi, 0) ? 0 : -1">
-                      <mat-icon aria-hidden="true">add</mat-icon>{{ t }}
-                    </button>
+                    @if (finRacha(v.id, t); as fin) {
+                      <button type="button" class="libre libre--racha" (click)="agendarEn(v, t)"
+                        [attr.aria-label]="'Libre de ' + t + ' a ' + fin + ': agendar con ' + v.nombre + ' a las ' + t"
+                        [attr.data-celda]="ti + ',' + vi + ',0'" [attr.tabindex]="esEntrada(ti, vi, 0) ? 0 : -1">
+                        <mat-icon aria-hidden="true">add</mat-icon>Libre {{ t }}–{{ fin }}
+                      </button>
+                    } @else {
+                      <button type="button" class="libre libre--resto" (click)="agendarEn(v, t)" [attr.aria-label]="'Hueco libre: agendar con ' + v.nombre + ' a las ' + t"
+                        [attr.data-celda]="ti + ',' + vi + ',0'" [attr.tabindex]="esEntrada(ti, vi, 0) ? 0 : -1">
+                        <mat-icon aria-hidden="true">add</mat-icon>{{ t }}
+                      </button>
+                    }
                   }
                 }
               </div>
@@ -151,13 +159,33 @@
   <!-- ===== Por confirmar ===== -->
   @if (vista === 'confirmar') {
     <section class="confirmar" aria-label="Citas por confirmar">
-      <p class="ayuda">Citas pendientes de los próximos 7 días. Envíe el recordatorio por WhatsApp y marque la cita como confirmada cuando el dueño responda.</p>
+      <p class="ayuda">Citas pendientes de los próximos 7 días. Envíe el recordatorio por WhatsApp y marque la cita como confirmada cuando el dueño responda. Puede marcar varias y confirmarlas juntas.</p>
+      @if (porConfirmar.length) {
+        <div class="lote" role="region" aria-label="Confirmar varias citas">
+          <label class="lote-todas">
+            <input type="checkbox" [checked]="todasElegidas()" [indeterminate]="elegidas.size > 0 && !todasElegidas()" (change)="elegirTodas()">
+            {{ elegidas.size ? elegidas.size + (elegidas.size === 1 ? ' seleccionada' : ' seleccionadas') : 'Seleccionar todas' }}
+          </label>
+          @if (elegidas.size) {
+            <button mat-button type="button" (click)="elegidas.clear()">Quitar selección</button>
+            <button mat-flat-button type="button" (click)="confirmarElegidas()"><mat-icon>done_all</mat-icon>Confirmar {{ elegidas.size === 1 ? 'la cita' : 'las ' + elegidas.size + ' citas' }}</button>
+          }
+        </div>
+      }
       @for (g of porConfirmar; track g.dia.getTime()) {
         <div class="grupo">
-          <h2 class="grupo-titulo">{{ nombreDia(g.dia) }} <span>{{ g.dia | date: "d 'de' MMMM" }} · {{ g.citas.length }}</span></h2>
+          <h2 class="grupo-titulo">
+            <label class="grupo-elegir">
+              <input type="checkbox" [checked]="diaElegido(g)" (change)="elegirDia(g)" [attr.aria-label]="'Seleccionar las citas del ' + nombreDia(g.dia).toLowerCase()">
+              {{ nombreDia(g.dia) }}
+            </label>
+            <span>{{ g.dia | date: "d 'de' MMMM" }} · {{ g.citas.length }}</span>
+          </h2>
           <ul class="filas">
             @for (c of g.citas; track c.id) {
-              <li class="fila-confirmar">
+              <li class="fila-confirmar" [class.fila-confirmar--elegida]="elegidas.has(c.id)">
+                <input type="checkbox" class="fc-elegir" [checked]="elegidas.has(c.id)" (change)="alternar(c.id)"
+                  [attr.aria-label]="'Seleccionar la cita de ' + getMascota(c.mascotaId) + ' a las ' + c.hora">
                 <span class="fc-hora">{{ c.hora }}</span>
                 <span class="fc-paciente">
                   <span class="fc-nombre"><mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon><strong>{{ getMascota(c.mascotaId) }}</strong> · {{ getCliente(c.clienteId) }}</span>
@@ -269,13 +297,18 @@
     @if (puedeConsultar && c.estado !== 'completada' && c.estado !== 'cancelada') {
       <button mat-menu-item (click)="iniciarConsulta(c)"><mat-icon>medical_services</mat-icon>Iniciar consulta</button>
     }
+    @if (puedeMarcarLlegada(c)) {
+      <button mat-menu-item (click)="marcarLlegada(c)"><mat-icon>how_to_reg</mat-icon>Marcar llegada</button>
+    } @else if (enEspera(c)) {
+      <button mat-menu-item (click)="deshacerLlegada(c)"><mat-icon>undo</mat-icon>Deshacer llegada ({{ horaLlegada(c) }})</button>
+    }
     @if (c.estado === 'pendiente') {
       <button mat-menu-item (click)="cambiarEstado(c, 'confirmada')"><mat-icon>check_circle</mat-icon>Confirmar</button>
     }
     @if ((c.estado === 'pendiente' || c.estado === 'confirmada') && !noLlego(c) && whatsapp(c); as wa) {
       <a mat-menu-item [href]="wa" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>Recordar por WhatsApp</a>
     }
-    @if (c.estado !== 'completada' && c.estado !== 'cancelada') {
+    @if (puedeConsultar && c.estado !== 'completada' && c.estado !== 'cancelada') {
       <button mat-menu-item (click)="cambiarEstado(c, 'completada')"><mat-icon>done_all</mat-icon>Marcar atendida</button>
     }
     <a mat-menu-item [routerLink]="['/mascotas', c.mascotaId]"><mat-icon>folder_open</mat-icon>Historial de la mascota</a>

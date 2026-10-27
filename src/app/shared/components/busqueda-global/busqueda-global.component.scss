@@ -1,0 +1,38 @@
+// Búsqueda global sobre la barra teal: campo claro translúcido, atajo visible en escritorio.
+:host { display: flex; align-items: center; flex: 1; justify-content: center; min-width: 0; }
+
+.caja {
+  display: flex; align-items: center; gap: var(--vs-space-2); width: min(520px, 100%); height: 40px; padding: 0 var(--vs-space-2) 0 var(--vs-space-3);
+  border-radius: var(--vs-radius-full); background: rgba(255, 255, 255, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  color: #fff; transition: background var(--vs-dur-fast) var(--vs-ease);
+  &:focus-within { background: rgba(255, 255, 255, 0.2); box-shadow: inset 0 0 0 2px #fff; }
+}
+.lupa { flex: none; font-size: 20px; width: 20px; height: 20px; opacity: .85; }
+.campo {
+  flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; color: #fff; font: 400 14px var(--vs-font);
+  &::placeholder { color: rgba(255, 255, 255, 0.72); }
+  &::-webkit-search-cancel-button { display: none; }
+}
+.atajo { flex: none; padding: 2px 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.14); color: rgba(255, 255, 255, 0.85);
+  font: 500 11px var(--vs-font); letter-spacing: .02em; }
+
+.abrir-movil, .cerrar-movil { display: none; color: #fff; }
+
+.opcion { display: flex; align-items: center; gap: var(--vs-space-2);
+  mat-icon { margin: 0; font-size: 18px; width: 18px; height: 18px; color: var(--vs-primary); }
+  small { color: var(--vs-text-secondary); } }
+
+// Celular: solo la lupa; al tocarla la caja cubre la barra
+@media (max-width: 720px) {
+  :host { flex: 0 0 auto; justify-content: flex-end; }
+  .abrir-movil { display: inline-flex; }
+  .caja { display: none; }
+  // Opaca sobre la marca y el avatar (también con foco, que en escritorio la vuelve translúcida)
+  .caja.caja--abierta, .caja.caja--abierta:focus-within {
+    display: flex; position: absolute; inset: 0 var(--vs-space-2); z-index: 2; width: auto; height: 44px; margin: auto 0;
+    background: #0c3833; box-shadow: inset 0 0 0 2px #fff;
+    .cerrar-movil { display: inline-flex; }
+    .atajo { display: none; }
+  }
+}
+@media (prefers-reduced-motion: reduce) { .caja { transition: none; } }

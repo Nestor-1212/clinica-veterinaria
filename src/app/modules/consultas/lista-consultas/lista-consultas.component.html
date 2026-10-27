@@ -24,7 +24,7 @@
         @for (c of espera; track c.id) {
           <li class="paciente" [class.paciente--urgente]="c.estado === 'inmediata'">
             <span class="p-hora">
-              <strong>{{ c.estado === 'inmediata' ? 'Llegó ' + c.hora : c.hora }}</strong>
+              <strong>{{ horaEspera(c) }}</strong>
               @if (esperando(c); as e) { <small>{{ e }}</small> }
             </span>
             <span class="p-icono" aria-hidden="true"><mat-icon>{{ especie(c.mascotaId) }}</mat-icon></span>
@@ -33,6 +33,8 @@
                 <strong>{{ getMascota(c.mascotaId) }}</strong>
                 @if (mascota(c.mascotaId)?.alergias) { <span class="alergia"><mat-icon aria-hidden="true">warning</mat-icon>Alergia</span> }
                 @if (c.estado === 'inmediata') { <span class="vs-status vs-status--accent vs-status--pill">Inmediata</span> }
+                @else if (c.llegada) { <span class="vs-status vs-status--success vs-status--pill">En espera</span> }
+                @else { <span class="vs-status vs-status--neutral">Aún no llega</span> }
               </span>
               <small>{{ getCliente(c.clienteId) }} · {{ c.motivo }}@if (!soloMias) { · {{ vetCorto(c.veterinarioId) }} }</small>
             </span>

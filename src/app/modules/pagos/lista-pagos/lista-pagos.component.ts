@@ -1,3 +1,5 @@
+import { CierreCajaComponent } from '../cierre-caja/cierre-caja.component';
+import { aCsv, descargarCsv, fechaArchivo } from '../../../core/utils/csv';
 import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -182,6 +184,22 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   }
 
   get atrasado(): number { return this.cobrar?.tramos.find(t => t.atrasado)?.total ?? 0; }
+
+  abrirCierre(): void {
+    this.dialog.open(CierreCajaComponent, { width: '640px', maxWidth: '94vw', autoFocus: 'dialog' });
+  }
+
+  /** Exporta lo que se ve en la lista (filtro y búsqueda aplicados), no solo la página actual. */
+  exportarCsv(): void {
+    const estado: Record<Pago['estado'], string> = { pagado: 'Pagado', pendiente: 'Pendiente', anulado: 'Anulado' };
+    const filas = this.dataSource.filteredData.map(p => [
+      fechaArchivo(new Date(p.fecha)), p.estado === 'pagado' ? fechaArchivo(fechaCobro(p)) : '', this.getCliente(p.clienteId), this.getMascota(p.mascotaId),
+      p.items.map(i => i.descripcion).join(' + '), estado[p.estado], p.estado === 'pendiente' ? '' : METODO_TEXTO[p.metodoPago], p.referencia ?? '',
+      p.subtotal, p.descuento, p.total
+    ]);
+    descargarCsv(`pagos-${this.filtro}-${fechaArchivo(this.hoy)}`, aCsv(
+      ['Fecha', 'Fecha de cobro', 'Cliente', 'Mascota', 'Conceptos', 'Estado', 'Método', 'Referencia', 'Subtotal', 'Descuento', 'Total'], filas));
+  }
 
   async imprimirFactura(pago: Pago): Promise<void> {
     const cliente = this.clientesService.getById(pago.clienteId);

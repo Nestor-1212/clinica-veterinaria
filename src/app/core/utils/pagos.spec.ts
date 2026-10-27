@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from './pagos';
+import { cierreDeCaja, cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from './pagos';
 import { Pago } from '../models';
 
 describe('Cálculo de pagos (B10)', () => {
@@ -66,5 +66,28 @@ describe('serviciosFrecuentes', () => {
       pago('2026-03-02', [['Desparasitación', 99]], 'anulado')
     ]);
     expect(r.map(s => [s.descripcion, s.veces, s.precio])).toEqual([['Consulta veterinaria', 3, 25], ['Desparasitación', 1, 8]]);
+  });
+});
+
+describe('cierreDeCaja', () => {
+  const p = (id: string, total: number, metodo: Pago['metodoPago'], estado: Pago['estado'], fecha: string, extra: Partial<Pago> = {}): Pago => ({
+    id, clienteId: 'c', mascotaId: 'm', fecha, items: [], subtotal: total, descuento: 0, total, metodoPago: metodo, estado, ...extra
+  });
+  const DIA = new Date(2026, 9, 27, 18, 0);
+
+  it('suma por método lo cobrado ese día, incluidos pendientes cobrados hoy, y aparte anulados y pendientes', () => {
+    const c = cierreDeCaja([
+      p('a', 25, 'efectivo', 'pagado', '2026-10-27T09:00:00'),
+      p('b', 40.5, 'yappy', 'pagado', '2026-10-27T10:00:00'),
+      p('c', 30, 'efectivo', 'pagado', '2026-10-20T10:00:00', { fechaPago: '2026-10-27T11:00:00' }),
+      p('d', 99, 'tarjeta', 'pagado', '2026-10-26T10:00:00'),
+      p('e', 15, 'efectivo', 'anulado', '2026-10-27T08:00:00', { fechaAnulacion: '2026-10-27T12:00:00' }),
+      p('f', 20, 'efectivo', 'pendiente', '2026-10-27T13:00:00')
+    ], DIA);
+    expect(c.cobros.map(x => x.id)).toEqual(['a', 'b', 'c']);
+    expect(c.porMetodo.find(m => m.metodo === 'efectivo')).toEqual({ metodo: 'efectivo', cantidad: 2, total: 55 });
+    expect(c.total).toBe(95.5);
+    expect(c.anulados).toEqual({ cantidad: 1, total: 15 });
+    expect(c.pendientes).toEqual({ cantidad: 1, total: 20 });
   });
 });

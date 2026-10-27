@@ -4,7 +4,10 @@
       <h1><mat-icon>payments</mat-icon> Pagos</h1>
       <p>Cobros de la clínica · {{ hoy | date: "MMMM 'de' y" }}</p>
     </div>
-    <button mat-flat-button routerLink="/pagos/nuevo"><mat-icon>add</mat-icon> Nuevo cobro</button>
+    <div class="header-actions">
+      <button mat-stroked-button type="button" (click)="abrirCierre()"><mat-icon>point_of_sale</mat-icon> Cierre de caja</button>
+      <button mat-flat-button routerLink="/pagos/nuevo"><mat-icon>add</mat-icon> Nuevo cobro</button>
+    </div>
   </div>
 
   <!-- Indicadores -->
@@ -56,6 +59,8 @@
             <mat-icon matSuffix>search</mat-icon>
           }
         </mat-form-field>
+        <button mat-stroked-button type="button" class="exportar" (click)="exportarCsv()" [disabled]="!dataSource.filteredData.length"
+          [attr.aria-label]="'Exportar a CSV los ' + dataSource.filteredData.length + ' pagos de la lista'"><mat-icon>download</mat-icon> CSV</button>
       </div>
 
       <div class="table-responsive">

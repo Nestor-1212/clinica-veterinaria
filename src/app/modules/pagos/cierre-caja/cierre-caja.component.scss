@@ -1,0 +1,32 @@
+// Cierre de caja: total del día, tabla por método y detalle para cuadrar.
+.titulo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--vs-space-2); }
+.dia { display: inline-flex; align-items: center; gap: 2px; font-size: 14px; font-weight: 500; color: var(--vs-text-secondary); }
+.dia-texto::first-letter { text-transform: uppercase; }
+
+.total { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 var(--vs-space-4);
+  color: var(--vs-text-secondary); font-size: 14px;
+  strong { font-size: 30px; font-weight: 700; color: var(--vs-text); font-variant-numeric: tabular-nums; } }
+
+.metodos { width: 100%; border-collapse: collapse; font-size: 14px;
+  th, td { padding: var(--vs-space-2); border-bottom: 1px solid var(--vs-border); text-align: left; }
+  thead th { font-size: 12px; font-weight: 600; color: var(--vs-text-muted); text-transform: uppercase; letter-spacing: .03em; }
+  tbody th { font-weight: 500; color: var(--vs-text);
+    mat-icon { vertical-align: -5px; margin-right: var(--vs-space-2); font-size: 20px; width: 20px; height: 20px; color: var(--vs-primary); }
+    small { display: block; margin-left: 28px; font-size: 12px; font-weight: 400; color: var(--vs-text-secondary); } }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .efectivo { background: var(--vs-primary-soft); td:last-child { font-weight: 700; } }
+  .cero, .cero th { color: var(--vs-text-muted); } }
+
+.aparte { display: grid; gap: 4px; margin: var(--vs-space-3) 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--vs-text-secondary);
+  li { display: flex; align-items: center; gap: var(--vs-space-2); }
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+
+.detalle-titulo { margin: var(--vs-space-5) 0 var(--vs-space-2); font-size: 14px; font-weight: 600; color: var(--vs-text); }
+.detalle { display: grid; margin: 0; padding: 0; list-style: none; font-size: 14px;
+  li { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--vs-space-3); align-items: baseline; padding: var(--vs-space-2) 0;
+    & + li { border-top: 1px solid var(--vs-border); } }
+  .d-hora { color: var(--vs-text-muted); font-variant-numeric: tabular-nums; }
+  .d-texto { min-width: 0; small { display: block; color: var(--vs-text-secondary); font-size: 13px; } }
+  .d-monto { font-weight: 600; font-variant-numeric: tabular-nums; } }
+.vacio { display: flex; align-items: center; gap: var(--vs-space-2); margin: var(--vs-space-4) 0 0; color: var(--vs-text-secondary); }
+mat-dialog-actions { gap: var(--vs-space-2); }

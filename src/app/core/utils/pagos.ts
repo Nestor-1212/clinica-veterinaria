@@ -100,3 +100,38 @@ export function serviciosFrecuentes(pagos: Pago[], limite = 8): ServicioFrecuent
     .slice(0, limite)
     .map(({ descripcion, categoria, precio, veces }) => ({ descripcion, categoria, precio, veces }));
 }
+
+// ---------- Cierre de caja ----------
+
+export interface CierreMetodo { metodo: MetodoPago; cantidad: number; total: number; }
+
+export interface CierreCaja {
+  dia: Date;
+  /** Cobros que entraron ese día (pagos al momento y pendientes cobrados ese día), del más temprano al más tardío. */
+  cobros: Pago[];
+  porMetodo: CierreMetodo[];
+  total: number;
+  /** Anulados ese día (no cuentan en el total). */
+  anulados: { cantidad: number; total: number };
+  /** Atenciones registradas ese día que quedaron sin cobrar. */
+  pendientes: { cantidad: number; total: number };
+}
+
+/** Cierre de caja de un día: lo cobrado por método (el efectivo es lo que debe haber en la gaveta). */
+export function cierreDeCaja(pagos: Pago[], dia: Date): CierreCaja {
+  const delDia = (f: Date | string | undefined) => !!f && mismoDia(new Date(f), dia);
+  const cobros = pagos.filter(p => p.estado === 'pagado' && delDia(fechaCobro(p))).sort((a, b) => fechaCobro(a).getTime() - fechaCobro(b).getTime());
+  const porMetodo = (Object.keys(METODO_TEXTO) as MetodoPago[]).map(metodo => {
+    const del = cobros.filter(p => p.metodoPago === metodo);
+    return { metodo, cantidad: del.length, total: redondearCentavos(del.reduce((s, p) => s + p.total, 0)) };
+  });
+  const sumar = (l: Pago[]) => ({ cantidad: l.length, total: redondearCentavos(l.reduce((s, p) => s + p.total, 0)) });
+  return {
+    dia,
+    cobros,
+    porMetodo,
+    total: redondearCentavos(cobros.reduce((s, p) => s + p.total, 0)),
+    anulados: sumar(pagos.filter(p => p.estado === 'anulado' && delDia(p.fechaAnulacion))),
+    pendientes: sumar(pagos.filter(p => p.estado === 'pendiente' && delDia(p.fecha)))
+  };
+}

@@ -10,6 +10,7 @@
   z-index: 1000;
   position: sticky;
   top: 0;
+  gap: var(--vs-space-3);
 }
 
 .menu-btn { color: var(--vs-on-primary); }

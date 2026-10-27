@@ -1,0 +1,55 @@
+<h2 mat-dialog-title class="titulo">
+  <span>Cierre de caja</span>
+  <span class="dia">
+    <button mat-icon-button type="button" (click)="moverDia(-1)" aria-label="Día anterior"><mat-icon>chevron_left</mat-icon></button>
+    <span class="dia-texto" aria-live="polite">{{ esHoy() ? 'Hoy, ' : '' }}{{ dia() | date: "EEEE d 'de' MMMM" }}</span>
+    <button mat-icon-button type="button" (click)="moverDia(1)" [disabled]="esHoy()" aria-label="Día siguiente"><mat-icon>chevron_right</mat-icon></button>
+  </span>
+</h2>
+
+<mat-dialog-content>
+  @let c = cierre();
+  <p class="total"><span>Cobrado en el día · {{ c.cobros.length }} {{ c.cobros.length === 1 ? 'cobro' : 'cobros' }}</span><strong>{{ moneda(c.total) }}</strong></p>
+
+  <table class="metodos">
+    <caption class="sr-only">Cobrado por método de pago</caption>
+    <thead><tr><th scope="col">Método</th><th scope="col" class="num">Cobros</th><th scope="col" class="num">Total</th></tr></thead>
+    <tbody>
+      @for (m of c.porMetodo; track m.metodo) {
+        <tr [class.efectivo]="m.metodo === 'efectivo'" [class.cero]="!m.cantidad">
+          <th scope="row"><mat-icon aria-hidden="true">{{ METODO_ICONO[m.metodo] }}</mat-icon>{{ METODO_TEXTO[m.metodo] }}
+            @if (m.metodo === 'efectivo' && m.total) { <small>Debe haber esto en la caja</small> }</th>
+          <td class="num">{{ m.cantidad }}</td>
+          <td class="num">{{ moneda(m.total) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (c.anulados.cantidad || c.pendientes.cantidad) {
+    <ul class="aparte">
+      @if (c.anulados.cantidad) { <li><mat-icon aria-hidden="true">block</mat-icon>{{ c.anulados.cantidad }} {{ c.anulados.cantidad === 1 ? 'anulado' : 'anulados' }} ({{ moneda(c.anulados.total) }}, no cuentan en el total)</li> }
+      @if (c.pendientes.cantidad) { <li><mat-icon aria-hidden="true">schedule</mat-icon>{{ c.pendientes.cantidad }} {{ c.pendientes.cantidad === 1 ? 'atención quedó' : 'atenciones quedaron' }} sin cobrar ({{ moneda(c.pendientes.total) }})</li> }
+    </ul>
+  }
+
+  @if (c.cobros.length) {
+    <h3 class="detalle-titulo">Detalle</h3>
+    <ul class="detalle">
+      @for (p of c.cobros; track p.id) {
+        <li>
+          <span class="d-hora">{{ hora(p) }}</span>
+          <span class="d-texto"><strong>{{ cliente(p) }}</strong> · {{ mascota(p) }}<small>{{ concepto(p) }} · {{ METODO_TEXTO[p.metodoPago] }}@if (p.referencia) { · {{ p.referencia }} }</small></span>
+          <span class="d-monto">{{ moneda(p.total) }}</span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="vacio"><mat-icon aria-hidden="true">savings</mat-icon>No hubo cobros este día.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" mat-dialog-close>Cerrar</button>
+  <button mat-stroked-button type="button" (click)="exportar()" [disabled]="!cierre().cobros.length"><mat-icon>download</mat-icon>Exportar CSV</button>
+</mat-dialog-actions>

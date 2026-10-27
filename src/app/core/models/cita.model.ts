@@ -10,5 +10,7 @@ export interface Cita {
   motivo: string;
   estado: EstadoCita;
   notas?: string;
+  /** Hora real en que el paciente con cita llegó a la clínica (pasa a la sala de espera). */
+  llegada?: Date | string;
   createdAt: Date | string;
 }

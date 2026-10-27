@@ -115,13 +115,3 @@
   .huecos-movil { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { .bloque, .libre { transition: none; } }
-
-// Horas pasadas sin citas, plegadas en una línea
-.pasadas { padding: var(--vs-space-2) 0; border-top: 1px solid var(--vs-border); }
-.pasadas-btn {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 var(--vs-space-3);
-  border: 0; border-radius: var(--vs-radius-full); background: var(--vs-surface-muted); color: var(--vs-text-secondary);
-  font: 500 13px var(--vs-font); cursor: pointer;
-  &:hover { color: var(--vs-text); }
-  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
-}

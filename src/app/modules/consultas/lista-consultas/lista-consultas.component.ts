@@ -136,10 +136,17 @@ export class ListaConsultasComponent implements OnInit, AfterViewInit {
 
   /** Minutos de espera de una inmediata o de retraso de una cita (null si aún no es su hora). */
   esperando(c: Cita): string | null {
-    const min = Math.floor((this.ahora.getTime() - momentoCita(c).getTime()) / 60000);
+    const desde = c.llegada && c.estado !== 'inmediata' ? new Date(c.llegada) : momentoCita(c);
+    const min = Math.floor((this.ahora.getTime() - desde.getTime()) / 60000);
     if (min < 1) return null;
     const texto = min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60} min`;
-    return c.estado === 'inmediata' ? `Espera ${texto}` : `Hace ${texto}`;
+    return c.estado === 'inmediata' || c.llegada ? `Espera ${texto}` : `Hace ${texto}`;
+  }
+
+  /** "Llegó 10:05" para inmediatas y citas con llegada marcada; la hora de la cita si aún no llega. */
+  horaEspera(c: Cita): string {
+    if (c.estado === 'inmediata') return 'Llegó ' + c.hora;
+    return c.llegada ? 'Llegó ' + new Date(c.llegada).toTimeString().slice(0, 5) : c.hora;
   }
 
   // ---------- Acciones ----------

@@ -1,0 +1,30 @@
+<button mat-icon-button type="button" class="abrir-movil" (click)="abrir()" aria-label="Buscar mascota o cliente"><mat-icon>search</mat-icon></button>
+
+<div class="caja" [class.caja--abierta]="abierta()" role="search" matAutocompleteOrigin #origen="matAutocompleteOrigin">
+  <mat-icon class="lupa" aria-hidden="true">search</mat-icon>
+  <input #campo type="search" class="campo" [value]="texto()" (input)="alEscribir($event)" (keydown.escape)="limpiar()"
+    [matAutocomplete]="auto" [matAutocompleteConnectedTo]="origen" placeholder="Buscar mascota, cliente, cédula o teléfono" autocomplete="off" spellcheck="false"
+    aria-label="Buscar mascota o cliente" [attr.aria-keyshortcuts]="'Control+K /'">
+  <kbd class="atajo" aria-hidden="true">{{ atajo }}</kbd>
+  <button mat-icon-button type="button" class="cerrar-movil" (click)="limpiar()" aria-label="Cerrar búsqueda"><mat-icon>close</mat-icon></button>
+</div>
+
+<mat-autocomplete #auto="matAutocomplete" [displayWith]="mostrar" (optionSelected)="alElegir($event)" class="busqueda-global-panel">
+  @if (resultados().mascotas.length) {
+    <mat-optgroup label="Mascotas">
+      @for (r of resultados().mascotas; track r.id) {
+        <mat-option [value]="r"><span class="opcion"><mat-icon aria-hidden="true">{{ r.icono }}</mat-icon><strong>{{ r.titulo }}</strong><small>{{ r.detalle }}</small></span></mat-option>
+      }
+    </mat-optgroup>
+  }
+  @if (resultados().clientes.length) {
+    <mat-optgroup label="Clientes">
+      @for (r of resultados().clientes; track r.id) {
+        <mat-option [value]="r"><span class="opcion"><mat-icon aria-hidden="true">{{ r.icono }}</mat-icon><strong>{{ r.titulo }}</strong><small>{{ r.detalle }}</small></span></mat-option>
+      }
+    </mat-optgroup>
+  }
+  @if (sinResultados()) {
+    <mat-option disabled>Ninguna mascota ni cliente coincide con «{{ texto() }}»</mat-option>
+  }
+</mat-autocomplete>

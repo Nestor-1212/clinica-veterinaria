@@ -1,5 +1,5 @@
 import { Cita, Consulta, TipoMascota } from '../models';
-import { inicioDia, mismoDia } from './metricas';
+import { inicioDia, mismoDia, momentoCita } from './metricas';
 
 /**
  * Consultas: rangos clínicos por especie, sala de espera del día y filtros por período.
@@ -33,11 +33,13 @@ export function cambioPeso(actual: number | null | undefined, anterior: number |
  * pendientes o confirmadas del día por hora. Con `vetId`, solo las de ese veterinario.
  */
 export function salaDeEspera(citas: Cita[], ahora: Date, vetId?: string): Cita[] {
-  const peso = (c: Cita) => (c.estado === 'inmediata' ? 0 : 1);
+  // Primero las inmediatas, luego quienes ya llegaron (por orden de llegada) y al final las citas por llegar
+  const peso = (c: Cita) => (c.estado === 'inmediata' ? 0 : c.llegada ? 1 : 2);
+  const orden = (c: Cita) => (c.llegada && c.estado !== 'inmediata' ? new Date(c.llegada).getTime() : momentoCita(c).getTime());
   return citas
     .filter(c => mismoDia(c.fecha, ahora) && (c.estado === 'inmediata' || c.estado === 'pendiente' || c.estado === 'confirmada'))
     .filter(c => !vetId || c.veterinarioId === vetId)
-    .sort((a, b) => peso(a) - peso(b) || a.hora.localeCompare(b.hora));
+    .sort((a, b) => peso(a) - peso(b) || orden(a) - orden(b));
 }
 
 export type PeriodoConsultas = 'hoy' | 'semana' | 'mes' | 'todas';

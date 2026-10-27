@@ -1,43 +1,40 @@
-<section class="escenario ingresos" aria-labelledby="titulo-ingresos">
-  <div class="ingresos-cifra">
-    <app-kpi hero etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
-      [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
-      [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mismo tramo del mes anterior: ' + moneda(ingresos().mismoTramoAnterior) + ' · mes completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
-    <div class="ingresos-secundarias">
-      <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
-        [delta]="ingresos().variacionTicket === null ? null : { porcentaje: ingresos().variacionTicket!, contra: contra(), subirEsBueno: true }"
-        [ayuda]="plural(ingresos().cobros, 'cobro') + ' este mes'"></app-kpi>
-      <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
-        [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
-        [ayuda]="plural(asistencia().inmediatas, 'inmediata') + ' · ' + asistencia().tasaInasistencia + ' % no asistieron'"></app-kpi>
-      <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos" [tono]="atrasado() ? 'atencion' : null"
-        [ayuda]="plural(cobrar().cantidad, 'pendiente') + (atrasado() ? ' · ' + moneda(atrasado()) + ' con más de 30 días' : '')"></app-kpi>
-    </div>
-  </div>
-  <div class="ingresos-grafico">
-    <header class="cabecera">
-      <div>
-        <h2 id="titulo-ingresos">Ingresos de los últimos 6 meses</h2>
-        <p>Cobros registrados, en dólares</p>
-      </div>
-    </header>
-    <app-grafico-columnas [datos]="meses()" titulo="Ingresos cobrados por mes, últimos 6 meses" [formato]="moneda" [alto]="300"
-      notaParcial="Mes en curso: suma hasta hoy."></app-grafico-columnas>
-  </div>
+<section class="escenario pulso" aria-labelledby="titulo-pulso">
+  <h2 id="titulo-pulso" class="sr-only">Cómo va el mes</h2>
+  <app-kpi hero etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
+    [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
+    [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mismo tramo del mes anterior: ' + moneda(ingresos().mismoTramoAnterior) + ' · mes completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
+  <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos" [tono]="atrasado()?.cantidad ? 'atencion' : null"
+    [ayuda]="plural(cobrar().cantidad, 'pendiente')"></app-kpi>
+  <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
+    [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
+    [ayuda]="plural(asistencia().inmediatas, 'inmediata')"></app-kpi>
+  <a class="a-reportes" routerLink="/reportes">
+    <mat-icon aria-hidden="true">bar_chart</mat-icon>
+    <span><strong>Análisis completo en Reportes</strong><small>Últimos 6 meses, servicios, veterinarios y métodos de pago</small></span>
+    <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+  </a>
 </section>
 
 <div class="contexto">
-  <section class="seccion" aria-labelledby="titulo-categorias">
+  <section class="seccion alertas" aria-labelledby="titulo-alertas">
     <header class="cabecera">
       <div>
-        <h2 id="titulo-categorias">Qué se vende este mes</h2>
-        <p>Facturado por tipo de servicio, antes de descuentos</p>
+        <h2 id="titulo-alertas">Requiere su atención</h2>
+        <p>Lo del mes que pide una decisión</p>
       </div>
     </header>
-    @if (categorias().length) {
-      <app-grafico-barras [datos]="categorias()" titulo="Facturado por tipo de servicio este mes" [formato]="moneda"></app-grafico-barras>
+    @if (alertas().length) {
+      <ul class="lista">
+        @for (a of alertas(); track a.titulo) {
+          <li class="alerta">
+            <span class="alerta-icono" aria-hidden="true"><mat-icon>{{ a.icono }}</mat-icon></span>
+            <span class="alerta-texto"><strong>{{ a.titulo }}</strong><small>{{ a.detalle }}</small></span>
+            <a class="alerta-accion" [routerLink]="a.enlace" [queryParams]="a.consulta">{{ a.accion }} <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
+          </li>
+        }
+      </ul>
     } @else {
-      <p class="vacio"><mat-icon aria-hidden="true">receipt_long</mat-icon>Aún no hay cobros este mes.</p>
+      <p class="vacio"><mat-icon aria-hidden="true">verified</mat-icon>Nada requiere atención: cobros al día, ingresos y asistencia dentro de lo normal.</p>
     }
   </section>
 
@@ -52,44 +49,5 @@
     @if (cobrar().pendientes.length) {
       <a class="ver-mas" routerLink="/pagos">Gestionar cobros <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
     }
-  </section>
-
-  <section class="seccion" aria-labelledby="titulo-asistencia">
-    <header class="cabecera">
-      <div>
-        <h2 id="titulo-asistencia">Asistencia del mes</h2>
-        <p>Citas cuya hora ya pasó, desde el día 1</p>
-      </div>
-    </header>
-    <dl class="cifras">
-      <div><dt>Citas programadas</dt><dd>{{ entero(asistencia().programadas) }}</dd></div>
-      <div><dt>Atendidas</dt><dd>{{ entero(asistencia().atendidas) }}</dd></div>
-      <div><dt>Canceladas</dt><dd>{{ entero(asistencia().canceladas) }} <span class="cifras-detalle">{{ asistencia().tasaCancelacion }} %</span></dd></div>
-      <div><dt>No asistieron</dt><dd>{{ entero(asistencia().noAsistieron) }} <span class="cifras-detalle">{{ asistencia().tasaInasistencia }} %</span></dd></div>
-      <div><dt>Atenciones inmediatas</dt><dd>{{ entero(asistencia().inmediatas) }}</dd></div>
-    </dl>
-  </section>
-
-  <section class="seccion" aria-labelledby="titulo-vets">
-    <header class="cabecera">
-      <div>
-        <h2 id="titulo-vets">Por veterinario</h2>
-        <p>Atenciones e ingresos cobrados del mes</p>
-      </div>
-    </header>
-    <table class="tabla">
-      <thead>
-        <tr><th scope="col">Veterinario</th><th scope="col" class="num">Atenciones</th><th scope="col" class="num">Ingresos</th></tr>
-      </thead>
-      <tbody>
-        @for (v of veterinarios(); track v.id) {
-          <tr>
-            <th scope="row"><span class="tabla-nombre">{{ v.nombre }}</span>@if (v.especialidad) {<span class="tabla-detalle">{{ v.especialidad }}</span>}</th>
-            <td class="num">{{ entero(v.atenciones) }}</td>
-            <td class="num">{{ moneda(v.ingresos) }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
   </section>
 </div>

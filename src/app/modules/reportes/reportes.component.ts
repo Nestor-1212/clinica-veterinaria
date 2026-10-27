@@ -1,3 +1,5 @@
+import { aCsv, descargarCsv, fechaArchivo } from '../../core/utils/csv';
+import { METODO_TEXTO, fechaCobro } from '../../core/utils/pagos';
 import { DIAS_AVISO_VACUNA } from '../../core/utils/vacunas';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ClientesService } from '../../core/services/clientes.service';
@@ -79,6 +81,21 @@ export class ReportesComponent implements OnInit {
 
     this.vacunasPendientesList = this.vacunasService.getPendientes(this.hoy).sort(porProximaFecha);
     this.calcular();
+  }
+
+  /** Cobros del período, uno por fila, para la contabilidad (Excel o Google Sheets). */
+  exportarCsv(): void {
+    const { desde, hasta } = this.rango;
+    const cobros = this.pagosService.getAll()
+      .filter(p => p.estado === 'pagado' && fechaCobro(p) >= desde && fechaCobro(p) <= hasta)
+      .sort((a, b) => fechaCobro(a).getTime() - fechaCobro(b).getTime());
+    const cliente = (id: string) => this.clientesService.getById(id)?.nombre ?? '';
+    const mascota = (id: string) => this.mascotasService.getById(id)?.nombre ?? '';
+    // La descarga del archivo es la confirmación (como el PDF)
+    descargarCsv(`cobros-${fechaArchivo(desde)}-a-${fechaArchivo(hasta)}`, aCsv(
+      ['Fecha de cobro', 'Cliente', 'Mascota', 'Conceptos', 'Método', 'Referencia', 'Subtotal', 'Descuento', 'Total'],
+      cobros.map(p => [fechaArchivo(fechaCobro(p)), cliente(p.clienteId), mascota(p.mascotaId), p.items.map(i => i.descripcion).join(' + '),
+        METODO_TEXTO[p.metodoPago], p.referencia ?? '', p.subtotal, p.descuento, p.total])));
   }
 
   elegirPeriodo(p: Periodo): void { this.periodo = p; this.calcular(); }

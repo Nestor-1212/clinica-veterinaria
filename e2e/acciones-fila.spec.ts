@@ -42,7 +42,7 @@ test.describe('Acciones dentro de filas clicables (UX C1/C2)', () => {
   test('el dashboard del admin abre en Negocio y respeta la vista pedida en la URL', async ({ page }) => {
     await login(page, 'admin');
     await expect(page.getByRole('tab', { name: 'Negocio' })).toHaveAttribute('aria-selected', 'true');
-    await expect(page.getByRole('heading', { name: 'Ingresos de los últimos 6 meses' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Requiere su atención' })).toBeVisible();
     await page.goto('/dashboard?vista=clientes');
     await expect(page.getByRole('tab', { name: 'Clientes' })).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByRole('heading', { name: 'Para recuperar' })).toBeVisible();

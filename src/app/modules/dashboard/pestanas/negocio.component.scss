@@ -1,20 +1,35 @@
-// Pestaña Negocio: el escenario une la cifra del mes (con sus secundarias debajo,
-// separadas por filetes) y el gráfico de 6 meses a todo el ancho restante. El contexto
-// (servicios, cobros, asistencia, veterinarios) va debajo, sobre el fondo.
-.ingresos { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: var(--vs-space-6) var(--vs-space-8); }
-.ingresos-cifra { display: grid; align-content: start; gap: var(--vs-space-6); padding-right: var(--vs-space-6);
-  background: linear-gradient(transparent, var(--vs-border) 15% 85%, transparent) right / 1px 100% no-repeat; }
-.ingresos-secundarias { display: grid;
-  > app-kpi { padding: var(--vs-space-3) 0; background: linear-gradient(90deg, var(--vs-border), transparent) top / 100% 1px no-repeat; } }
-.contexto { --columnas: 4; }
+// Pestaña Negocio: arriba el pulso del mes (tres cifras y el paso a Reportes); debajo lo que
+// pide una decisión y la antigüedad de lo pendiente. El análisis vive en Reportes.
+.pulso { display: grid; grid-template-columns: minmax(240px, 1.3fr) repeat(2, minmax(160px, 1fr)) minmax(220px, 1.2fr); gap: var(--vs-space-6); align-items: start; }
 
-@media (max-width: 1600px) { .contexto { --columnas: 2; } }
-@media (max-width: 960px) {
-  .ingresos { grid-template-columns: minmax(0, 1fr); }
-  .ingresos-cifra { padding-right: 0; background: none; }
-  .ingresos-secundarias { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--vs-space-5); }
+.a-reportes {
+  display: flex; align-items: center; gap: var(--vs-space-3); align-self: stretch;
+  padding: var(--vs-space-4); border: 1px solid var(--vs-border); border-radius: var(--vs-radius-lg);
+  color: var(--vs-text); text-decoration: none;
+  span { display: grid; gap: 2px; flex: 1; }
+  small { font-size: 13px; color: var(--vs-text-secondary); }
+  mat-icon { color: var(--vs-primary); }
+  &:hover { border-color: var(--vs-primary); background: var(--vs-primary-soft); }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; }
 }
-@media (max-width: 720px) { .contexto { --columnas: 1; } }
+
+.contexto { --columnas: 2; }
+
+.alerta { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: var(--vs-space-3); padding: var(--vs-space-3) 0;
+  & + & { border-top: 1px solid var(--vs-border); } }
+.alerta-icono { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--vs-attention-container); color: var(--vs-on-attention-container); }
+.alerta-texto { display: grid; gap: 2px; min-width: 0;
+  strong { font-size: 15px; color: var(--vs-text); }
+  small { font-size: 13px; color: var(--vs-text-secondary); } }
+.alerta-accion { display: inline-flex; align-items: center; gap: 4px; color: var(--vs-primary); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  &:hover { text-decoration: underline; }
+  &:focus-visible { outline: 2px solid var(--vs-focus); outline-offset: 2px; border-radius: 4px; } }
+
+@media (max-width: 1200px) { .pulso { grid-template-columns: repeat(3, minmax(0, 1fr)); .a-reportes { grid-column: 1 / -1; } } }
+@media (max-width: 960px) { .contexto { --columnas: 1; } }
 @media (max-width: 600px) {
-  .ingresos-secundarias { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--vs-space-4); }
+  .pulso { grid-template-columns: 1fr 1fr; app-kpi[hero] { grid-column: 1 / -1; } }
+  .alerta { grid-template-columns: 40px minmax(0, 1fr); .alerta-accion { grid-column: 2; } }
 }
