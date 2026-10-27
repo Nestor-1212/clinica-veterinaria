@@ -46,6 +46,7 @@
               </label>
             }
           </div>
+          @if (form.get('tipo')?.touched && form.get('tipo')?.invalid) { <p class="error-grupo" role="alert">Elija la especie</p> }
         </fieldset>
 
         <fieldset class="grupo">
@@ -58,6 +59,7 @@
               <input type="radio" formControlName="sexo" value="hembra"><mat-icon aria-hidden="true">female</mat-icon>Hembra
             </label>
           </div>
+          @if (form.get('sexo')?.touched && form.get('sexo')?.invalid) { <p class="error-grupo" role="alert">Elija el sexo</p> }
         </fieldset>
 
         <div class="dos">
@@ -142,7 +144,7 @@
         }
       </div>
       <h2 class="vs-previa-nombre" [class.vacio]="!v('nombre')">{{ v('nombre') || 'Nombre' }}</h2>
-      <p class="vs-previa-sub">{{ v('tipo') }}@if (v('raza')) { · {{ v('raza') }} } · {{ v('sexo') === 'hembra' ? 'Hembra' : 'Macho' }}</p>
+      <p class="vs-previa-sub">{{ v('tipo') || 'Especie sin elegir' }}@if (v('raza')) { · {{ v('raza') }} }@if (v('sexo')) { · {{ v('sexo') === 'hembra' ? 'Hembra' : 'Macho' }} }</p>
       <dl class="previa-datos">
         <div><dt>Edad</dt><dd>{{ v('edad') !== null && v('edad') !== '' ? (v('edad') | edad) : '—' }}</dd></div>
         <div><dt>Peso</dt><dd>{{ v('peso') ? v('peso') + ' kg' : '—' }}</dd></div>
@@ -150,7 +152,7 @@
       @if (v('alergias')?.trim()) {
         <p class="previa-alergia"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ v('alergias') }}</span></p>
       } @else {
-        <p class="previa-linea previa-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias: no indicadas</p>
+        <p class="previa-linea previa-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias sin registrar</p>
       }
       @if (dueno; as d) {
         <p class="previa-dueno"><mat-icon aria-hidden="true">person</mat-icon>{{ d.nombre }} · {{ d.telefono }}</p>

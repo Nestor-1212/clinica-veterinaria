@@ -64,6 +64,12 @@
             <textarea matInput formControlName="diagnostico" rows="2" placeholder="Diagnóstico clínico"></textarea>
             <mat-error>Indique el diagnóstico</mat-error>
           </mat-form-field>
+          @if (mascota?.alergias) {
+            <p class="alerta-alergia" role="note">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              <span><strong>{{ mascota?.nombre }} tiene alergias:</strong> {{ mascota?.alergias }}. Téngalo en cuenta en el tratamiento.</span>
+            </p>
+          }
           <mat-form-field appearance="outline" class="ancho">
             <mat-label>Tratamiento</mat-label>
             <textarea matInput formControlName="tratamiento" rows="3" placeholder="Plan de tratamiento y cuidados en casa"></textarea>

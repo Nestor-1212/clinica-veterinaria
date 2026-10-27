@@ -59,7 +59,18 @@
             </div>
           }
         </div>
+        @if (tramosPasadosVacios.size) {
+          <div class="pasadas" role="presentation">
+            <button type="button" class="pasadas-btn" (click)="verPasadas = !verPasadas" [attr.aria-expanded]="verPasadas">
+              <mat-icon aria-hidden="true">{{ verPasadas ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+              {{ verPasadas ? 'Ocultar horas pasadas sin citas' : textoPasadas + ' · mostrar' }}
+            </button>
+          </div>
+        }
         @for (t of tramos; track t; let ti = $index) {
+          @if (ocultarTramo(t)) {
+            <!-- plegado: hora pasada sin citas -->
+          } @else {
           @if (t === tramoAhora) {
             <div class="ahora" role="presentation"><span>Ahora · {{ horaAhora }}</span></div>
           }
@@ -92,6 +103,7 @@
               </div>
             }
           </div>
+          }
         }
       </div>
 

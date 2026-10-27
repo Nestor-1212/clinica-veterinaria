@@ -1,7 +1,8 @@
 :host { display: block; margin-bottom: var(--vs-space-4); }
 
 .buscar { width: 100%; }
-.error { color: var(--vs-danger); }
+.error-arriba { display: flex; align-items: center; gap: 6px; margin: 0 0 var(--vs-space-2); color: var(--vs-danger); font-size: 13px; font-weight: 600;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; } }
 
 .elegida {
   display: flex; align-items: center; gap: var(--vs-space-3);

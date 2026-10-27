@@ -30,3 +30,9 @@ export async function elegirOpcion(page: Page, etiqueta: string, opcion: string 
   await page.getByRole('combobox', { name: etiqueta }).click();
   await page.getByRole('option', { name: opcion }).first().click();
 }
+
+/** Buscador de paciente compartido: escribe y elige la primera mascota que coincide. */
+export async function elegirPaciente(page: Page, busqueda: string, mascota: string | RegExp): Promise<void> {
+  await page.locator('#selector-paciente').fill(busqueda);
+  await page.getByRole('option', { name: mascota }).first().click();
+}

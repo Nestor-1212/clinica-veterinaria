@@ -10,7 +10,7 @@ test('desde Mascotas, la atención inmediata abre con esa mascota elegida (filtr
   const nombre = (await page.locator('.c-paciente .nombre a').first().innerText()).trim();
   await page.getByRole('button', { name: `Iniciar atención inmediata para ${nombre}` }).first().click();
   await expect(page).toHaveURL(/\/citas\/nueva\?.*mascotaId=.*tipo=inmediata/);
-  await expect(page.getByRole('radio', { name: new RegExp(nombre) })).toBeChecked();
+  await expect(page.locator('app-selector-paciente .elegida')).toContainText(nombre);
   await expect(page.locator('.ficha-alergia')).toBeVisible();
 });
 

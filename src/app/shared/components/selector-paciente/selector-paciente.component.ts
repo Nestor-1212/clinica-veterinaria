@@ -12,7 +12,7 @@ const sinTildes = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '
 interface OpcionPaciente { mascota: Mascota; cliente?: Cliente; texto: string; }
 
 /**
- * Elegir paciente buscando por mascota, dueño o teléfono (en vez de una lista de decenas
+ * Elegir paciente buscando por mascota, dueño, teléfono o cédula (en vez de una lista de decenas
  * de mascotas). Elegido, se muestra como tarjeta con "Cambiar".
  */
 @Component({
@@ -38,7 +38,7 @@ export class SelectorPacienteComponent {
     return this.mascotas()
       .map(m => {
         const cliente = clientes.get(m.clienteId);
-        return { mascota: m, cliente, texto: sinTildes(`${m.nombre} ${m.tipo} ${cliente?.nombre ?? ''} ${cliente?.telefono ?? ''}`) };
+        return { mascota: m, cliente, texto: sinTildes(`${m.nombre} ${m.tipo} ${cliente?.nombre ?? ''} ${cliente?.telefono ?? ''} ${cliente?.telefono?.replace(/\D/g, '') ?? ''} ${cliente?.cedula ?? ''}`) };
       })
       .sort((a, b) => a.mascota.nombre.localeCompare(b.mascota.nombre, 'es'));
   });

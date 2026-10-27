@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ElementRef, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, DestroyRef, AfterViewInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { habilitarSi, validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -17,21 +17,21 @@ import { DisponibilidadVet, Horario, MOTIVOS_FRECUENTES, MOTIVOS_PROGRAMADOS, ag
 import { ICONO_ESPECIE } from '../../../core/utils/clientes';
 import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
 import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
+import { SelectorPacienteComponent } from '../../../shared/components/selector-paciente/selector-paciente.component';
 import { EdadPipe } from '../../../shared/pipes/edad.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatFormField, MatLabel, MatSuffix, MatError, MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel, MatError, MatInput } from '@angular/material/input';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { MatSelect, MatOption } from '@angular/material/select';
 import { MatCalendar } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-form-cita',
     templateUrl: './form-cita.component.html',
     styleUrls: ['./form-cita.component.scss', './atencion-inmediata.scss'],
-    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatSuffix, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe, FichaPacienteComponent]
+    imports: [MatIcon, MatButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatError, MatInput, MatCalendar, DatePipe, NgTemplateOutlet, EdadPipe, FichaPacienteComponent, SelectorPacienteComponent]
 })
-export class FormCitaComponent implements OnInit {
+export class FormCitaComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private citasService = inject(CitasService);
   private clientesService = inject(ClientesService);
@@ -51,6 +51,8 @@ export class FormCitaComponent implements OnInit {
   private host = inject(ElementRef, { optional: true });
   clientes: Cliente[] = [];
   mascotas: Mascota[] = [];
+  /** Todas las mascotas activas de clientes activos (buscador de paciente). */
+  todasMascotas: Mascota[] = [];
   veterinarios: Usuario[] = [];
   isInmediata = false;
   horas = this.generarHoras();
@@ -124,6 +126,8 @@ export class FormCitaComponent implements OnInit {
 
   ngOnInit(): void {
     this.clientes = this.clientesService.getAll().filter(c => c.activo);
+    const activos = new Set(this.clientes.map(c => c.id));
+    this.todasMascotas = this.mascotasService.getAll().filter(m => m.activo && activos.has(m.clienteId));
     this.veterinarios = this.usuariosService.getVeterinarios();
 
     const params = this.route.snapshot.queryParams;
@@ -152,10 +156,31 @@ export class FormCitaComponent implements OnInit {
     }
   }
 
+  /** Al llegar (desde un hueco de la agenda o a una atención inmediata) el foco va al buscador de paciente: es el paso que falta. */
+  ngAfterViewInit(): void {
+    if (this.form.get('clienteId')!.value || typeof document === 'undefined') return;
+    setTimeout(() => this.host?.nativeElement.querySelector('#selector-paciente')?.focus({ preventScroll: true }));
+  }
+
   /** Mascota elegida: para avisar de sus alergias antes de atenderla. */
   get mascotaSeleccionada(): Mascota | undefined {
     const id = this.form.get('mascotaId')?.value;
     return id ? this.mascotas.find(m => m.id === id) : undefined;
+  }
+
+  /** Del buscador: la mascota elegida fija también al dueño ('' = cambiar de paciente). */
+  elegirPaciente(mascotaId: string): void {
+    const clienteId = this.todasMascotas.find(m => m.id === mascotaId)?.clienteId ?? '';
+    this.form.patchValue({ clienteId });
+    this.onClienteChange(clienteId);
+    if (mascotaId) this.form.patchValue({ mascotaId });
+  }
+
+  get nombreCliente(): string { return this.clientes.find(c => c.id === this.form.get('clienteId')?.value)?.nombre ?? ''; }
+
+  get pacienteInvalido(): boolean {
+    const c = this.form.get('clienteId')!;
+    return c.invalid && c.touched;
   }
 
   onClienteChange(clienteId: string): void {
@@ -179,6 +204,11 @@ export class FormCitaComponent implements OnInit {
 
   onSubmit(): void {
     if (this.enviando) return;
+    if (this.form.get('clienteId')!.invalid) {
+      this.form.markAllAsTouched();
+      this.host?.nativeElement.querySelector('#selector-paciente')?.focus();
+      return;
+    }
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.enviando = true;
     if (this.isInmediata) {

@@ -8,10 +8,12 @@
     <button mat-button type="button" (click)="cambiar()" [attr.aria-label]="'Cambiar de paciente (ahora ' + o.mascota.nombre + ')'">Cambiar</button>
   </div>
 } @else {
+  <!-- El aviso va encima: debajo lo taparía la lista de sugerencias, que se abre al recibir el foco -->
+  @if (invalido()) { <p class="error-arriba" id="selector-paciente-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>Elija el paciente para continuar</p> }
   <mat-form-field appearance="outline" class="buscar" subscriptSizing="dynamic" [class.mat-form-field-invalid]="invalido()">
     <mat-label>Paciente</mat-label>
     <input matInput id="selector-paciente" [value]="texto()" (input)="alEscribir($event)" [matAutocomplete]="auto"
-      placeholder="Nombre de la mascota, dueño o teléfono" autocomplete="off" [attr.aria-invalid]="invalido()">
+      placeholder="Mascota, dueño, teléfono o cédula" autocomplete="off" required [attr.aria-invalid]="invalido()" [attr.aria-describedby]="invalido() ? 'selector-paciente-error' : null">
     <mat-icon matSuffix>search</mat-icon>
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="alElegir($event)">
       @for (o of filtradas(); track o.mascota.id) {
@@ -26,10 +28,6 @@
         <mat-option disabled>Ninguna mascota coincide</mat-option>
       }
     </mat-autocomplete>
-    @if (invalido()) {
-      <mat-hint class="error">Elija el paciente</mat-hint>
-    } @else {
-      <mat-hint>Busque por mascota, dueño o teléfono</mat-hint>
-    }
+    <mat-hint>Busque por mascota, dueño, teléfono o cédula</mat-hint>
   </mat-form-field>
 }

@@ -20,7 +20,7 @@
   @if (f.mascota.alergias) {
     <p class="ficha-alergia" role="note"><mat-icon aria-hidden="true">warning</mat-icon><span><strong>Alergias:</strong> {{ f.mascota.alergias }}</span></p>
   } @else {
-    <p class="ficha-linea ficha-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias: no indicadas</p>
+    <p class="ficha-linea ficha-linea--sin-dato"><mat-icon aria-hidden="true">help_outline</mat-icon>Alergias sin registrar: pregunte al dueño</p>
   }
   <p class="ficha-linea" [class.ficha-linea--atencion]="f.vacunas.estado === 'vencidas'">
     <mat-icon aria-hidden="true">vaccines</mat-icon>

@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { elegirOpcion, leerColeccion, login } from './helpers';
+import { elegirPaciente, leerColeccion, login } from './helpers';
 
 interface CitaLS { motivo: string; hora: string; veterinarioId: string; estado: string }
 
 test('nueva cita: paciente, veterinario, día en el calendario, hora libre y motivo de un toque', async ({ page }) => {
   await login(page, 'recepcion');
   await page.goto('/citas/nueva');
-  await elegirOpcion(page, 'Propietario', 'Ana Castillo');
-  await expect(page.getByRole('radio', { name: /Max/ })).toBeChecked();
+  await elegirPaciente(page, 'Ana Castillo', /Max/);
+  await expect(page.locator('app-selector-paciente .elegida')).toContainText('Max');
   await page.getByRole('radio', { name: /Carlos/ }).check();
 
   // Mañana siempre tiene horas no pasadas; se elige la primera libre

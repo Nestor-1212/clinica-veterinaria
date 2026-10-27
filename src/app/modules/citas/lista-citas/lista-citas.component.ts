@@ -142,10 +142,31 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     this.delDia = this.citas.filter(c => c.estado !== 'cancelada' && mismoDia(c.fecha, this.dia)).sort((a, b) => a.hora.localeCompare(b.hora));
     this.citasPorVet = Object.fromEntries(this.veterinarios.map(v => [v.id, this.delDia.filter(c => c.veterinarioId === v.id).length]));
     this.calcularEntrada();
+    this.calcularPasadas();
     this.proximosHuecos = this.veterinarios.map(v => ({
       vet: v,
       tramos: this.tramos.filter(t => this.puedeAgendar(t) && !this.citasEn(v.id, t).length).slice(0, 4)
     })).filter(x => x.tramos.length);
+  }
+
+  // ---------- Horas pasadas sin citas (hoy) ----------
+  /** Tramos de hoy ya pasados y sin ninguna cita: se pliegan en una línea para que el tablero empiece en lo que importa. */
+  tramosPasadosVacios = new Set<string>();
+  verPasadas = false;
+
+  private calcularPasadas(): void {
+    const ahora = this.tramoAhora;
+    this.tramosPasadosVacios = new Set(ahora
+      ? this.tramos.filter(t => t < ahora && this.veterinarios.every(v => !this.citasEn(v.id, t).length))
+      : []);
+  }
+
+  ocultarTramo(t: string): boolean { return !this.verPasadas && this.tramosPasadosVacios.has(t); }
+
+  get textoPasadas(): string {
+    const minutos = this.tramosPasadosVacios.size * 30;
+    const duracion = minutos < 60 ? `${minutos} min` : `${String(minutos / 60).replace('.', ',')} h`;
+    return `${duracion} pasadas sin citas`;
   }
 
   // ---------- Teclado en el tablero (un solo Tab entra; las flechas recorren) ----------

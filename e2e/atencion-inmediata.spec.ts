@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { elegirOpcion, leerColeccion, login } from './helpers';
+import { elegirPaciente, leerColeccion, login } from './helpers';
 
 interface CitaLS { id: string; estado: string; motivo: string }
 interface ConsultaLS { id: string; citaId?: string; tipo: string; diagnostico: string }
@@ -10,9 +10,9 @@ test('atención inmediata → consulta queda vinculada, tipo inmediata y cita co
   await page.goto('/citas/nueva?tipo=inmediata');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Atención inmediata');
 
-  // Ana Castillo tiene una sola mascota (Max) en la semilla demo: se autoselecciona.
-  await elegirOpcion(page, 'Propietario', 'Ana Castillo');
-  await expect(page.getByRole('radio', { name: /Max/ })).toBeChecked();
+  // Se busca por el dueño: Ana Castillo tiene una sola mascota (Max) en la semilla demo.
+  await elegirPaciente(page, 'Ana Castillo', /Max/);
+  await expect(page.locator('app-selector-paciente .elegida')).toContainText('Max');
   await page.getByRole('button', { name: 'Vómitos', exact: true }).click();
   await expect(page.locator('textarea[formControlName="motivo"]')).toHaveValue('Vómitos');
   await page.getByRole('radio', { name: /Carlos/ }).check();
@@ -46,7 +46,7 @@ test('atención inmediata → consulta queda vinculada, tipo inmediata y cita co
 test('recepción registra atención inmediata y vuelve a Citas (no a Consultas)', async ({ page }) => {
   await login(page, 'recepcion');
   await page.goto('/citas/nueva?tipo=inmediata');
-  await elegirOpcion(page, 'Propietario', 'Ana Castillo');
+  await elegirPaciente(page, 'Ana Castillo', /Max/);
   await page.getByRole('radio', { name: /Carlos/ }).check();
   await page.locator('textarea[formControlName="motivo"]').fill('E2E recepción inmediata');
   await page.getByRole('button', { name: /Iniciar atención$/ }).click();

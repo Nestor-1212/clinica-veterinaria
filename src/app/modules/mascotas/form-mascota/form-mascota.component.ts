@@ -52,9 +52,10 @@ export class FormMascotaComponent implements OnInit {
     this.form = this.fb.group({
       clienteId: ['', Validators.required],
       nombre: ['', [Validators.required, Validators.minLength(2)]],
-      tipo: ['Perro', Validators.required],
+      // Sin valor por defecto: una especie o sexo equivocados quedarían en el expediente sin que nadie lo note
+      tipo: ['', Validators.required],
       raza: ['', Validators.required],
-      sexo: ['macho', Validators.required],
+      sexo: ['', Validators.required],
       // Vacíos al empezar (antes "0", que había que borrar)
       edad: [null, [Validators.required, Validators.min(0)]],
       peso: [null, [Validators.required, Validators.min(0.1)]],

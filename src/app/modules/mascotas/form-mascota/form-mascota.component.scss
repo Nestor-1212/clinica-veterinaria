@@ -7,6 +7,7 @@
   mat-form-field { margin-bottom: var(--vs-space-4); } }
 
 // Especie y sexo: radios nativos dentro de etiquetas (teclado y lector de pantalla)
+.error-grupo { margin: var(--vs-space-2) 0 0; color: var(--vs-danger); font-size: 13px; }
 .grupo {
   margin: 0 0 var(--vs-space-4); padding: 0; border: 0; min-width: 0;
   legend { margin-bottom: var(--vs-space-2); padding: 0; font-size: 13px; font-weight: 600; color: var(--vs-text-secondary); }

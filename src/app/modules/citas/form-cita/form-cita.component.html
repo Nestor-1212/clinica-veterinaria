@@ -19,20 +19,12 @@
       <!-- Paciente -->
       <section class="paso" aria-labelledby="paso-paciente">
         <h2 id="paso-paciente"><span class="paso-num" aria-hidden="true">1</span>Paciente</h2>
-        <mat-form-field appearance="outline" class="ancho">
-          <mat-label>Propietario</mat-label>
-          <mat-select formControlName="clienteId" (selectionChange)="onClienteChange($event.value)">
-            @for (c of clientes; track c.id) {
-              <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
-            }
-          </mat-select>
-          <mat-icon matSuffix>person</mat-icon>
-          <mat-error>Seleccione el propietario</mat-error>
-        </mat-form-field>
+        <app-selector-paciente [mascotas]="todasMascotas" [clientes]="clientes" [seleccion]="form.get('mascotaId')?.value || ''"
+          [invalido]="pacienteInvalido" (elegir)="elegirPaciente($event)" />
 
-        @if (form.get('clienteId')?.value) {
+        @if (form.get('clienteId')?.value && mascotas.length !== 1) {
           <fieldset class="opciones">
-            <legend>Mascota</legend>
+            <legend>{{ mascotas.length ? 'Mascotas de ' + nombreCliente : 'Mascota' }}</legend>
             @if (mascotas.length === 0) {
               <p class="opciones-vacio">Este cliente no tiene mascotas activas. <a [routerLink]="['/mascotas/nueva']" [queryParams]="{ clienteId: form.get('clienteId')?.value }">Registrar mascota</a></p>
             }
