@@ -1,3 +1,4 @@
+import { conceptoPago } from '../../../core/utils/pagos';
 import { DIAS_AVISO_VACUNA } from '../../../core/utils/vacunas';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -24,6 +25,8 @@ import { DatosDashboard, ICONO_ESPECIE, enDias, entero, moneda, plural } from '.
 })
 export class HoyComponent {
   readonly diasAviso = DIAS_AVISO_VACUNA;
+  /** "Consulta veterinaria + 1 más": la deuda se nombra por todo lo que incluye, no solo la primera línea. */
+  readonly concepto = conceptoPago;
   private router = inject(Router);
   private citasService = inject(CitasService);
   private snack = inject(MatSnackBar);

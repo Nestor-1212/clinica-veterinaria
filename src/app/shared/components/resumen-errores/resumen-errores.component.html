@@ -2,7 +2,7 @@
   <div class="resumen" role="alert" aria-labelledby="resumen-errores-titulo">
     <p id="resumen-errores-titulo" class="titulo">
       <mat-icon aria-hidden="true">error</mat-icon>
-      {{ errores().length === 1 ? 'Falta corregir 1 dato antes de guardar' : 'Faltan corregir ' + errores().length + ' datos antes de guardar' }}
+      {{ errores().length === 1 ? 'Hay 1 dato por corregir antes de guardar' : 'Hay ' + errores().length + ' datos por corregir antes de guardar' }}
     </p>
     <ul>
       @for (e of errores(); track e.texto) {

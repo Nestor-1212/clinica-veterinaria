@@ -13,7 +13,7 @@
       <div class="resumen-cifras">
         <app-kpi hero etiqueta="Cobrado este mes" [valor]="cifra(ingresos.mes)"
           [delta]="ingresos.variacion === null ? null : { porcentaje: ingresos.variacion, contra: contra, subirEsBueno: true }"
-          [ayuda]="ingresos.cobros + ' cobros · mes anterior completo: ' + cifra(ingresos.mesAnterior)"></app-kpi>
+          [ayuda]="ingresos.cobros + ' cobros · mismo tramo del mes anterior: ' + cifra(ingresos.mismoTramoAnterior)"></app-kpi>
         <div class="resumen-secundarias">
           <app-kpi etiqueta="Por cobrar" [valor]="cifra(cobrar.total)" [tono]="atrasado ? 'atencion' : null"
             [ayuda]="cobrar.cantidad + (cobrar.cantidad === 1 ? ' pendiente' : ' pendientes') + (atrasado ? ' · ' + cifra(atrasado) + ' con más de 30 días' : '')"></app-kpi>

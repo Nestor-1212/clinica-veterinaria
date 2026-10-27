@@ -231,7 +231,7 @@ export class FormCitaComponent implements OnInit, AfterViewInit {
       });
     } else {
       // Recepción no tiene acceso a Consultas: el veterinario la iniciará desde Citas.
-      this.snack.open('Atención inmediata registrada. El paciente ya aparece en la sala de espera de Consultas.', 'OK', { duration: 4000 });
+      this.snack.open('Atención inmediata registrada. El veterinario ya lo ve en su sala de espera.', 'OK', { duration: 4000 });
       this.router.navigate(['/citas']);
     }
   }

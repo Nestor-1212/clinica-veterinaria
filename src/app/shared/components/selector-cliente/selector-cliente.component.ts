@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal, viewChild } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatInput, MatSuffix, MatHint } from '@angular/material/input';
@@ -26,6 +26,19 @@ export class SelectorClienteComponent {
   readonly elegir = output<string>();
 
   readonly texto = signal('');
+  private readonly trigger = viewChild(MatAutocompleteTrigger);
+  private porClic = false;
+
+  /**
+   * El foco puesto por código (al llegar o tras un envío fallido) no abre la lista: taparía el
+   * paso siguiente y el resumen de errores. Se abre al hacer clic, escribir o pulsar flecha abajo.
+   */
+  porClicar(): void { this.porClic = true; }
+
+  alEnfocar(): void {
+    if (!this.porClic) setTimeout(() => this.trigger()?.closePanel());
+    this.porClic = false;
+  }
 
   private readonly opciones = computed(() => this.clientes()
     .map(c => ({ cliente: c, texto: sinTildes(`${c.nombre} ${c.cedula} ${c.telefono} ${c.telefono.replace(/\D/g, '')}`) }))

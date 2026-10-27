@@ -21,7 +21,7 @@
   <!-- Indicadores del período -->
   <section class="cifras" aria-label="Indicadores del período">
     <app-kpi hero etiqueta="Ingresos cobrados" [valor]="moneda(cifras.ingresos.actual)" [delta]="delta(cifras.ingresos)"
-      [ayuda]="entero(cifras.cobros.actual) + ' cobros · período anterior: ' + moneda(cifras.ingresos.anterior)"></app-kpi>
+      [ayuda]="entero(cifras.cobros.actual) + ' cobros · ' + (periodo === 'mes' ? 'mismo tramo del mes anterior' : 'período anterior') + ': ' + moneda(cifras.ingresos.anterior)"></app-kpi>
     <div class="cifras-secundarias">
       <app-kpi etiqueta="Atenciones" [valor]="entero(cifras.atenciones.actual)" [delta]="delta(cifras.atenciones)"></app-kpi>
       <app-kpi etiqueta="Ticket promedio" [valor]="moneda(cifras.ticket.actual)" [delta]="delta(cifras.ticket)"></app-kpi>
@@ -29,7 +29,7 @@
       <app-kpi etiqueta="No asistieron" [valor]="cifras.inasistencia.actual + ' %'" [delta]="delta(cifras.inasistencia, false)"
         [tono]="cifras.inasistencia.actual >= 15 ? 'atencion' : null" ayuda="De las citas que ya pasaron"></app-kpi>
       <app-kpi etiqueta="Refuerzos vencidos" [valor]="entero(vacunasVencidas)" enlace="/vacunas" [tono]="vacunasVencidas ? 'atencion' : null"
-        [ayuda]="(vacunasPendientesList.length - vacunasVencidas) + ' vencen en 7 días'"></app-kpi>
+        [ayuda]="(vacunasPendientesList.length - vacunasVencidas) + ' vencen en ' + diasAviso + ' días'"></app-kpi>
     </div>
   </section>
 

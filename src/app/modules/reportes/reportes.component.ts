@@ -1,3 +1,4 @@
+import { DIAS_AVISO_VACUNA } from '../../core/utils/vacunas';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ClientesService } from '../../core/services/clientes.service';
 import { MascotasService } from '../../core/services/mascotas.service';
@@ -57,7 +58,8 @@ export class ReportesComponent implements OnInit {
   columnasIngresos: Columna[] = [];
   columnasConsultas: Columna[] = [];
 
-  // Recordatorios de vacunas (vencidas y de los próximos 7 días)
+  // Recordatorios de vacunas (vencidas y dentro de la ventana de aviso)
+  readonly diasAviso = DIAS_AVISO_VACUNA;
   vacunasPendientesList: Vacuna[] = [];
   private hoy = new Date();
 

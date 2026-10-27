@@ -2,7 +2,7 @@
   <div class="ingresos-cifra">
     <app-kpi hero etiqueta="Ingresos del mes" [valor]="moneda(ingresos().mes)" enlace="/pagos"
       [delta]="ingresos().variacion === null ? null : { porcentaje: ingresos().variacion!, contra: contra(), subirEsBueno: true }"
-      [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mes anterior completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
+      [ayuda]="ingresos().variacion === null ? 'Sin datos del mes anterior para comparar' : 'Mismo tramo del mes anterior: ' + moneda(ingresos().mismoTramoAnterior) + ' · mes completo: ' + moneda(ingresos().mesAnterior)"></app-kpi>
     <div class="ingresos-secundarias">
       <app-kpi etiqueta="Ticket promedio" [valor]="moneda(ingresos().ticketPromedio)"
         [delta]="ingresos().variacionTicket === null ? null : { porcentaje: ingresos().variacionTicket!, contra: contra(), subirEsBueno: true }"

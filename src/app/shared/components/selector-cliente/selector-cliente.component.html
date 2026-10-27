@@ -12,7 +12,7 @@
   @if (invalido()) { <p class="error-arriba" id="selector-cliente-error" role="alert"><mat-icon aria-hidden="true">error</mat-icon>Elija el propietario</p> }
   <mat-form-field appearance="outline" class="buscar" subscriptSizing="dynamic" [class.mat-form-field-invalid]="invalido()">
     <mat-label>Propietario</mat-label>
-    <input matInput id="selector-cliente" [value]="texto()" (input)="alEscribir($event)" [matAutocomplete]="auto"
+    <input matInput id="selector-cliente" [value]="texto()" (input)="alEscribir($event)" (mousedown)="porClicar()" (focus)="alEnfocar()" [matAutocomplete]="auto"
       placeholder="Nombre, cédula o teléfono" autocomplete="off" required [attr.aria-invalid]="invalido()"
       [attr.aria-describedby]="invalido() ? 'selector-cliente-error' : null">
     <mat-icon matSuffix>search</mat-icon>

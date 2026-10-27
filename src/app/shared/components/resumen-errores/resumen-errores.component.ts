@@ -38,7 +38,14 @@ export class ResumenErroresComponent implements OnInit {
     const form = this.host.nativeElement.closest('form');
     if (!form) return;
     // Tras el submit, Angular marca los controles y pinta los errores en la siguiente vuelta
-    const alEnviar = () => { this.activo = true; setTimeout(() => this.leer(form)); };
+    const alEnviar = () => {
+      this.activo = true;
+      setTimeout(() => {
+        this.leer(form);
+        // Tras enfocar el primer error la página queda desplazada: el resumen tiene que verse
+        if (this.errores().length) setTimeout(() => this.host.nativeElement.scrollIntoView?.({ block: 'start', behavior: 'smooth' }));
+      });
+    };
     const alCorregir = () => { if (this.activo) setTimeout(() => this.leer(form)); };
     form.addEventListener('submit', alEnviar);
     form.addEventListener('input', alCorregir);

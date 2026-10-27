@@ -37,8 +37,8 @@
           <li><strong>{{ resumen.total }}</strong> {{ resumen.total === 1 ? 'cita' : 'citas' }}</li>
           @if (resumen.enEspera) { <li class="r-espera"><strong>{{ resumen.enEspera }}</strong> en espera</li> }
           @if (resumen.porConfirmar) { <li class="r-pendiente"><strong>{{ resumen.porConfirmar }}</strong> por confirmar</li> }
-          @if (resumen.confirmadas) { <li><strong>{{ resumen.confirmadas }}</strong> confirmadas</li> }
-          @if (resumen.atendidas) { <li><strong>{{ resumen.atendidas }}</strong> atendidas</li> }
+          @if (resumen.confirmadas) { <li><strong>{{ resumen.confirmadas }}</strong> {{ resumen.confirmadas === 1 ? 'confirmada' : 'confirmadas' }}</li> }
+          @if (resumen.atendidas) { <li><strong>{{ resumen.atendidas }}</strong> {{ resumen.atendidas === 1 ? 'atendida' : 'atendidas' }}</li> }
           @if (resumen.noLlegaron) { <li class="r-pendiente"><strong>{{ resumen.noLlegaron }}</strong> no {{ resumen.noLlegaron === 1 ? 'llegó' : 'llegaron' }}</li> }
         </ul>
       </div>

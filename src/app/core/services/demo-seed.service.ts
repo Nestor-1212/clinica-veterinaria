@@ -7,7 +7,7 @@ import { Cliente, Mascota, Usuario, Cita, Consulta, Examen, Pago, Receta, Vacuna
  * Versión de los datos de demostración. Al subirla, los navegadores en modo demo
  * regeneran los datos una vez (se reemplazan las colecciones clínicas; los usuarios se conservan).
  */
-export const VERSION_DATOS_DEMO = 8;
+export const VERSION_DATOS_DEMO = 9;
 const CLAVE_VERSION = 'vet_demo_version';
 const COLECCIONES_CLINICAS = ['vet_clientes', 'vet_mascotas', 'vet_citas', 'vet_consultas', 'vet_examenes', 'vet_recetas', 'vet_pagos', 'vet_vacunas'];
 
@@ -195,7 +195,7 @@ export class DemoSeedService {
       for (let i = 0; i < cuantas; i++) {
         const tipo = azar.pesado<TipoMascota>([['Perro', 55], ['Gato', 32], ['Ave', 5], ['Conejo', 4], ['Reptil', 2], ['Otro', 2]]);
         const edad = azar.entero(0, 13) || 1;
-        const peso = tipo === 'Perro' ? azar.entero(3, 38) : tipo === 'Gato' ? azar.entero(2, 7) : Math.round(azar.num() * 20) / 10 + 0.1;
+        const peso = tipo === 'Perro' ? azar.entero(3, 38) : tipo === 'Gato' ? azar.entero(2, 7) : (Math.round(azar.num() * 20) + 1) / 10; // en décimas enteras: 0.1 + 1.3 daba 1.4000000000000001
         mascotas.push({
           id: id(), clienteId: cliente.id, nombre: azar.uno(NOMBRES_MASCOTA), tipo, raza: azar.uno(RAZAS[tipo]),
           sexo: azar.prob(0.5) ? 'macho' : 'hembra', edad, peso, color: azar.uno(COLORES),
