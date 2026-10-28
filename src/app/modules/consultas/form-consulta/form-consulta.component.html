@@ -45,9 +45,13 @@
             </mat-form-field>
           </div>
           @if (estadoTemperatura === 'alta' || estadoTemperatura === 'baja') {
-            <p class="aviso-temp" role="status">
-              <mat-icon aria-hidden="true">device_thermostat</mat-icon>
-              {{ estadoTemperatura === 'alta' ? 'Temperatura alta: posible fiebre.' : 'Temperatura baja: posible hipotermia.' }} {{ rangoTexto }}.
+            <p class="aviso-temp" [class.aviso-temp--critica]="temperaturaCritica" [attr.role]="temperaturaCritica ? 'alert' : 'status'">
+              <mat-icon aria-hidden="true">{{ temperaturaCritica ? 'emergency' : 'device_thermostat' }}</mat-icon>
+              @if (temperaturaCritica) {
+                <span><strong>{{ estadoTemperatura === 'alta' ? 'Fiebre alta' : 'Hipotermia' }}: trátelo como urgencia.</strong> {{ rangoTexto }}.</span>
+              } @else {
+                {{ estadoTemperatura === 'alta' ? 'Temperatura alta: posible fiebre.' : 'Temperatura baja: posible hipotermia.' }} {{ rangoTexto }}.
+              }
             </p>
           }
         </section>

@@ -44,3 +44,12 @@ describe('recetas', () => {
     expect(t).toContain('• Amoxicilina: 5 ml, cada 12 horas, durante 7 días');
   });
 });
+
+describe('alergiaEnMedicamento con plurales y familias', () => {
+  it('"Sensibilidad a ciertos antibióticos" alerta con un antibiótico o una amoxicilina', () => {
+    expect(alergiaEnMedicamento('Sensibilidad a ciertos antibióticos', 'Gotas óticas con antibiótico')).toBe('antibioticos');
+    expect(alergiaEnMedicamento('Sensibilidad a ciertos antibióticos', 'Amoxicilina 250 mg')).toBe('antibioticos');
+    expect(alergiaEnMedicamento('Alergia a la penicilina', 'Amoxicilina con clavulánico')).toBe('penicilina');
+    expect(alergiaEnMedicamento('Alergia al pollo', 'Meloxicam')).toBeNull();
+  });
+});

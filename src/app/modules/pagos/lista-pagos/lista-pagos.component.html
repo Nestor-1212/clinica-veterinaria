@@ -10,18 +10,41 @@
     </div>
   </div>
 
+  <!-- Atendidos hoy sin cobro: la consulta guardada es lo que recepción cobra -->
+  @if (listas.length) {
+    <section class="listas" aria-labelledby="titulo-listas">
+      <h2 id="titulo-listas"><mat-icon aria-hidden="true">point_of_sale</mat-icon>Listos para cobrar <span class="vs-cuenta">{{ listas.length }}</span></h2>
+      <p class="listas-ayuda">Atendidos hoy que aún no tienen cobro. Al cobrar, los servicios llegan sugeridos con su precio habitual.</p>
+      <ul>
+        @for (c of listas; track c.id) {
+          <li>
+            <span class="l-hora">{{ c.fecha | date: 'HH:mm' }}</span>
+            <span class="l-texto"><strong>{{ getMascota(c.mascotaId) }}</strong> · {{ getCliente(c.clienteId) }}<small>{{ c.diagnostico || c.sintomas }}@if (c.tipo === 'inmediata') { · atención inmediata }</small></span>
+            <a mat-flat-button routerLink="/pagos/nuevo" [queryParams]="{ consultaId: c.id }" [attr.aria-label]="'Cobrar la atención de ' + getMascota(c.mascotaId)"><mat-icon>point_of_sale</mat-icon>Cobrar</a>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
   <!-- Indicadores -->
   @if (ingresos && cobrar) {
     <section class="resumen" aria-label="Resumen de cobros">
       <div class="resumen-cifras">
+        @if (esRecepcion) {
+          <app-kpi hero etiqueta="Cobrado hoy" [valor]="cifra(hoyCobrado.total)" [ayuda]="hoyCobrado.cantidad + (hoyCobrado.cantidad === 1 ? ' cobro' : ' cobros') + ' · este mes: ' + cifra(ingresos.mes)"></app-kpi>
+        } @else {
         <app-kpi hero etiqueta="Cobrado este mes" [valor]="cifra(ingresos.mes)"
           [delta]="ingresos.variacion === null ? null : { porcentaje: ingresos.variacion, contra: contra, subirEsBueno: true }"
           [ayuda]="ingresos.cobros + ' cobros · mismo tramo del mes anterior: ' + cifra(ingresos.mismoTramoAnterior)"></app-kpi>
+        }
         <div class="resumen-secundarias">
           <app-kpi etiqueta="Por cobrar" [valor]="cifra(cobrar.total)" [tono]="atrasado ? 'atencion' : null"
             [ayuda]="cobrar.cantidad + (cobrar.cantidad === 1 ? ' pendiente' : ' pendientes') + (atrasado ? ' · ' + cifra(atrasado) + ' con más de 30 días' : '')"></app-kpi>
-          <app-kpi etiqueta="Cobrado hoy" [valor]="cifra(hoyCobrado.total)" [ayuda]="hoyCobrado.cantidad + (hoyCobrado.cantidad === 1 ? ' cobro' : ' cobros')"></app-kpi>
-          <app-kpi class="kpi-ticket" etiqueta="Ticket promedio" [valor]="cifra(ingresos.ticketPromedio)"
+          @if (!esRecepcion) {
+            <app-kpi etiqueta="Cobrado hoy" [valor]="cifra(hoyCobrado.total)" [ayuda]="hoyCobrado.cantidad + (hoyCobrado.cantidad === 1 ? ' cobro' : ' cobros')"></app-kpi>
+          }
+          <app-kpi class="kpi-ticket" etiqueta="Cobro promedio" [valor]="cifra(ingresos.ticketPromedio)"
             [delta]="ingresos.variacionTicket === null ? null : { porcentaje: ingresos.variacionTicket, contra: contra, subirEsBueno: true }"></app-kpi>
         </div>
       </div>

@@ -122,7 +122,7 @@
           }
         </div>
         <mat-form-field appearance="outline" class="ancho">
-          <mat-label>Descripción</mat-label>
+          <mat-label>{{ isInmediata ? 'Qué le pasa' : 'Motivo' }}</mat-label>
           <textarea matInput formControlName="motivo" rows="3" [placeholder]="isInmediata ? 'Toque un motivo o escriba: desde cuándo, qué notó el dueño…' : 'Toque un motivo o escriba el detalle'"></textarea>
           <mat-error>{{ isInmediata ? 'Describa qué le pasa' : 'Indique el motivo de la cita' }}</mat-error>
         </mat-form-field>

@@ -2,7 +2,11 @@
   <div class="page-header">
     <div>
       <h1><mat-icon>point_of_sale</mat-icon> Nuevo cobro@if (mascota) { <span class="h1-paciente">· {{ mascota.nombre }}</span> }</h1>
-      <p>Paciente, servicios y cómo paga el cliente</p>
+      @if (consultaOrigen; as c) {
+        <p>De la atención de las {{ c.fecha | date: 'HH:mm' }} · {{ c.diagnostico || c.sintomas }} · revise los servicios y cobre</p>
+      } @else {
+        <p>Paciente, servicios y cómo paga el cliente</p>
+      }
     </div>
     <button mat-button type="button" [routerLink]="volverA"><mat-icon>arrow_back</mat-icon> Volver</button>
   </div>

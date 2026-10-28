@@ -12,5 +12,7 @@ export interface Cita {
   notas?: string;
   /** Hora real en que el paciente con cita llegó a la clínica (pasa a la sala de espera). */
   llegada?: Date | string;
+  /** Cuándo se envió el recordatorio por WhatsApp (confirmar sin él es confirmar a ciegas). */
+  recordatorio?: Date | string;
   createdAt: Date | string;
 }

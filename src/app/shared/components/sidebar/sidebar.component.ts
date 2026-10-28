@@ -22,7 +22,7 @@ export class SidebarComponent {
   auth = inject(AuthService);
 
   navItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', seccion: 'dashboard' },
+    { label: 'Inicio', icon: 'dashboard', route: '/dashboard', seccion: 'dashboard' },
     { label: 'Clientes', icon: 'people', route: '/clientes', seccion: 'clientes' },
     { label: 'Mascotas', icon: 'pets', route: '/mascotas', seccion: 'mascotas' },
     { label: 'Citas', icon: 'event', route: '/citas', seccion: 'citas' },

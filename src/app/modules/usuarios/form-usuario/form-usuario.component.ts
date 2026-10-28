@@ -122,6 +122,6 @@ export class FormUsuarioComponent implements OnInit {
 }
 
 const NOMBRE_SECCION: Record<Seccion, string> = {
-  dashboard: 'Dashboard', clientes: 'Clientes', mascotas: 'Mascotas', citas: 'Citas', consultas: 'Consultas', recetas: 'Recetas',
+  dashboard: 'Inicio', clientes: 'Clientes', mascotas: 'Mascotas', citas: 'Citas', consultas: 'Consultas', recetas: 'Recetas',
   vacunas: 'Vacunas', examenes: 'Laboratorio', pagos: 'Pagos', reportes: 'Reportes', usuarios: 'Usuarios'
 };

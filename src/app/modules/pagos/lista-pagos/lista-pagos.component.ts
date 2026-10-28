@@ -1,3 +1,4 @@
+import { ConsultasService } from '../../../core/services/consultas.service';
 import { CierreCajaComponent } from '../cierre-caja/cierre-caja.component';
 import { aCsv, descargarCsv, fechaArchivo } from '../../../core/utils/csv';
 import { Component, OnInit, ViewChild, inject, AfterViewInit } from '@angular/core';
@@ -14,9 +15,9 @@ import { CobrarService } from '../cobro-dialog/cobrar.service';
 import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { PdfService } from '../../../core/services/pdf.service';
-import { Cliente, Mascota, Pago } from '../../../core/models';
+import { Cliente, Mascota, Pago, Consulta } from '../../../core/models';
 import { PorCobrar, ResumenIngresos, diasDesde, enlaceWhatsApp, porCobrar, resumenIngresos } from '../../../core/utils/metricas';
-import { FilaMetodo, METODO_ICONO, METODO_TEXTO, cobradoHoy, cobradoPorMetodo, conceptoPago, fechaCobro, mensajeCobro } from '../../../core/utils/pagos';
+import { FilaMetodo, METODO_ICONO, METODO_TEXTO, atencionesPorCobrar, cobradoHoy, cobradoPorMetodo, conceptoPago, fechaCobro, mensajeCobro } from '../../../core/utils/pagos';
 import { tiempoRelativo } from '../../../core/utils/clientes';
 import { filtroPorTexto } from '../../../shared/utils/filtro-texto';
 import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
@@ -45,6 +46,10 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   private auth = inject(AuthService);
+  private consultasService = inject(ConsultasService);
+  readonly esRecepcion = this.auth.currentUser?.rol === 'recepcion';
+  /** Consultas de hoy sin cobro (cola de recepción). */
+  listas: Consulta[] = [];
   private cobrarService = inject(CobrarService);
 
   readonly METODO_TEXTO = METODO_TEXTO;
@@ -98,6 +103,7 @@ export class ListaPagosComponent implements OnInit, AfterViewInit {
     this.totalMes = this.ingresos.mes;
     this.cobrar = porCobrar(this.todos, this.hoy);
     this.hoyCobrado = cobradoHoy(this.todos, this.hoy);
+    this.listas = atencionesPorCobrar(this.consultasService.getAll(), this.todos, this.hoy);
     this.metodos = cobradoPorMetodo(this.todos, this.hoy);
 
     const ini = new Date(this.hoy.getFullYear(), this.hoy.getMonth(), 1);

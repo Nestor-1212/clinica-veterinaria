@@ -12,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Mascota, Cliente, Usuario, Consulta } from '../../../core/models';
 import { VacunasService } from '../../../core/services/vacunas.service';
 import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
-import { EstadoTemperatura, RANGO_TEMPERATURA, cambioPeso, evaluarTemperatura } from '../../../core/utils/consultas';
+import { EstadoTemperatura, RANGO_TEMPERATURA, cambioPeso, evaluarTemperatura, temperaturaCritica } from '../../../core/utils/consultas';
 import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -84,7 +84,7 @@ export class FormConsultaComponent implements OnInit {
       const c = this.consultasService.getById(this.consultaId);
       if (c) {
         this.form.patchValue(c);
-        this.cargarMascotaYCliente(c.mascotaId, c.clienteId, false);
+        this.cargarMascotaYCliente(c.mascotaId, c.clienteId);
         if (c.citaId) this.cargarMotivo(c.citaId);
       }
       return;
@@ -105,12 +105,12 @@ export class FormConsultaComponent implements OnInit {
     }
   }
 
-  cargarMascotaYCliente(mascotaId: string, clienteId: string, sugerirPeso = true): void {
+  /** El peso no se precarga: se mide en cada consulta (el último registro queda como referencia en la ayuda). */
+  cargarMascotaYCliente(mascotaId: string, clienteId: string): void {
     this.mascota = this.mascotasService.getById(mascotaId) || null;
     this.cliente = this.clientesService.getById(clienteId) || null;
     if (!this.mascota) return;
     this.pesoAnterior = this.mascota.peso;
-    if (sugerirPeso) this.form.patchValue({ peso: this.mascota.peso });
     this.ficha = fichaPaciente(this.mascota, this.cliente ?? undefined, this.consultasService.getAll(), this.vacunasService.getAll(), new Date(), this.consultaId || undefined);
   }
 
@@ -130,6 +130,10 @@ export class FormConsultaComponent implements OnInit {
     const tipo = this.mascota?.tipo;
     const r = tipo ? RANGO_TEMPERATURA[tipo] : null;
     return r && tipo ? `Normal en ${tipo === 'Otro' ? 'esta especie' : tipo.toLowerCase() + 's'}: ${r[0]}–${r[1]} °C` : 'Rango normal según la especie';
+  }
+
+  get temperaturaCritica(): boolean {
+    return !!this.mascota && temperaturaCritica(this.form.get('temperatura')?.value, this.mascota.tipo);
   }
 
   get estadoTemperatura(): EstadoTemperatura | null {
@@ -163,7 +167,7 @@ export class FormConsultaComponent implements OnInit {
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.enviando = true;
     const consulta = this.guardar();
-    this.snack.open(this.isEdit ? 'Consulta actualizada' : 'Consulta registrada', 'OK', { duration: 2000 });
+    this.snack.open(this.isEdit ? 'Consulta actualizada' : 'Consulta registrada: recepción ya la ve lista para cobrar', 'OK', { duration: 3000 });
     this.router.navigate(['/recetas/nueva'], { queryParams: { consultaId: consulta.id } });
   }
 
@@ -172,7 +176,7 @@ export class FormConsultaComponent implements OnInit {
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.enviando = true;
     this.guardar();
-    this.snack.open('Consulta guardada', 'OK', { duration: 2000 });
+    this.snack.open(this.isEdit ? 'Consulta guardada' : 'Consulta guardada: recepción ya la ve lista para cobrar', 'OK', { duration: 3000 });
     this.router.navigate(['/consultas']);
   }
 }

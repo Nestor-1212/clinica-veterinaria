@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ElementRef } from '@angular/core';
 import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CATEGORIA_TEXTO, METODO_ICONO, METODO_TEXTO, ServicioFrecuente, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from '../../../core/utils/pagos';
+import { lineasDeAtencion, CATEGORIA_TEXTO, METODO_ICONO, METODO_TEXTO, ServicioFrecuente, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from '../../../core/utils/pagos';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PagosService } from '../../../core/services/pagos.service';
@@ -9,14 +9,15 @@ import { ClientesService } from '../../../core/services/clientes.service';
 import { MascotasService } from '../../../core/services/mascotas.service';
 import { ConsultasService } from '../../../core/services/consultas.service';
 import { VacunasService } from '../../../core/services/vacunas.service';
-import { Cliente, ItemPago, Mascota, MetodoPago } from '../../../core/models';
+import { ExamenesService } from '../../../core/services/examenes.service';
+import { Cliente, Consulta, ItemPago, Mascota, MetodoPago } from '../../../core/models';
 import { FichaPaciente, fichaPaciente } from '../../../core/utils/ficha';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatError, MatInput, MatHint } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatTooltip } from '@angular/material/tooltip';
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { SelectorPacienteComponent } from '../../../shared/components/selector-paciente/selector-paciente.component';
 import { FichaPacienteComponent } from '../../../shared/components/ficha-paciente/ficha-paciente.component';
 import { ResumenErroresComponent } from '../../../shared/components/resumen-errores/resumen-errores.component';
@@ -28,7 +29,7 @@ export type ModoCobro = 'cobrar' | 'pendiente';
   selector: 'app-form-pago',
   templateUrl: './form-pago.component.html',
   styleUrls: ['./form-pago.component.scss'],
-  imports: [ResumenErroresComponent, MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatHint, MatTooltip, DecimalPipe, SelectorPacienteComponent, FichaPacienteComponent]
+  imports: [ResumenErroresComponent, MatIcon, MatButton, MatIconButton, RouterLink, ReactiveFormsModule, MatFormField, MatLabel, MatSelect, MatOption, MatError, MatInput, MatHint, MatTooltip, DecimalPipe, DatePipe, SelectorPacienteComponent, FichaPacienteComponent]
 })
 export class FormPagoComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -37,6 +38,7 @@ export class FormPagoComponent implements OnInit {
   private mascotasService = inject(MascotasService);
   private consultasService = inject(ConsultasService);
   private vacunasService = inject(VacunasService);
+  private examenesService = inject(ExamenesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snack = inject(MatSnackBar);
@@ -51,6 +53,8 @@ export class FormPagoComponent implements OnInit {
   ficha: FichaPaciente | null = null;
   frecuentes: ServicioFrecuente[] = [];
   volverA: unknown[] = ['/pagos'];
+  /** Consulta de la que viene este cobro (las líneas llegan sugeridas). */
+  consultaOrigen: Consulta | null = null;
 
   readonly metodosPago = Object.keys(METODO_TEXTO) as MetodoPago[];
   readonly METODO_TEXTO = METODO_TEXTO;
@@ -92,7 +96,21 @@ export class FormPagoComponent implements OnInit {
       if (suyas.length === 1) this.onMascotaChange(suyas[0].id);
       this.volverA = ['/clientes', params.clienteId];
     }
-    if (params.consultaId) this.form.patchValue({ consultaId: params.consultaId });
+    if (params.consultaId) this.desdeConsulta(params.consultaId);
+  }
+
+  /** Cobrar una atención: paciente, consulta, recargo e insumos de laboratorio ya cargados con su último precio. */
+  private desdeConsulta(id: string): void {
+    const c = this.consultasService.getById(id);
+    if (!c) return;
+    this.consultaOrigen = c;
+    this.form.patchValue({ consultaId: c.id });
+    this.onMascotaChange(c.mascotaId);
+    this.items.clear();
+    for (const l of lineasDeAtencion(c, this.examenesService.getAll(), serviciosFrecuentes(this.pagosService.getAll(), 200))) {
+      this.items.push(this.crearItem({ descripcion: l.descripcion, categoria: l.categoria, cantidad: 1, precioUnitario: l.precio ?? undefined }));
+    }
+    this.volverA = ['/pagos'];
   }
 
   onMascotaChange(id: string): void {

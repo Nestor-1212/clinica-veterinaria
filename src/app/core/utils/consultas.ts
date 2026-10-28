@@ -20,6 +20,13 @@ export function evaluarTemperatura(temp: number | null | undefined, tipo: TipoMa
   return t > rango[1] ? 'alta' : t < rango[0] ? 'baja' : 'normal';
 }
 
+/** Más de 1 °C fuera del rango normal de la especie: se trata como urgencia, no como un aviso. */
+export function temperaturaCritica(temp: number | null | undefined, tipo: TipoMascota): boolean {
+  const rango = RANGO_TEMPERATURA[tipo];
+  if (!rango || temp === null || temp === undefined || isNaN(Number(temp)) || Number(temp) <= 0) return false;
+  return Number(temp) >= rango[1] + 1 || Number(temp) <= rango[0] - 1;
+}
+
 /** Diferencia de peso con un decimal: "+0.4 kg", "−1.2 kg", "sin cambio". */
 export function cambioPeso(actual: number | null | undefined, anterior: number | null | undefined): string | null {
   if (!actual || !anterior) return null;

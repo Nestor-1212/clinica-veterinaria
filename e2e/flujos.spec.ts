@@ -20,6 +20,9 @@ test('por confirmar: se seleccionan las citas de un día y se confirman juntas',
   const antes = await filas.count();
   await page.locator('.grupo-elegir input').first().check();
   await page.locator('.lote').getByRole('button', { name: /Confirmar (la cita|las \d+ citas)$/ }).click();
+  // Sin recordatorio enviado se pide confirmar que el dueño respondió por otro medio
+  await expect(page.getByRole('dialog')).toContainText('recordatorio');
+  await page.getByRole('button', { name: 'Confirmar igual' }).click();
   await expect(filas).toHaveCount(antes - delDia);
   const citas = await leerColeccion<CitaLS>(page, 'vet_citas');
   expect(citas.filter(c => c.estado === 'confirmada').length).toBeGreaterThanOrEqual(delDia);

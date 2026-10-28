@@ -87,7 +87,7 @@
                       <span class="bloque-hora">{{ c.hora }}</span>
                       <mat-icon class="bloque-especie" aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>
                       <strong>{{ getMascota(c.mascotaId) }}</strong>
-                      @if (mascota(c.mascotaId)?.alergias) { <mat-icon class="bloque-alergia" aria-hidden="true">warning</mat-icon> }
+                      @if (mascota(c.mascotaId)?.alergias) { <span class="bloque-alergia"><mat-icon aria-hidden="true">warning</mat-icon>Alergia</span> }
                     </span>
                     <span class="bloque-sub">{{ getCliente(c.clienteId) }} · {{ c.motivo }}</span>
                     <span class="bloque-estado">{{ textoEstado(c) }}</span>
@@ -142,7 +142,7 @@
                 <span class="bloque-hora">{{ c.hora }}</span>
                 <mat-icon class="bloque-especie" aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>
                 <strong>{{ getMascota(c.mascotaId) }}</strong>
-                @if (mascota(c.mascotaId)?.alergias) { <mat-icon class="bloque-alergia" aria-label="Tiene alergias">warning</mat-icon> }
+                @if (mascota(c.mascotaId)?.alergias) { <span class="bloque-alergia"><mat-icon aria-hidden="true">warning</mat-icon>Alergia</span> }
               </span>
               <span class="bloque-sub">{{ getCliente(c.clienteId) }} · {{ vetCorto(c.veterinarioId) }}</span>
               <span class="bloque-sub">{{ c.motivo }}</span>
@@ -185,12 +185,13 @@
                 <span class="fc-hora">{{ c.hora }}</span>
                 <span class="fc-paciente">
                   <span class="fc-nombre"><mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon><strong>{{ getMascota(c.mascotaId) }}</strong> · {{ getCliente(c.clienteId) }}</span>
-                  <small>{{ c.motivo }} · con {{ vetCorto(c.veterinarioId) }}</small>
+                  <small>{{ c.motivo }} · con {{ vetCorto(c.veterinarioId) }}
+                    @if (c.recordatorio) { · <span class="fc-recordado"><mat-icon aria-hidden="true">done</mat-icon>Recordado {{ horaRecordatorio(c) }}</span> }</small>
                 </span>
                 <a class="fc-tel" [href]="tel(c.clienteId)" [attr.aria-label]="'Llamar a ' + getCliente(c.clienteId)"><mat-icon aria-hidden="true">call</mat-icon>{{ telefono(c.clienteId) }}</a>
                 <span class="fc-acciones">
                   @if (whatsapp(c); as wa) {
-                    <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Enviar recordatorio por WhatsApp a ' + getCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>Recordar</a>
+                    <a mat-button [href]="wa" target="_blank" rel="noopener" (click)="registrarRecordatorio(c)" [attr.aria-label]="(c.recordatorio ? 'Volver a recordar' : 'Recordar') + ' por WhatsApp a ' + getCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>{{ c.recordatorio ? 'Volver a recordar' : 'Recordar' }}</a>
                   }
                   <button mat-stroked-button type="button" (click)="cambiarEstado(c, 'confirmada')" [attr.aria-label]="'Confirmar la cita de ' + getMascota(c.mascotaId)"><mat-icon>check</mat-icon>Confirmar</button>
                 </span>
@@ -303,7 +304,7 @@
       <button mat-menu-item (click)="cambiarEstado(c, 'confirmada')"><mat-icon>check_circle</mat-icon>Confirmar</button>
     }
     @if ((c.estado === 'pendiente' || c.estado === 'confirmada') && !noLlego(c) && whatsapp(c); as wa) {
-      <a mat-menu-item [href]="wa" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>Recordar por WhatsApp</a>
+      <a mat-menu-item [href]="wa" target="_blank" rel="noopener" (click)="registrarRecordatorio(c)"><mat-icon>chat</mat-icon>Recordar por WhatsApp</a>
     }
     <a mat-menu-item [routerLink]="['/mascotas', c.mascotaId]"><mat-icon>folder_open</mat-icon>Historial de la mascota</a>
     @if (c.estado !== 'completada' && c.estado !== 'cancelada') {

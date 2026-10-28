@@ -115,6 +115,9 @@ export class FormRecetaComponent implements OnInit {
     return filtrarSugerencias([...opciones], texto).slice(0, 8);
   }
 
+  /** Para la lista de sugerencias: la alergia con la que choca un medicamento (o null). */
+  alergiaEn(medicamento: string): string | null { return alergiaEnMedicamento(this.mascota?.alergias, medicamento); }
+
   /** Palabra de las alergias de la mascota que aparece en el medicamento i (o null). */
   alergiaDe(i: number): string | null {
     return alergiaEnMedicamento(this.mascota?.alergias, this.items.at(i)?.get('medicamento')?.value);

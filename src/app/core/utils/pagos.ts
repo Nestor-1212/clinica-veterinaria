@@ -5,7 +5,7 @@ export interface LineaCobro {
   precioUnitario?: number | null;
 }
 
-import { ItemPago, MetodoPago, Pago } from '../models';
+import { Consulta, Examen, ItemPago, MetodoPago, Pago } from '../models';
 
 /** Redondea a centavos para evitar arrastre de decimales binarios (0.1 + 0.2). */
 export function redondearCentavos(valor: number): number {
@@ -134,4 +134,38 @@ export function cierreDeCaja(pagos: Pago[], dia: Date): CierreCaja {
     anulados: sumar(pagos.filter(p => p.estado === 'anulado' && delDia(p.fechaAnulacion))),
     pendientes: sumar(pagos.filter(p => p.estado === 'pendiente' && delDia(p.fecha)))
   };
+}
+
+// ---------- De la consulta al cobro ----------
+
+/**
+ * Atenciones del día que aún no tienen cobro (ni pendiente ni pagado): la consulta guardada es
+ * lo que recepción tiene que cobrar. Un cobro anulado no cuenta como cobrado.
+ */
+export function atencionesPorCobrar(consultas: Consulta[], pagos: Pago[], dia: Date): Consulta[] {
+  const conCobro = new Set(pagos.filter(p => p.estado !== 'anulado' && p.consultaId).map(p => p.consultaId));
+  return consultas
+    .filter(c => !conCobro.has(c.id) && mismoDia(new Date(c.fecha), dia))
+    .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+}
+
+export interface LineaSugerida { descripcion: string; categoria: ItemPago['categoria']; precio: number | null; }
+
+/**
+ * Líneas para cobrar una atención: la consulta, el recargo si fue inmediata y los exámenes que se
+ * pidieron, con el último precio usado (sin precio si nunca se cobró: recepción lo escribe).
+ */
+export function lineasDeAtencion(consulta: Consulta, examenes: Examen[], frecuentes: ServicioFrecuente[]): LineaSugerida[] {
+  const buscar = (prueba: (s: ServicioFrecuente) => boolean) => frecuentes.find(prueba);
+  const consultaBase = buscar(s => s.categoria === 'consulta' && /consulta/i.test(s.descripcion) && !/recargo/i.test(s.descripcion));
+  const lineas: LineaSugerida[] = [{ descripcion: consultaBase?.descripcion ?? 'Consulta veterinaria', categoria: 'consulta', precio: consultaBase?.precio ?? null }];
+  if (consulta.tipo === 'inmediata') {
+    const recargo = buscar(s => /inmediata/i.test(s.descripcion));
+    if (recargo) lineas.push({ descripcion: recargo.descripcion, categoria: recargo.categoria, precio: recargo.precio });
+  }
+  for (const e of examenes.filter(x => x.consultaId === consulta.id)) {
+    const previo = buscar(s => s.descripcion.toLowerCase() === e.tipo.toLowerCase());
+    lineas.push({ descripcion: e.tipo, categoria: 'examen', precio: previo?.precio ?? null });
+  }
+  return lineas;
 }

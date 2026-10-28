@@ -32,7 +32,11 @@
                   <input matInput [id]="'med-' + i" formControlName="medicamento" [matAutocomplete]="autoMed" placeholder="Escriba o elija" autocomplete="off">
                   <mat-autocomplete #autoMed="matAutocomplete">
                     @for (m of sugerir(medicamentos, item.get('medicamento')?.value); track m) {
-                      <mat-option [value]="m">{{ m }}</mat-option>
+                      @if (alergiaEn(m); as a) {
+                        <mat-option [value]="m" class="opcion-alergia"><mat-icon aria-hidden="true">warning</mat-icon>{{ m }} <small>· choca con su alergia ({{ a }})</small></mat-option>
+                      } @else {
+                        <mat-option [value]="m">{{ m }}</mat-option>
+                      }
                     }
                   </mat-autocomplete>
                   <mat-error>Indique el medicamento</mat-error>

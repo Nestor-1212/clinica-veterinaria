@@ -1,4 +1,4 @@
-import { conceptoPago } from '../../../core/utils/pagos';
+import { atencionesPorCobrar, conceptoPago } from '../../../core/utils/pagos';
 import { DIAS_AVISO_VACUNA } from '../../../core/utils/vacunas';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -62,27 +62,28 @@ export class HoyComponent {
   });
   /** Posición de la línea "Ahora" en la agenda. */
   readonly indiceAhora = computed(() => {
-    const i = this.agenda().findIndex(c => c.hora >= this.ahora() && c.estado !== 'completada');
+    // Por hora, no por estado: una cita de las 15:00 ya atendida sigue estando después de "Ahora"
+    const i = this.agenda().findIndex(c => c.hora >= this.ahora());
     return i === -1 ? this.agenda().length : i;
   });
 
   readonly resumen = computed(() => {
     const a = this.agenda();
     const atendidas = a.filter(c => c.estado === 'completada').length;
-    const porLlegar = a.filter(c => (c.estado === 'pendiente' || c.estado === 'confirmada') && !this.noLlego(c)).length;
+    const porLlegar = a.filter(c => (c.estado === 'pendiente' || c.estado === 'confirmada') && !c.llegada && !this.noLlego(c)).length;
+    const enEspera = a.filter(c => this.enEspera(c)).length;
     const noLlegaron = a.filter(c => this.noLlego(c)).length;
     const inmediatas = a.filter(c => c.estado === 'inmediata').length;
-    return { total: a.length, atendidas, porLlegar, noLlegaron, inmediatas };
+    return { total: a.length, atendidas, porLlegar, enEspera, noLlegaron, inmediatas };
   });
   /** "3 atendidas · 2 por llegar · 1 no llegó" (inasistencias solo si las hay). */
   readonly ayudaCitas = computed(() => {
     const r = this.resumen();
-    return `${plural(r.atendidas, 'atendida')} · ${r.porLlegar} por llegar` + (r.noLlegaron ? ` · ${r.noLlegaron} ${r.noLlegaron === 1 ? 'no llegó' : 'no llegaron'}` : '');
+    return `${plural(r.atendidas, 'atendida')}` + (r.enEspera ? ` · ${r.enEspera} en espera` : '') + ` · ${r.porLlegar} por llegar` + (r.noLlegaron ? ` · ${r.noLlegaron} ${r.noLlegaron === 1 ? 'no llegó' : 'no llegaron'}` : '');
   });
   /** La primera cita por atender después de la línea "Ahora": se destaca en la agenda. */
   readonly siguiente = computed(() => {
-    const c = this.agenda()[this.indiceAhora()];
-    return c && c.estado !== 'completada' && !this.noLlego(c) ? c : null;
+    return this.agenda().slice(this.indiceAhora()).find(c => c.estado !== 'completada' && !this.noLlego(c)) ?? null;
   });
 
   readonly manana = computed(() => siguienteDiaHabil(this.datos().hoy));
@@ -94,6 +95,8 @@ export class HoyComponent {
   });
   /** Atenciones de hoy con el pago pendiente: a quién cobrar antes de que se vaya. */
   readonly cobrarHoy = computed(() => porCobrarHoy(this.datos().pagos, this.datos().hoy));
+  /** Consultas de hoy que aún no tienen cobro: recepción las cobra con los servicios sugeridos. */
+  readonly listasCobrar = computed(() => atencionesPorCobrar(this.datos().consultas, this.datos().pagos, this.datos().hoy));
   readonly totalCobrarHoy = computed(() => this.cobrarHoy().reduce((s, p) => s + p.total, 0));
   readonly porConfirmar = computed(() =>
     citasDelDia(this.datos().citas, this.manana()).filter(c => c.estado === 'pendiente' && !this.confirmadas().has(c.id)));
@@ -161,6 +164,8 @@ export class HoyComponent {
       this.llegadas.update(m => { const n = new Map(m); n.delete(cita.id); return n; });
     });
   }
+
+  registrarRecordatorio(cita: Cita): void { this.citasService.registrarRecordatorio(cita.id); }
 
   confirmar(cita: Cita): void {
     this.citasService.update(cita.id, { estado: 'confirmada' });

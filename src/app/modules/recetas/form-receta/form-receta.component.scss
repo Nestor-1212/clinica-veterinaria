@@ -48,3 +48,8 @@
   .med-grid { grid-template-columns: 1fr; margin-left: 0; }
   .med-alerta { margin-left: 0; }
 }
+
+// Sugerencia que choca con la alergia del paciente
+.opcion-alergia { color: var(--vs-danger);
+  mat-icon { color: var(--vs-danger); }
+  small { color: var(--vs-danger); } }

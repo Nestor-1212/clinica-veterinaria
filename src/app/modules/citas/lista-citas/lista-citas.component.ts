@@ -38,7 +38,7 @@ interface GrupoDia { dia: Date; citas: Cita[]; }
 @Component({
     selector: 'app-lista-citas',
     templateUrl: './lista-citas.component.html',
-    styleUrls: ['./lista-citas.component.scss', './tablero.scss'],
+    styleUrls: ['./lista-citas.component.scss', './tablero.scss', './confirmar.scss'],
     imports: [MatCheckbox, MatIcon, MatButton, MatAnchor, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatMenuTrigger, MatMenu, MatMenuItem, MatMenuContent, MatDivider, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, MatDatepicker, MatDatepickerInput, DatePipe]
 })
 export class ListaCitasComponent implements OnInit, AfterViewInit {
@@ -168,7 +168,35 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
     g.citas.forEach(c => (todas ? this.elegidas.delete(c.id) : this.elegidas.add(c.id)));
   }
 
+  /** Al abrir WhatsApp queda anotado que se recordó (sin recargar: el enlace abre otra pestaña). */
+  registrarRecordatorio(c: Cita): void {
+    const ahora = new Date();
+    this.citasService.registrarRecordatorio(c.id, ahora);
+    c.recordatorio = ahora;
+  }
+
+  horaRecordatorio(c: Cita): string {
+    const f = new Date(c.recordatorio!);
+    const hoy = mismoDia(f, this.ahora);
+    return hoy ? f.toTimeString().slice(0, 5) : f.toLocaleDateString('es-PA', { day: 'numeric', month: 'short' });
+  }
+
+  /** "Confirmada" promete que el dueño respondió: si alguna no tiene recordatorio enviado, se pregunta antes. */
   confirmarElegidas(): void {
+    const citas = this.porConfirmar.flatMap(g => g.citas).filter(c => this.elegidas.has(c.id));
+    const sinRecordar = citas.filter(c => !c.recordatorio).length;
+    if (!sinRecordar) { this.confirmarLote(); return; }
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Confirmar sin recordatorio',
+        message: `${sinRecordar === citas.length ? (sinRecordar === 1 ? 'Esta cita no tiene' : `Ninguna de las ${sinRecordar} citas tiene`) : `${sinRecordar} de las ${citas.length} citas no tienen`} recordatorio enviado. Confírmelas solo si el dueño ya respondió por otro medio (llamada, en persona).`,
+        confirmText: 'Confirmar igual'
+      }
+    });
+    ref.afterClosed().subscribe(ok => { if (ok) this.confirmarLote(); });
+  }
+
+  private confirmarLote(): void {
     const ids = [...this.elegidas];
     ids.forEach(id => this.citasService.update(id, { estado: 'confirmada' }));
     this.elegidas.clear();

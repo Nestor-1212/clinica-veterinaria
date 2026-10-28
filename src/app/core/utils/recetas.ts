@@ -63,9 +63,26 @@ export function alergiaEnMedicamento(alergias: string | undefined, medicamento: 
   if (!alergias?.trim() || !medicamento?.trim()) return null;
   const med = sinTildes(medicamento);
   const comunes = new Set(['alergia', 'alergica', 'alergico', 'sensibilidad', 'ciertos', 'ciertas', 'leve', 'severa']);
-  const palabra = sinTildes(alergias).split(/[^a-zñ]+/).find(p => p.length >= 4 && !comunes.has(p) && med.includes(p));
-  return palabra ?? null;
+  // Singular para comparar ("antibioticos" → "antibiotico")
+  const raiz = (p: string) => (p.length > 5 && p.endsWith('es') ? p.slice(0, -2) : p.length > 4 && p.endsWith('s') ? p.slice(0, -1) : p);
+  const palabras = sinTildes(alergias).split(/[^a-zñ]+/).filter(p => p.length >= 4 && !comunes.has(p));
+  for (const p of palabras) {
+    const r = raiz(p);
+    if (med.includes(r)) return p;
+    // La familia del fármaco: alergia a "antibióticos" o "penicilina" también cubre la amoxicilina
+    const familia = FAMILIAS_FARMACO.find(f => f.claves.some(k => r.startsWith(k)));
+    if (familia && familia.miembros.some(m => med.includes(m))) return p;
+  }
+  return null;
 }
+
+/** Familias de fármacos frecuentes en la clínica: una alergia nombrada por familia cubre a sus miembros. */
+const FAMILIAS_FARMACO: { claves: string[]; miembros: string[] }[] = [
+  { claves: ['penicilin', 'betalactam'], miembros: ['penicilina', 'amoxicilina', 'ampicilina', 'clavulan'] },
+  { claves: ['antibiotic'], miembros: ['antibiotico', 'penicilina', 'amoxicilina', 'ampicilina', 'cefalexina', 'enrofloxacina', 'doxiciclina', 'metronidazol', 'clindamicina', 'gentamicina', 'trimetoprim'] },
+  { claves: ['sulfa'], miembros: ['sulfa', 'trimetoprim'] },
+  { claves: ['antiinflamatori', 'aine'], miembros: ['meloxicam', 'carprofeno', 'ketoprofeno', 'firocoxib', 'antiinflamatorio'] }
+];
 
 /** Texto de la receta para enviar al dueño por WhatsApp. */
 export function textoReceta(receta: Receta, mascota: Mascota | undefined, nombreDueno: string): string {

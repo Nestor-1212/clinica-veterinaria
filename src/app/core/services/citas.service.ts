@@ -65,6 +65,7 @@ export class CitasService {
   /** El paciente con cita llegó: entra en la sala de espera del veterinario. */
   marcarLlegada(id: string, cuando: Date = new Date()): void { this.update(id, { llegada: cuando }); }
   deshacerLlegada(id: string): void { this.update(id, { llegada: undefined }); }
+  registrarRecordatorio(id: string, cuando: Date = new Date()): void { this.update(id, { recordatorio: cuando }); }
 
   update(id: string, data: Partial<Cita>): void {
     const all = this.getAll().map(c => c.id === id ? { ...c, ...data } : c);

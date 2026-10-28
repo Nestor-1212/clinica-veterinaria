@@ -35,3 +35,6 @@
   border-radius: var(--vs-radius-md); background: var(--vs-danger-container); color: var(--vs-on-danger-container); font-size: 14px;
   mat-icon { flex-shrink: 0; font-size: 20px; width: 20px; height: 20px; }
 }
+
+.aviso-temp--critica { background: var(--vs-danger-container); color: var(--vs-on-danger-container);
+  mat-icon { color: var(--vs-danger); } }

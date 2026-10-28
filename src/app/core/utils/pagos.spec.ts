@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { cierreDeCaja, cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from './pagos';
-import { Pago } from '../models';
+import { atencionesPorCobrar, cierreDeCaja, lineasDeAtencion, cobradoHoy, cobradoPorMetodo, conceptoPago, descuentoValido, serviciosFrecuentes, subtotalLineas, totalPago } from './pagos';
+import { Consulta, Examen, Pago } from '../models';
 
 describe('Cálculo de pagos (B10)', () => {
   it('subtotal de las líneas redondeado a centavos', () => {
@@ -89,5 +89,37 @@ describe('cierreDeCaja', () => {
     expect(c.total).toBe(95.5);
     expect(c.anulados).toEqual({ cantidad: 1, total: 15 });
     expect(c.pendientes).toEqual({ cantidad: 1, total: 20 });
+  });
+});
+
+describe('de la consulta al cobro', () => {
+  const consulta = (id: string, fecha: string, tipo: Consulta['tipo'] = 'cita'): Consulta => ({
+    id, clienteId: 'c', mascotaId: 'm', veterinarioId: 'v', fecha, sintomas: '', temperatura: 38, peso: 5, diagnostico: '', tratamiento: '', tipo, createdAt: fecha
+  });
+  const pago = (consultaId: string, estado: Pago['estado']): Pago => ({
+    id: 'p' + consultaId, clienteId: 'c', mascotaId: 'm', consultaId, fecha: '2026-10-28', items: [], subtotal: 0, descuento: 0, total: 0, metodoPago: 'efectivo', estado
+  });
+
+  it('lista las consultas del día sin cobro; un cobro anulado no cuenta', () => {
+    const r = atencionesPorCobrar(
+      [consulta('a', '2026-10-28T09:00:00'), consulta('b', '2026-10-28T10:00:00'), consulta('c', '2026-10-28T11:00:00'), consulta('ayer', '2026-10-27T11:00:00')],
+      [pago('a', 'pendiente'), pago('c', 'anulado')], new Date(2026, 9, 28, 18));
+    expect(r.map(c => c.id)).toEqual(['b', 'c']);
+  });
+
+  it('sugiere consulta, recargo si fue inmediata y los exámenes pedidos con su último precio', () => {
+    const frecuentes = [
+      { descripcion: 'Consulta veterinaria', categoria: 'consulta' as const, precio: 25, veces: 9 },
+      { descripcion: 'Recargo por atención inmediata', categoria: 'consulta' as const, precio: 20, veces: 3 },
+      { descripcion: 'Hemograma completo', categoria: 'examen' as const, precio: 35, veces: 2 }
+    ];
+    const examenes = [{ id: 'e', mascotaId: 'm', clienteId: 'c', consultaId: 'x', veterinarioId: 'v', tipo: 'Hemograma completo', descripcion: '', resultado: '', fecha: '2026-10-28' } as Examen,
+      { id: 'f', mascotaId: 'm', clienteId: 'c', consultaId: 'x', veterinarioId: 'v', tipo: 'Coprológico', descripcion: '', resultado: '', fecha: '2026-10-28' } as Examen];
+    expect(lineasDeAtencion(consulta('x', '2026-10-28T09:00:00', 'inmediata'), examenes, frecuentes)).toEqual([
+      { descripcion: 'Consulta veterinaria', categoria: 'consulta', precio: 25 },
+      { descripcion: 'Recargo por atención inmediata', categoria: 'consulta', precio: 20 },
+      { descripcion: 'Hemograma completo', categoria: 'examen', precio: 35 },
+      { descripcion: 'Coprológico', categoria: 'examen', precio: null }
+    ]);
   });
 });

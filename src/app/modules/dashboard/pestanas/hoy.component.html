@@ -64,7 +64,7 @@
                 <span class="cita-motivo">{{ c.motivo }}@if (!esVet() || !soloMias()) { · {{ nombreVet(c.veterinarioId) }} }</span>
               </div>
               <div class="cita-fin">
-                @if (c.id === siguiente()?.id) {
+                @if (c.id === siguiente()?.id && !enEspera(c)) {
                   <span class="cita-cuenta">{{ faltan(c.hora) }}</span>
                 }
                 @if (enEspera(c)) {
@@ -80,10 +80,10 @@
                   <!-- Mostrador: registrar que llegó (lo pasa a la sala de espera del veterinario) -->
                   @if (c.id === siguiente()?.id) {
                     <button mat-flat-button type="button" class="cita-accion" (click)="marcarLlegada(c)"
-                      [attr.aria-label]="'Marcar que llegó ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
+                      [attr.aria-label]="'Marcar llegada de ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
                   } @else {
                     <button mat-button type="button" class="cita-accion" (click)="marcarLlegada(c)"
-                      [attr.aria-label]="'Marcar que llegó ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
+                      [attr.aria-label]="'Marcar llegada de ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
                   }
                 }
                 @if (puedeConsultar() && c.estado !== 'completada') {
@@ -131,7 +131,7 @@
                     <a mat-button [href]="tel(t)" [attr.aria-label]="'Llamar a ' + nombreCliente(c.clienteId) + ', ' + t"><mat-icon>call</mat-icon>{{ t }}</a>
                   }
                   @if (whatsappConfirmar(c); as wa) {
-                    <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Escribir por WhatsApp a ' + nombreCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
+                    <a mat-button [href]="wa" target="_blank" rel="noopener" (click)="registrarRecordatorio(c)" [attr.aria-label]="'Recordar por WhatsApp a ' + nombreCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon></a>
                   }
                   <button mat-button type="button" class="confirmar-accion" (click)="confirmar(c)" [attr.aria-label]="'Marcar como confirmada la cita de ' + nombreMascota(c.mascotaId)">Confirmar</button>
                 </span>
@@ -145,12 +145,23 @@
 
   <div class="lateral">
     @if (!esVet()) {
-      @if (cobrarHoy().length) {
+      @if (cobrarHoy().length || listasCobrar().length) {
         <section class="urgente" aria-labelledby="titulo-cobrar-hoy">
           <h2 id="titulo-cobrar-hoy">Por cobrar hoy</h2>
-          <p class="urgente-cifra">{{ moneda(totalCobrarHoy()) }}</p>
-          <p class="urgente-ayuda">{{ plural(cobrarHoy().length, 'atención', 'atenciones') }} de hoy sin pagar. Cobrar antes de que se vayan.</p>
+          @if (cobrarHoy().length) {
+            <p class="urgente-cifra">{{ moneda(totalCobrarHoy()) }}</p>
+          }
+          <p class="urgente-ayuda">{{ plural(cobrarHoy().length + listasCobrar().length, 'atención', 'atenciones') }} de hoy sin pagar. Cobrar antes de que se vayan.</p>
           <ul class="lista">
+            @for (c of listasCobrar(); track c.id) {
+              <li class="lista-fila">
+                <div class="lista-cuerpo">
+                  <span class="lista-titulo">{{ nombreMascota(c.mascotaId) }} · {{ nombreCliente(c.clienteId) }}</span>
+                  <span class="lista-meta">Atendido {{ c.fecha | date: 'HH:mm' }} · aún sin cobro</span>
+                </div>
+                <a mat-stroked-button routerLink="/pagos/nuevo" [queryParams]="{ consultaId: c.id }" [attr.aria-label]="'Cobrar la atención de ' + nombreMascota(c.mascotaId)">Cobrar</a>
+              </li>
+            }
             @for (p of cobrarHoy(); track p.id) {
               <li class="lista-fila">
                 <div class="lista-cuerpo">
