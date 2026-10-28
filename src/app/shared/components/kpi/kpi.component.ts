@@ -5,7 +5,10 @@ import { MatIcon } from '@angular/material/icon';
 
 /** Comparación contra un periodo nombrado. */
 export interface DeltaKpi {
+  /** El cambio, en la unidad indicada (por defecto, porcentaje). */
   porcentaje: number;
+  /** 'porcentaje' (+12 %), 'puntos' de una tasa (+1 p. p.) o 'cantidad' cuando la base es pequeña (+4). Ver delta.ts. */
+  unidad?: 'porcentaje' | 'puntos' | 'cantidad';
   /** Periodo de referencia, p. ej. "vs. 1–22 sep". */
   contra: string;
   /** true si subir es bueno (ingresos); false si subir es malo (cancelaciones). */
@@ -43,7 +46,7 @@ export type TonoKpi = 'atencion' | 'alerta' | null;
       @if (delta(); as d) {
         <span class="delta" [class.delta--bien]="favorable()" [class.delta--mal]="favorable() === false">
           <mat-icon aria-hidden="true">{{ d.porcentaje > 0 ? 'arrow_upward' : d.porcentaje < 0 ? 'arrow_downward' : 'remove' }}</mat-icon>
-          {{ d.porcentaje > 0 ? '+' : '' }}{{ d.porcentaje }} % <span class="contra">{{ d.contra }}</span>
+          {{ d.porcentaje > 0 ? '+' : '' }}{{ d.porcentaje }}{{ d.unidad === 'puntos' ? ' p. p.' : d.unidad === 'cantidad' ? '' : ' %' }} <span class="contra">{{ d.contra }}</span>
         </span>
       }
       @if (ayuda()) {

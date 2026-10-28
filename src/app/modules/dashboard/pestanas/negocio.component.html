@@ -6,7 +6,7 @@
   <app-kpi etiqueta="Por cobrar" [valor]="moneda(cobrar().total)" enlace="/pagos" [tono]="atrasado()?.cantidad ? 'atencion' : null"
     [ayuda]="plural(cobrar().cantidad, 'pendiente')"></app-kpi>
   <app-kpi etiqueta="Atenciones del mes" [valor]="entero(asistencia().atendidas)" enlace="/consultas"
-    [delta]="asistencia().variacionAtendidas === null ? null : { porcentaje: asistencia().variacionAtendidas!, contra: contra(), subirEsBueno: true }"
+    [delta]="deltaAtendidas()"
     [ayuda]="plural(asistencia().inmediatas, 'inmediata')"></app-kpi>
   <a class="a-reportes" routerLink="/reportes">
     <mat-icon aria-hidden="true">bar_chart</mat-icon>

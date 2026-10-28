@@ -4,7 +4,7 @@
   <app-kpi etiqueta="Con visita en 90 días" [valor]="entero(resumen().activos)" enlace="/clientes"
     [ayuda]="'De ' + entero(resumen().registrados) + ' clientes registrados'"></app-kpi>
   <app-kpi etiqueta="Clientes nuevos" [valor]="entero(resumen().nuevosMes)"
-    [delta]="variacionNuevos() === null ? null : { porcentaje: variacionNuevos()!, contra: 'vs. mes anterior', subirEsBueno: true }"
+    [delta]="deltaNuevos()"
     [ayuda]="comparacionNuevos()"></app-kpi>
   <app-kpi etiqueta="Mascotas activas" [valor]="entero(mascotasActivas())" enlace="/mascotas"
     [ayuda]="plural(vacunas().length, 'vacuna vence', 'vacunas vencen') + ' en 30 días'"></app-kpi>

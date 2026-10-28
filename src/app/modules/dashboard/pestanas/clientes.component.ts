@@ -1,10 +1,11 @@
+import { deltaDe } from '../../../shared/components/kpi/delta';
 import { DIAS_AVISO_VACUNA } from '../../../core/utils/vacunas';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { ClienteSinVolver, Recordatorio, enlaceWhatsApp, recordatoriosVacuna, resumenClientes, variacion } from '../../../core/utils/metricas';
+import { ClienteSinVolver, Recordatorio, enlaceWhatsApp, recordatoriosVacuna, resumenClientes } from '../../../core/utils/metricas';
 import { KpiComponent } from '../../../shared/components/kpi/kpi.component';
 import { DatosDashboard, enDias, entero, plural } from '../dashboard-datos';
 
@@ -27,10 +28,8 @@ export class ClientesComponent {
     return resumenClientes(d.clientes, d.mascotas, d.consultas, d.citas, d.hoy);
   });
   /** Con menos de 5 altas el mes anterior, un porcentaje exagera: se muestra la diferencia absoluta. */
-  readonly variacionNuevos = computed(() => {
-    const r = this.resumen();
-    return r.nuevosMesAnterior >= 5 ? variacion(r.nuevosMes, r.nuevosMesAnterior) : null;
-  });
+  /** Con pocos clientes nuevos el mes anterior, la diferencia absoluta ("+4") en vez de un porcentaje inflado. */
+  readonly deltaNuevos = computed(() => deltaDe(this.resumen().nuevosMes, this.resumen().nuevosMesAnterior, 'conteo', 'vs. el mes anterior'));
   readonly comparacionNuevos = computed(() => {
     const r = this.resumen();
     const mes = new Date(this.datos().hoy.getFullYear(), this.datos().hoy.getMonth() - 1, 1).toLocaleDateString('es-PA', { month: 'long' });

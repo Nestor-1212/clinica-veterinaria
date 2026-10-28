@@ -1,3 +1,4 @@
+import { TipoDelta, deltaDe } from '../../shared/components/kpi/delta';
 import { aCsv, descargarCsv, fechaArchivo } from '../../core/utils/csv';
 import { METODO_TEXTO, fechaCobro } from '../../core/utils/pagos';
 import { DIAS_AVISO_VACUNA } from '../../core/utils/vacunas';
@@ -117,8 +118,10 @@ export class ReportesComponent implements OnInit {
     this.metodos = metodosPeriodo(pagos, this.rango);
   }
 
-  delta(c: Comparado, subirEsBueno = true) {
-    return c.variacion === null ? null : { porcentaje: c.variacion, contra: 'vs. ' + this.rango.anterior.etiqueta, subirEsBueno };
+  /** Variación en la unidad que se lee bien: % en montos, diferencia en conteos con base chica, p. p. en tasas. */
+  // El período de comparación va una vez (subtítulo y cifra principal), no bajo cada cifra
+  delta(c: Comparado, tipo: TipoDelta = 'monto', subirEsBueno = true, conPeriodo = false) {
+    return deltaDe(c.actual, c.anterior, tipo, conPeriodo ? 'vs. ' + this.rango.anterior.etiqueta : '', subirEsBueno);
   }
 
   /** Cifras agregadas en dólares enteros (igual que Dashboard y los indicadores de Pagos). */

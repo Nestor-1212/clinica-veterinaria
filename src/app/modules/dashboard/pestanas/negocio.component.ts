@@ -1,3 +1,4 @@
+import { deltaDe } from '../../../shared/components/kpi/delta';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -50,6 +51,8 @@ export class NegocioComponent {
       etiqueta: t.etiqueta, valor: t.total, detalle: `${t.cantidad} ${t.cantidad === 1 ? 'cobro' : 'cobros'}`,
       alerta: t.atrasado && t.cantidad ? 'Requiere gestión de cobro' : undefined
     })));
+
+  readonly deltaAtendidas = computed(() => deltaDe(this.asistencia().atendidas, this.asistencia().atendidasTramoAnterior, 'conteo', this.contra()));
 
   readonly atrasado = computed(() => this.cobrar().tramos.find(t => t.atrasado) ?? null);
 
