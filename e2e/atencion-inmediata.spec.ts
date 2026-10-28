@@ -28,6 +28,8 @@ test('atención inmediata → consulta queda vinculada, tipo inmediata y cita co
   expect(citas.find(c => c.id === citaId)?.estado).toBe('inmediata');
 
   await page.locator('input[formControlName="temperatura"]').fill('38.6');
+  // El peso se mide en cada consulta: ya no llega precargado
+  await page.locator('input[formControlName="peso"]').fill('30');
   await page.locator('textarea[formControlName="sintomas"]').fill('Vómitos desde anoche');
   await page.locator('textarea[formControlName="diagnostico"]').fill('E2E gastroenteritis');
   await page.locator('textarea[formControlName="tratamiento"]').fill('Dieta blanda');
