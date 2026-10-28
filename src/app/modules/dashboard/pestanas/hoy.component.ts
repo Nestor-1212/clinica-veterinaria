@@ -49,7 +49,12 @@ export class HoyComponent {
     return `${String(h.getHours()).padStart(2, '0')}:${String(h.getMinutes()).padStart(2, '0')}`;
   });
 
-  private readonly todasHoy = computed(() => citasDelDia(this.datos().citas, this.datos().hoy));
+  /** Llegadas marcadas desde esta pantalla (actualiza la lista sin recargar). */
+  private readonly llegadas = signal<Map<string, Date>>(new Map());
+  private readonly todasHoy = computed(() => {
+    const llegadas = this.llegadas();
+    return citasDelDia(this.datos().citas, this.datos().hoy).map(c => (llegadas.has(c.id) ? { ...c, llegada: llegadas.get(c.id) } : c));
+  });
   readonly agenda = computed(() => {
     const d = this.datos();
     const lista = this.esVet() && this.soloMias() ? this.todasHoy().filter(c => c.veterinarioId === d.usuarioId) : this.todasHoy();
@@ -136,6 +141,25 @@ export class HoyComponent {
 
   iniciarConsulta(cita: Cita): void {
     this.router.navigate(['/consultas/nueva'], { queryParams: { citaId: cita.id, mascotaId: cita.mascotaId, clienteId: cita.clienteId } });
+  }
+
+  /** Cita de hoy que aún no llega: recepción marca la llegada desde aquí (pasa a la sala de espera). */
+  puedeMarcarLlegada(c: Cita): boolean {
+    return (c.estado === 'pendiente' || c.estado === 'confirmada') && !c.llegada;
+  }
+
+  enEspera(c: Cita): boolean { return !!c.llegada && (c.estado === 'pendiente' || c.estado === 'confirmada'); }
+  horaLlegada(c: Cita): string { return c.llegada ? new Date(c.llegada).toTimeString().slice(0, 5) : ''; }
+
+  marcarLlegada(cita: Cita): void {
+    const ahora = new Date();
+    this.citasService.marcarLlegada(cita.id, ahora);
+    this.llegadas.update(m => new Map(m).set(cita.id, ahora));
+    const aviso = this.snack.open(`${this.nombreMascota(cita.mascotaId)} llegó: ya está en la sala de espera`, 'Deshacer', { duration: 5000 });
+    aviso.onAction().subscribe(() => {
+      this.citasService.deshacerLlegada(cita.id);
+      this.llegadas.update(m => { const n = new Map(m); n.delete(cita.id); return n; });
+    });
   }
 
   confirmar(cita: Cita): void {

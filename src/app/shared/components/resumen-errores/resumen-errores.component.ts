@@ -73,8 +73,11 @@ export class ResumenErroresComponent implements OnInit {
       if (this.host.nativeElement.contains(el)) return;
       if (el.matches('[role="alert"]')) {
         if (el.closest('.mat-mdc-form-field')) return; // ya cubierto por su campo
-        const zona = el.closest('fieldset, section, app-selector-paciente') ?? el.parentElement;
-        agregar(textoVisible(el), zona?.querySelector<HTMLElement>(FOCO) ?? null);
+        const zona = el.closest('fieldset, section, app-selector-paciente, app-selector-cliente') ?? el.parentElement;
+        const grupo = el.closest('fieldset')?.querySelector('legend') ?? el.closest('section')?.querySelector('h2');
+        const nombre = textoVisible(grupo ?? null).replace(/^\d+\s*/, '').replace(/\s*\*$/, '');
+        const mensaje = textoVisible(el);
+        agregar(nombre && !mensaje.toLowerCase().includes(nombre.toLowerCase()) ? `${nombre}: ${mensaje}` : mensaje, zona?.querySelector<HTMLElement>(FOCO) ?? null);
         return;
       }
       // Un campo sin mensaje propio (p. ej. el buscador de paciente) ya avisa con su role="alert"

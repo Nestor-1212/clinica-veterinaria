@@ -48,6 +48,8 @@
 
 @media (max-width: 1023px) {
   .vs-registro { grid-template-columns: 1fr; }
+  // Sin paciente elegido, la ficha vacía solo empujaría el primer campo hacia abajo
+  app-ficha-paciente.sin-ficha { display: none; }
   .vs-previa { position: static; order: -1; }
 }
 @media (max-width: 599px) {

@@ -35,7 +35,7 @@
   span { margin-left: 6px; font-size: 14px; font-weight: 400; color: var(--vs-text-secondary); } }
 .filas { margin: 0; padding: 0; list-style: none; }
 .fila-confirmar {
-  display: grid; grid-template-columns: 20px 56px minmax(0, 1fr) auto auto; align-items: center; gap: var(--vs-space-4);
+  display: grid; grid-template-columns: 32px 56px minmax(0, 1fr) auto auto; align-items: center; gap: var(--vs-space-4);
   padding: var(--vs-space-3) var(--vs-space-2); border-radius: var(--vs-radius-md);
   & + & { border-top: 1px solid var(--vs-border); }
 }
@@ -69,7 +69,7 @@
 @media (max-width: 767px) {
   .dia-titulo { flex-basis: 100%; order: -1; margin: 0 0 var(--vs-space-1); font-size: 18px; }
   .dia-nav { flex-wrap: wrap; }
-  .fila-confirmar { grid-template-columns: 20px 48px minmax(0, 1fr); row-gap: var(--vs-space-2);
+  .fila-confirmar { grid-template-columns: 32px 48px minmax(0, 1fr); row-gap: var(--vs-space-2);
     .fc-tel { grid-column: 3; }
     .fc-acciones { grid-column: 1 / -1; a, button { flex: 1; } } }
 }
@@ -96,6 +96,6 @@
   margin-bottom: var(--vs-space-4); padding: var(--vs-space-2) var(--vs-space-4); border-radius: var(--vs-radius-lg);
   background: var(--vs-surface); box-shadow: var(--vs-shadow-soft);
   .lote-todas { display: inline-flex; align-items: center; gap: var(--vs-space-2); margin-right: auto; font-size: 14px; font-weight: 600; cursor: pointer; } }
-.lote input, .grupo-elegir input, .fc-elegir { width: 18px; height: 18px; margin: 0; accent-color: var(--vs-primary); cursor: pointer; }
-.grupo-elegir { display: inline-flex; align-items: center; gap: var(--vs-space-2); cursor: pointer; }
+.fc-elegir { margin-left: -10px; }
+.grupo-elegir { margin-left: -10px; font: inherit; }
 .fila-confirmar--elegida { background: var(--vs-primary-soft); }

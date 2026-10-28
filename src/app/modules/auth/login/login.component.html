@@ -38,6 +38,8 @@
         }
         @if (form.get('password')?.hasError('required')) {
           <mat-error>Escriba su contraseña</mat-error>
+        } @else if (form.get('password')?.hasError('credenciales')) {
+          <mat-error>El correo o la contraseña no son correctos</mat-error>
         }
       </mat-form-field>
       <span class="sr-only" aria-live="polite">{{ bloqMayus ? 'Bloq Mayús está activado' : '' }}</span>

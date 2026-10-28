@@ -1,5 +1,6 @@
 @if (cliente) {
   <div class="page-container expediente">
+    <a mat-button class="volver" routerLink="/clientes"><mat-icon>arrow_back</mat-icon> Clientes</a>
     <div class="page-header">
       <div class="titulo">
         <span class="avatar" aria-hidden="true">{{ cliente.nombre.charAt(0) }}</span>
@@ -9,7 +10,6 @@
         </div>
       </div>
       <div class="header-actions">
-        <a mat-button routerLink="/clientes"><mat-icon>arrow_back</mat-icon> Clientes</a>
         <a mat-stroked-button [routerLink]="['/clientes/editar', cliente.id]"><mat-icon>edit</mat-icon> Editar</a>
         <button mat-stroked-button class="vs-btn-urgent" (click)="nuevaAtencion()">
           <mat-icon>bolt</mat-icon> Atención inmediata

@@ -72,3 +72,4 @@ dd { margin: 0; }
   .por-cobrar li { grid-template-columns: minmax(0, 1fr) auto; .concepto { grid-column: 1 / -1; } }
   .mascotas-grid { grid-template-columns: minmax(0, 1fr); }
 }
+.volver { margin: 0 0 var(--vs-space-2) calc(-1 * var(--vs-space-3)); }

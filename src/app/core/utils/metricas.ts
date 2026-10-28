@@ -180,7 +180,8 @@ export function momentoCita(c: Pick<Cita, 'fecha' | 'hora'>): Date {
 
 /** Cita cuya hora ya pasó y que sigue pendiente o confirmada: el paciente no llegó. */
 export function esInasistencia(c: Cita, ahora: Date): boolean {
-  return (c.estado === 'pendiente' || c.estado === 'confirmada') && momentoCita(c) < ahora;
+  // Quien ya llegó y espera en sala no es una inasistencia aunque su hora haya pasado
+  return (c.estado === 'pendiente' || c.estado === 'confirmada') && !c.llegada && momentoCita(c) < ahora;
 }
 
 export interface Asistencia {

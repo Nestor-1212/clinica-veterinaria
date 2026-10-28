@@ -1,3 +1,4 @@
+import { MatCheckbox } from '@angular/material/checkbox';
 import { Component, OnInit, ViewChild, inject, AfterViewInit, ElementRef } from '@angular/core';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -38,7 +39,7 @@ interface GrupoDia { dia: Date; citas: Cita[]; }
     selector: 'app-lista-citas',
     templateUrl: './lista-citas.component.html',
     styleUrls: ['./lista-citas.component.scss', './tablero.scss'],
-    imports: [MatIcon, MatButton, MatAnchor, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatMenuTrigger, MatMenu, MatMenuItem, MatMenuContent, MatDivider, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, MatDatepicker, MatDatepickerInput, DatePipe]
+    imports: [MatCheckbox, MatIcon, MatButton, MatAnchor, RouterLink, MatCard, MatCardContent, MatFormField, MatLabel, MatInput, MatIconButton, MatSuffix, MatTooltip, MatSelect, MatOption, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatSortHeader, MatCellDef, MatCell, MatMenuTrigger, MatMenu, MatMenuItem, MatMenuContent, MatDivider, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatNoDataRow, MatPaginator, MatDatepicker, MatDatepickerInput, DatePipe]
 })
 export class ListaCitasComponent implements OnInit, AfterViewInit {
   private citasService = inject(CitasService);
@@ -104,13 +105,15 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.irAAhora();
   }
 
-  /** Hoy, la agenda abre desplazada a la línea "Ahora" (no a las 07:00 ya pasadas). */
+  /**
+   * Lleva la línea "Ahora" a la vista solo si quedó fuera de ella, y lo justo para mostrarla
+   * (al abrir, las horas pasadas sin citas ya van plegadas y la cabecera queda visible).
+   */
   private irAAhora(): void {
     if (this.vista !== 'agenda' || !this.esHoy || typeof document === 'undefined') return;
-    setTimeout(() => this.host?.nativeElement.querySelector('.tablero .ahora')?.scrollIntoView({ block: 'center' }));
+    setTimeout(() => this.host?.nativeElement.querySelector('.tablero .ahora')?.scrollIntoView({ block: 'nearest' }));
   }
 
   cargar(): void {
@@ -379,9 +382,12 @@ export class ListaCitasComponent implements OnInit, AfterViewInit {
 
   // ---------- Acciones ----------
   cambiarEstado(cita: Cita, estado: EstadoCita): void {
+    const anterior = cita.estado;
     this.citasService.update(cita.id, { estado });
     this.cargar();
-    this.snack.open(`Cita ${ESTADO_TEXTO[estado].toLowerCase()}`, 'OK', { duration: 2000 });
+    // Mismo trato que la confirmación en lote: el cambio se puede deshacer
+    const aviso = this.snack.open(`Cita de ${this.getMascota(cita.mascotaId)} ${ESTADO_TEXTO[estado].toLowerCase()}`, 'Deshacer', { duration: 5000 });
+    aviso.onAction().subscribe(() => { this.citasService.update(cita.id, { estado: anterior }); this.cargar(); });
   }
 
   iniciarConsulta(cita: Cita): void {

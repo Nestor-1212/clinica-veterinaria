@@ -69,8 +69,6 @@
 
 @media (max-width: 1023px) {
   .ficha { position: static; order: -1; }
-  // Sin paciente elegido, la ficha vacía solo empujaría el formulario hacia abajo
-  .ficha.sin-ficha { display: none; }
 }
 @media (max-width: 899px) {
   .linea { grid-template-columns: minmax(0, 1fr) 96px 120px 40px;

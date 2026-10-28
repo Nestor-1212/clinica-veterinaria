@@ -42,7 +42,7 @@
                 </label>
               }
             </div>
-            @if (form.get('mascotaId')?.touched && form.get('mascotaId')?.invalid) {
+            @if (form.get('clienteId')?.valid && form.get('mascotaId')?.touched && form.get('mascotaId')?.invalid) {
               <p class="error" role="alert">Seleccione la mascota</p>
             }
           </fieldset>
@@ -162,7 +162,7 @@
                   <span class="opcion-texto">
                     <strong>{{ v.nombre }} {{ v.apellido }}</strong>
                     <span>{{ v.especialidad || 'Medicina general' }}</span>
-                    <span class="carga">{{ citasPorVet[v.id] || 0 }} {{ citasPorVet[v.id] === 1 ? 'cita' : 'citas' }} ese día</span>
+                    <span class="carga">{{ citasPorVet[v.id] || 0 }} por atender ese día</span>
                   </span>
                 </label>
               }

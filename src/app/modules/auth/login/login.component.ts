@@ -1,3 +1,4 @@
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Component, ElementRef, inject } from '@angular/core';
 import { validarYEnfocar } from '../../../shared/utils/formulario';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -64,6 +65,8 @@ export class LoginComponent {
       password: ['', Validators.required],
       recordar: [recordado !== null]
     });
+    // El error de credenciales marca los dos campos; al corregir cualquiera de ellos se quita de ambos
+    this.form.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => this.limpiarCredenciales());
 
     if (this.auth.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
@@ -83,8 +86,16 @@ export class LoginComponent {
     queueMicrotask(() => this.host?.nativeElement?.querySelector('button[type="submit"]')?.focus());
   }
 
+  private limpiarCredenciales(): void {
+    for (const nombre of ['correo', 'password']) {
+      const c = this.form.get(nombre)!;
+      if (c.hasError('credenciales')) c.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
   onSubmit(): void {
     if (this.loading) return;
+    this.limpiarCredenciales();
     if (!validarYEnfocar(this.form, this.host?.nativeElement)) return;
     this.loading = true;
     const { correo, password, recordar } = this.form.value;
@@ -102,6 +113,10 @@ export class LoginComponent {
       }
     } else {
       this.loading = false;
+      // Los campos quedan en rojo con su mensaje (se limpia al volver a escribir)
+      this.form.get('correo')!.setErrors({ credenciales: true });
+      this.form.get('password')!.setErrors({ credenciales: true });
+      this.form.markAllAsTouched();
       this.snack.open('El correo o la contraseña no son correctos. Revíselos e inténtelo de nuevo.', 'Cerrar', { duration: 6000, panelClass: 'snack-error' });
       // Se conserva lo escrito y queda seleccionado para reescribirlo de una vez
       queueMicrotask(() => {

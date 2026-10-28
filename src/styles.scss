@@ -728,3 +728,6 @@ mat-chip.mat-mdc-chip {
 
 // Búsqueda global: hasta 10 resultados a la vista antes de desplazarse
 .mat-mdc-autocomplete-panel.busqueda-global-panel { max-height: min(70vh, 520px); }
+
+// Listas: sin paginador cuando todo cabe en una página
+.mat-mdc-paginator.sin-paginas { display: none; }

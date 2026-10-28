@@ -109,7 +109,7 @@
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de exámenes"></mat-paginator>
+      <mat-paginator #pag [class.sin-paginas]="dataSource.filteredData.length <= pag.pageSize" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de exámenes"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>

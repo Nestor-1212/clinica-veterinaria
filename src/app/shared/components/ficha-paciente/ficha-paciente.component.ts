@@ -11,7 +11,7 @@ import { EdadPipe } from '../../pipes/edad.pipe';
   templateUrl: './ficha-paciente.component.html',
   styleUrl: './ficha-paciente.component.scss',
   imports: [MatIcon, MatAnchor, EdadPipe],
-  host: { role: 'complementary', 'aria-labelledby': 'ficha-titulo' }
+  host: { role: 'complementary', 'aria-labelledby': 'ficha-titulo', '[class.sin-ficha]': '!ficha()' }
 })
 export class FichaPacienteComponent {
   readonly ficha = input<FichaPaciente | null>(null);

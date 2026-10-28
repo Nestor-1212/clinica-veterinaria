@@ -162,10 +162,9 @@
       <p class="ayuda">Citas pendientes de los próximos 7 días. Envíe el recordatorio por WhatsApp y marque la cita como confirmada cuando el dueño responda. Puede marcar varias y confirmarlas juntas.</p>
       @if (porConfirmar.length) {
         <div class="lote" role="region" aria-label="Confirmar varias citas">
-          <label class="lote-todas">
-            <input type="checkbox" [checked]="todasElegidas()" [indeterminate]="elegidas.size > 0 && !todasElegidas()" (change)="elegirTodas()">
+          <mat-checkbox color="primary" class="lote-todas" [checked]="todasElegidas()" [indeterminate]="elegidas.size > 0 && !todasElegidas()" (change)="elegirTodas()">
             {{ elegidas.size ? elegidas.size + (elegidas.size === 1 ? ' seleccionada' : ' seleccionadas') : 'Seleccionar todas' }}
-          </label>
+          </mat-checkbox>
           @if (elegidas.size) {
             <button mat-button type="button" (click)="elegidas.clear()">Quitar selección</button>
             <button mat-flat-button type="button" (click)="confirmarElegidas()"><mat-icon>done_all</mat-icon>Confirmar {{ elegidas.size === 1 ? 'la cita' : 'las ' + elegidas.size + ' citas' }}</button>
@@ -175,17 +174,14 @@
       @for (g of porConfirmar; track g.dia.getTime()) {
         <div class="grupo">
           <h2 class="grupo-titulo">
-            <label class="grupo-elegir">
-              <input type="checkbox" [checked]="diaElegido(g)" (change)="elegirDia(g)" [attr.aria-label]="'Seleccionar las citas del ' + nombreDia(g.dia).toLowerCase()">
-              {{ nombreDia(g.dia) }}
-            </label>
+            <mat-checkbox color="primary" class="grupo-elegir" [checked]="diaElegido(g)" (change)="elegirDia(g)" [aria-label]="'Seleccionar las citas del ' + nombreDia(g.dia).toLowerCase()">{{ nombreDia(g.dia) }}</mat-checkbox>
             <span>{{ g.dia | date: "d 'de' MMMM" }} · {{ g.citas.length }}</span>
           </h2>
           <ul class="filas">
             @for (c of g.citas; track c.id) {
               <li class="fila-confirmar" [class.fila-confirmar--elegida]="elegidas.has(c.id)">
-                <input type="checkbox" class="fc-elegir" [checked]="elegidas.has(c.id)" (change)="alternar(c.id)"
-                  [attr.aria-label]="'Seleccionar la cita de ' + getMascota(c.mascotaId) + ' a las ' + c.hora">
+                <mat-checkbox color="primary" class="fc-elegir" [checked]="elegidas.has(c.id)" (change)="alternar(c.id)"
+                  [aria-label]="'Seleccionar la cita de ' + getMascota(c.mascotaId) + ' a las ' + c.hora"></mat-checkbox>
                 <span class="fc-hora">{{ c.hora }}</span>
                 <span class="fc-paciente">
                   <span class="fc-nombre"><mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon><strong>{{ getMascota(c.mascotaId) }}</strong> · {{ getCliente(c.clienteId) }}</span>
@@ -194,9 +190,9 @@
                 <a class="fc-tel" [href]="tel(c.clienteId)" [attr.aria-label]="'Llamar a ' + getCliente(c.clienteId)"><mat-icon aria-hidden="true">call</mat-icon>{{ telefono(c.clienteId) }}</a>
                 <span class="fc-acciones">
                   @if (whatsapp(c); as wa) {
-                    <a mat-stroked-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Enviar recordatorio por WhatsApp a ' + getCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>Recordar</a>
+                    <a mat-button [href]="wa" target="_blank" rel="noopener" [attr.aria-label]="'Enviar recordatorio por WhatsApp a ' + getCliente(c.clienteId) + ' (se abre en otra pestaña)'"><mat-icon>chat</mat-icon>Recordar</a>
                   }
-                  <button mat-flat-button type="button" (click)="cambiarEstado(c, 'confirmada')" [attr.aria-label]="'Confirmar la cita de ' + getMascota(c.mascotaId)"><mat-icon>check</mat-icon>Confirmar</button>
+                  <button mat-stroked-button type="button" (click)="cambiarEstado(c, 'confirmada')" [attr.aria-label]="'Confirmar la cita de ' + getMascota(c.mascotaId)"><mat-icon>check</mat-icon>Confirmar</button>
                 </span>
               </li>
             }
@@ -281,7 +277,7 @@
           </tr>
         </table>
       </div>
-      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de todas las citas"></mat-paginator>
+      <mat-paginator #pag [class.sin-paginas]="dataSource.filteredData.length <= pag.pageSize" [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons aria-label="Páginas de todas las citas"></mat-paginator>
     </mat-card-content>
   </mat-card>
 </div>
@@ -294,12 +290,13 @@
       <small>{{ momentoCita(c) | date: "EEE d MMM" }} · {{ c.hora }} · {{ vetCorto(c.veterinarioId) }}</small>
     </div>
     <mat-divider></mat-divider>
+    @if (puedeMarcarLlegada(c)) {
+      <button mat-menu-item (click)="marcarLlegada(c)"><mat-icon>how_to_reg</mat-icon>Marcar llegada</button>
+    }
     @if (puedeConsultar && c.estado !== 'completada' && c.estado !== 'cancelada') {
       <button mat-menu-item (click)="iniciarConsulta(c)"><mat-icon>medical_services</mat-icon>Iniciar consulta</button>
     }
-    @if (puedeMarcarLlegada(c)) {
-      <button mat-menu-item (click)="marcarLlegada(c)"><mat-icon>how_to_reg</mat-icon>Marcar llegada</button>
-    } @else if (enEspera(c)) {
+    @if (enEspera(c)) {
       <button mat-menu-item (click)="deshacerLlegada(c)"><mat-icon>undo</mat-icon>Deshacer llegada ({{ horaLlegada(c) }})</button>
     }
     @if (c.estado === 'pendiente') {
@@ -307,9 +304,6 @@
     }
     @if ((c.estado === 'pendiente' || c.estado === 'confirmada') && !noLlego(c) && whatsapp(c); as wa) {
       <a mat-menu-item [href]="wa" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>Recordar por WhatsApp</a>
-    }
-    @if (puedeConsultar && c.estado !== 'completada' && c.estado !== 'cancelada') {
-      <button mat-menu-item (click)="cambiarEstado(c, 'completada')"><mat-icon>done_all</mat-icon>Marcar atendida</button>
     }
     <a mat-menu-item [routerLink]="['/mascotas', c.mascotaId]"><mat-icon>folder_open</mat-icon>Historial de la mascota</a>
     @if (c.estado !== 'completada' && c.estado !== 'cancelada') {

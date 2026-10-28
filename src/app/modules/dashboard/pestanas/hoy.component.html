@@ -57,7 +57,7 @@
               <span class="cita-hora">{{ c.hora }}</span>
               <span class="nodo" aria-hidden="true"></span>
               <div class="cita-cuerpo">
-                <a class="cita-titulo" [routerLink]="['/clientes', c.clienteId]">
+                <a class="cita-titulo" [routerLink]="['/mascotas', c.mascotaId]">
                   <mat-icon aria-hidden="true">{{ especie(c.mascotaId) }}</mat-icon>{{ nombreMascota(c.mascotaId) }}
                   <span class="cita-dueno">· {{ nombreCliente(c.clienteId) }}</span>
                 </a>
@@ -67,12 +67,24 @@
                 @if (c.id === siguiente()?.id) {
                   <span class="cita-cuenta">{{ faltan(c.hora) }}</span>
                 }
-                @if (noLlego(c)) {
+                @if (enEspera(c)) {
+                  <span class="vs-status vs-status--accent vs-status--pill">Llegó {{ horaLlegada(c) }}</span>
+                } @else if (noLlego(c)) {
                   <span class="vs-status vs-status--warning">No llegó</span>
                 } @else if (c.estado === 'completada') {
                   <span class="cita-hecha"><mat-icon aria-hidden="true">check</mat-icon>Atendida</span>
                 } @else {
                   <span [class]="'vs-status ' + ESTADO_CLASE[c.estado]">{{ ESTADO_TEXTO[c.estado] }}</span>
+                }
+                @if (!puedeConsultar() && puedeMarcarLlegada(c)) {
+                  <!-- Mostrador: registrar que llegó (lo pasa a la sala de espera del veterinario) -->
+                  @if (c.id === siguiente()?.id) {
+                    <button mat-flat-button type="button" class="cita-accion" (click)="marcarLlegada(c)"
+                      [attr.aria-label]="'Marcar que llegó ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
+                  } @else {
+                    <button mat-button type="button" class="cita-accion" (click)="marcarLlegada(c)"
+                      [attr.aria-label]="'Marcar que llegó ' + nombreMascota(c.mascotaId)">Marcar llegada</button>
+                  }
                 }
                 @if (puedeConsultar() && c.estado !== 'completada') {
                   <!-- La acción fuerte solo en la siguiente cita; en las demás filas, botón de texto -->

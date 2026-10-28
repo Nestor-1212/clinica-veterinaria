@@ -119,7 +119,7 @@ export class FormConsultaComponent implements OnInit {
     this.motivo = cita?.motivo ?? '';
     this.notas = cita?.notas ?? '';
     // Lo que contó el dueño al llegar es el punto de partida de los síntomas (no se vuelve a escribir)
-    if (this.motivo && !this.form.get('sintomas')!.value) this.form.patchValue({ sintomas: this.motivo });
+    if (cita?.estado === 'inmediata' && this.motivo && !this.form.get('sintomas')!.value) this.form.patchValue({ sintomas: this.motivo });
   }
 
   /** Peso registrado de la mascota antes de esta consulta. */
